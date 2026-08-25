@@ -148,7 +148,7 @@ export function PartnerMarketing() {
             <button className="site-gradient">Register Now</button>
             <small>
               Already a partner?{" "}
-              <Link href="/partner/register">Login here</Link>
+              <Link href="/login">Login here</Link>
             </small>
           </form>
         </section>

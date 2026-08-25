@@ -1,0 +1,1 @@
+import PartnerRegister from "@/app/partner/register/page";import{SiteFooter,SiteHeader}from"@/components/public/site-shell";export default function LoginPage(){return <div className="public-site public-auth-page"><SiteHeader/><PartnerRegister/><SiteFooter/></div>}
