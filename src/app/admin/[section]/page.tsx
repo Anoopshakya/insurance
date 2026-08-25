@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Icon } from "@/components/admin/icons";
 
-const names: Record<string, string> = { users: "Users", partners: "Partners", products: "Products", policies: "Policies", leads: "Leads", finance: "Finance", risk: "Risk & compliance", support: "Support", reports: "Reports" };
+const names: Record<string, string> = { users: "Customers", partners: "Partners / Agents", products: "Products & Quotes", policies: "Policies", leads: "Leads", renewals: "Renewals", finance: "Earnings", payouts: "Payouts", referrals: "Referrals", notifications: "Notifications", messages: "Messages", profile: "Profile", risk: "Risk & compliance", support: "Support", reports: "Reports" };
 
 export default async function AdminSection({ params }: { params: Promise<{ section: string }> }) {
   const { section } = await params;

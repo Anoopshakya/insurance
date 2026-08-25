@@ -1,0 +1,42 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { adminAuth, verifyRequestToken } from "@/lib/firebase-admin";
+import { userHasPermission } from "@/lib/rbac";
+import { supabaseServer } from "@/lib/supabase-server";
+
+async function authorize(req: NextRequest, action: "view" | "edit") {
+  const decoded = await verifyRequestToken(req.headers.get("authorization"));
+  if (!decoded) return { error: NextResponse.json({ error: "unauthenticated" }, { status: 401 }) };
+  if (!(await userHasPermission(decoded.uid, "agents", action))) return { error: NextResponse.json({ error: "forbidden" }, { status: 403 }) };
+  return { decoded };
+}
+
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await authorize(req, "view"); if (auth.error) return auth.error;
+  const { id } = await params; const db = supabaseServer();
+  const { data, error } = await db.from("agents").select("*, users!inner(id,full_name,email,phone,status,created_at), sponsor:agents!sponsor_id(agent_code), partner_personal_details(date_of_birth,gender,father_or_spouse_name,occupation,pan_number,aadhaar_last4,city,state,postal_code), agent_bank_details(account_holder,bank_name,branch_name,account_type,account_number,ifsc,verification_status), agent_documents(id,doc_type,file_url,status,created_at), agent_status_history(from_status,to_status,reason,created_at)").eq("id", id).single();
+  if (error) return NextResponse.json({ error: error.message }, { status: error.code === "PGRST116" ? 404 : 500 });
+  const documents = await Promise.all((data.agent_documents ?? []).map(async (document: { file_url: string }) => { const { data: signed } = await db.storage.from("kyc-documents").createSignedUrl(document.file_url, 300); return { ...document, signedUrl: signed?.signedUrl ?? null }; }));
+  const bankDetails = Array.isArray(data.agent_bank_details) ? data.agent_bank_details : data.agent_bank_details ? [data.agent_bank_details] : [];
+  const personal = Array.isArray(data.partner_personal_details) ? data.partner_personal_details[0] : data.partner_personal_details;
+  const maskedPersonal = personal ? { ...personal, pan_number: `${personal.pan_number.slice(0, 3)}****${personal.pan_number.slice(-3)}`, aadhaar_number: `********${personal.aadhaar_last4}`, aadhaar_last4: undefined } : null;
+  return NextResponse.json({ data: { ...data, partner_personal_details: maskedPersonal, agent_bank_details: bankDetails, agent_documents: documents } });
+}
+
+const updateSchema = z.object({ fullName:z.string().trim().min(2).max(100).optional(), partnerType:z.string().trim().min(2).max(50).optional(), agencyName:z.string().trim().max(120).optional().or(z.literal("")), designation:z.string().trim().max(60).optional().or(z.literal("")), joiningDate:z.string().optional().or(z.literal("")), dateOfBirth:z.string().optional().or(z.literal("")), gender:z.string().max(30).optional().or(z.literal("")), panNumber:z.string().trim().toUpperCase().optional().or(z.literal("")), aadhaarNumber:z.string().transform(v=>v.replace(/\D/g,"")).optional().or(z.literal("")), state:z.string().trim().max(80).optional().or(z.literal("")), city:z.string().trim().max(80).optional().or(z.literal("")), postalCode:z.string().trim().optional().or(z.literal("")), operationsManagerId:z.string().trim().nullable().optional(), sendEmail:z.unknown().optional(), sendSms:z.unknown().optional() }).superRefine((value,context)=>{if(value.panNumber&&!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(value.panNumber))context.addIssue({code:"custom",path:["panNumber"],message:"Enter a valid PAN number"});if(value.aadhaarNumber&&!/^\d{12}$/.test(value.aadhaarNumber))context.addIssue({code:"custom",path:["aadhaarNumber"],message:"Enter a valid 12-digit Aadhaar number"});if(value.postalCode&&!/^[1-9]\d{5}$/.test(value.postalCode))context.addIssue({code:"custom",path:["postalCode"],message:"Enter a valid PIN code"})});
+
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const auth = await authorize(req, "edit"); if (auth.error) return auth.error;
+  const { id } = await params; const input = updateSchema.parse(await req.json()); const db = supabaseServer();
+  const { data: before, error: findError } = await db.from("agents").select("*,users!inner(id,full_name)").eq("id", id).single();
+  if (findError) return NextResponse.json({ error: "Partner not found" }, { status: 404 });
+  const now=new Date().toISOString();
+  const agentUpdate = { ...(input.state !== undefined ? { region: input.state || null } : {}), ...(input.partnerType ? { partner_type: input.partnerType } : {}), ...(input.agencyName!==undefined?{agency_name:input.agencyName||null}:{}), ...(input.designation!==undefined?{designation:input.designation||null}:{}), ...(input.joiningDate?{joining_date:input.joiningDate}:{}), ...(input.operationsManagerId !== undefined ? { operations_manager_id: input.operationsManagerId || null } : {}), updated_at: now };
+  const { data: agent, error } = await db.from("agents").update(agentUpdate).eq("id", id).select().single();
+  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (input.fullName) { await db.from("users").update({ full_name: input.fullName, updated_at: now }).eq("id", before.user_id); await adminAuth.updateUser(before.user_id, { displayName: input.fullName }); }
+  const hasPersonal=[input.dateOfBirth,input.gender,input.panNumber,input.aadhaarNumber,input.state,input.city,input.postalCode].some(value=>value!==undefined&&value!=="");
+  if(hasPersonal){const personalUpdate={agent_id:id,...(input.dateOfBirth?{date_of_birth:input.dateOfBirth}:{}),...(input.gender!==undefined?{gender:input.gender||null}:{}),...(input.panNumber?{pan_number:input.panNumber}:{}),...(input.aadhaarNumber?{aadhaar_last4:input.aadhaarNumber.slice(-4)}:{}),...(input.state!==undefined?{state:input.state||null}:{}),...(input.city!==undefined?{city:input.city||null}:{}),...(input.postalCode!==undefined?{postal_code:input.postalCode||null}:{}),updated_at:now};const{error:personalError}=await db.from("partner_personal_details").upsert(personalUpdate,{onConflict:"agent_id"});if(personalError)return NextResponse.json({error:personalError.message},{status:400})}
+  await db.from("audit_logs").insert({ entity_type: "agent", entity_id: id, action: "update", actor_id: auth.decoded!.uid, before_state: before, after_state: { ...agent, full_name: input.fullName ?? before.users.full_name } });
+  return NextResponse.json({ data: agent });
+}
