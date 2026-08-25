@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import "./public.css";
+import "./public-rich.css";
 
 export const metadata: Metadata = {
   title: { default: "MagikPolicy", template: "%s | MagikPolicy" },

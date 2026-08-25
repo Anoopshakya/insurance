@@ -1,5 +1,7 @@
 "use client";
 
+export { DashboardOverview as default } from "@/components/admin/dashboard-overview";
+
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
@@ -22,7 +24,7 @@ const metricMeta: Array<{ key: keyof DashboardData["metrics"]; label: string; ic
 const number = new Intl.NumberFormat("en-IN");
 const currency = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 });
 
-export default function AdminDashboard() {
+function LegacyAdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [state, setState] = useState<"loading" | "ready" | "unauthenticated" | "forbidden" | "error">("loading");
 

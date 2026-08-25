@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   if (!allowed) return NextResponse.json({ error: "forbidden" }, { status: 403 });
 
   const db = supabaseServer();
-  const [customers, partners, policies, leads, renewals, payouts, recentPolicies] = await Promise.all([
+  const [customers, partners, policies, leads, renewals, payouts, recentPolicies, policyValues, commissions] = await Promise.all([
     db.from("customers").select("id", { count: "exact", head: true }),
     db.from("agents").select("id", { count: "exact", head: true }).eq("status", "active"),
     db.from("policies").select("id", { count: "exact", head: true }).eq("status", "active"),
@@ -23,10 +23,12 @@ export async function GET(req: NextRequest) {
     db.from("renewals").select("id", { count: "exact", head: true }).lte("due_date", new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10)).neq("status", "renewed"),
     db.from("payout_requests").select("amount_requested").in("status", ["pending", "approved", "processing"]),
     db.from("policies").select("id, policy_number, premium, status, created_at, customers(name), products(name), insurers(name)").order("created_at", { ascending: false }).limit(5),
+    db.from("policies").select("premium"),
+    db.from("earning_ledger").select("amount"),
   ]);
 
   const counted: CountQuery[] = [customers, partners, policies, leads, renewals];
-  const firstError = [...counted, payouts, recentPolicies].find((result) => result.error)?.error;
+  const firstError = [...counted, payouts, recentPolicies, policyValues, commissions].find((result) => result.error)?.error;
   if (firstError) return NextResponse.json({ error: firstError.message }, { status: 500 });
 
   const pendingPayouts = (payouts.data ?? []).reduce((sum, row) => sum + Number(row.amount_requested), 0);
@@ -39,6 +41,8 @@ export async function GET(req: NextRequest) {
         newLeads: leads.count ?? 0,
         renewalsDue: renewals.count ?? 0,
         pendingPayouts,
+        premiumCollected: (policyValues.data ?? []).reduce((sum,row)=>sum+Number(row.premium),0),
+        totalCommission: (commissions.data ?? []).reduce((sum,row)=>sum+Number(row.amount),0),
       },
       recentPolicies: recentPolicies.data ?? [],
       generatedAt: new Date().toISOString(),
