@@ -3,7 +3,7 @@ import path from "node:path";
 
 const root = process.cwd();
 const env = Object.fromEntries(
-  (await readFile(path.join(root, ".env.local"), "utf8"))
+  (await readFile(path.join(root, ".env"), "utf8"))
     .split(/\r?\n/)
     .filter((line) => line && !line.startsWith("#") && line.includes("="))
     .map((line) => {
