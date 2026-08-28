@@ -1,0 +1,3 @@
+create table if not exists public.commission_category_company_mappings(id uuid primary key default gen_random_uuid(),commission_category_id uuid not null references public.company_commission_categories(id) on delete cascade,insurer_id uuid not null references public.insurers(id) on delete restrict,commission_tier text not null check(commission_tier in('high','average','low')),created_at timestamptz not null default now(),unique(commission_category_id,insurer_id));
+create index if not exists commission_category_company_tier_idx on public.commission_category_company_mappings(commission_category_id,commission_tier);
+notify pgrst,'reload schema';

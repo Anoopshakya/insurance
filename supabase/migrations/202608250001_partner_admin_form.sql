@@ -12,5 +12,4 @@ alter table public.partner_personal_details alter column city drop not null;
 alter table public.partner_personal_details alter column state drop not null;
 alter table public.partner_personal_details alter column postal_code drop not null;
 
-alter table public.partner_personal_details drop column if exists address_line1;
 alter table public.partner_personal_details drop column if exists address_line2;

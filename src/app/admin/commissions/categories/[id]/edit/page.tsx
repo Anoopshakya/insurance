@@ -1,0 +1,1 @@
+import{CommissionCategoryEditorV2}from"@/components/admin/commission-category-editor-v2";export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;return <CommissionCategoryEditorV2 categoryId={id}/>}

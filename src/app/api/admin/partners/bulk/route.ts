@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { verifyRequestToken } from "@/lib/firebase-admin";
-import { userHasPermission } from "@/lib/rbac";
+import { ensureAdminPermission } from "@/lib/rbac";
 import { createPartner } from "@/lib/partners/service";
 
 const headerMap: Record<string, string> = { name: "fullName", "full name": "fullName", fullname: "fullName", mobile: "mobile", phone: "mobile", "mobile number": "mobile", email: "email", region: "region", "partner type": "partnerType", partnertype: "partnerType", "sponsor code": "sponsorCode", sponsorcode: "sponsorCode" };
@@ -9,7 +9,7 @@ const headerMap: Record<string, string> = { name: "fullName", "full name": "full
 export async function POST(req: NextRequest) {
   const decoded = await verifyRequestToken(req.headers.get("authorization"));
   if (!decoded) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
-  if (!(await userHasPermission(decoded.uid, "agents", "create"))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!(await ensureAdminPermission(decoded.uid, decoded.email, "agents", "create"))) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const form = await req.formData();
   const file = form.get("file");
   if (!(file instanceof File)) return NextResponse.json({ error: "Select an Excel file" }, { status: 400 });

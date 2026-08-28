@@ -1,0 +1,1 @@
+import{CommissionSlabEditorV2}from"@/components/admin/commission-slab-editor-v2";export default async function Page({params}:{params:Promise<{id:string}>}){const{id}=await params;return <CommissionSlabEditorV2 slabId={id}/>}

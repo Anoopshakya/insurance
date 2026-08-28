@@ -1,0 +1,1 @@
+import{notFound}from"next/navigation";import{CatalogMasterPage}from"@/components/admin/catalog-master-page";export default async function MasterPage({params}:{params:Promise<{kind:string}>}){const{kind}=await params;if(!["sectors","providers","types"].includes(kind))notFound();return <CatalogMasterPage kind={kind as "sectors"|"providers"|"types"}/>}

@@ -20,9 +20,16 @@ const navigation: Array<{ label?: string; items: NavItem[] }> = [
     { label: "Renewals", href: "/admin/renewals", icon: "refresh", badge: "18" },
   ]},
   { label: "Earnings", items: [
+    { label: "Commission Categories", href: "/admin/commissions/categories", icon: "finance" },
+    { label: "Commission Slabs", href: "/admin/commissions/slabs", icon: "reports" },
     { label: "Earnings", href: "/admin/finance", icon: "finance" },
     { label: "Payouts", href: "/admin/payouts", icon: "finance" },
     { label: "Referrals", href: "/admin/referrals", icon: "partners" },
+  ]},
+  { label: "Catalog Masters", items: [
+    { label: "Product Sectors", href: "/admin/masters/sectors", icon: "products" },
+    { label: "Provider Companies", href: "/admin/masters/providers", icon: "shield" },
+    { label: "Product Types", href: "/admin/masters/types", icon: "reports" },
   ]},
   { label: "Engagement", items: [
     { label: "Notifications", href: "/admin/notifications", icon: "bell" },
