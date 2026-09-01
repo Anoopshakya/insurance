@@ -1,0 +1,40 @@
+import Link from "next/link";
+import { PublicPage } from "@/components/website/site-shell";
+export default function ResourcesPage() {
+  return (
+    <PublicPage
+      eyebrow="Knowledge centre"
+      title="Insurance made easier to understand"
+      copy="Helpful guides for choosing cover, renewing policies, filing claims and planning investments."
+    >
+      <section className="public-card-grid">
+        <article>
+          <b>?</b>
+          <h2>Insurance FAQs</h2>
+          <p>
+            Answers to common questions about premiums, coverage, waiting
+            periods and exclusions.
+          </p>
+          <Link href="/contact">Ask an expert →</Link>
+        </article>
+        <article>
+          <b>☷</b>
+          <h2>Claims guide</h2>
+          <p>
+            Understand documents, timelines and the support available during a
+            claim.
+          </p>
+          <Link href="/claims">Raise a claim →</Link>
+        </article>
+        <article>
+          <b>↻</b>
+          <h2>Renewal guide</h2>
+          <p>
+            Keep your protection active and review your cover before renewal.
+          </p>
+          <Link href="/renew">Renew policy →</Link>
+        </article>
+      </section>
+    </PublicPage>
+  );
+}

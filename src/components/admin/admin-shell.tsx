@@ -32,6 +32,7 @@ const navigation: Array<{ label?: string; items: NavItem[] }> = [
     { label: "Product Types", href: "/admin/masters/types", icon: "reports" },
   ]},
   { label: "Engagement", items: [
+    { label: "Website Announcement", href: "/admin/announcement", icon: "bell" },
     { label: "Notifications", href: "/admin/notifications", icon: "bell" },
     { label: "Messages", href: "/admin/messages", icon: "support" },
   ]},
