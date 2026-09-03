@@ -2,40 +2,909 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, type ComponentType, type ReactNode } from "react";
 import {
-  ArrowRight, Baby, Bike, Calculator, CarFront, Check, CheckCircle2,
-  ChevronRight, CircleDollarSign, Clock3, CloudLightning, FileCheck2,
-  Gavel, Headphones, HeartPulse, IndianRupee, Laptop, LockKeyhole,
-  Plane, Scale, ShieldCheck, Sparkles, Star, Target, TrendingUp,
-  Umbrella, UserRound, UsersRound, WalletCards, Zap,
+  useState,
+  type ComponentType,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import {
+  ArrowRight,
+  Baby,
+  Bike,
+  Calculator,
+  CarFront,
+  Check,
+  CheckCircle2,
+  ChevronRight,
+  Clock3,
+  CloudLightning,
+  FileCheck2,
+  Gavel,
+  Headphones,
+  HeartPulse,
+  IndianRupee,
+  Laptop,
+  LockKeyhole,
+  Plane,
+  Scale,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+  Umbrella,
+  UserRound,
+  UsersRound,
+  WalletCards,
+  Zap,
 } from "lucide-react";
 
-type IconType=ComponentType<{className?:string}>;
-type Option={label:string;icon?:IconType};
-const people:Option[]=[{label:"Self",icon:UserRound},{label:"My Family",icon:UsersRound},{label:"My Parents",icon:UserRound},{label:"My Child",icon:Baby}];
-const covers=["₹5 Lakhs","₹10 Lakhs","₹25 Lakhs","₹50 Lakhs","₹1 Crore+"].map(label=>({label}));
-const tabs:Array<[string,IconType,string]>=[["health",HeartPulse,"Health"],["motor",CarFront,"Motor"],["term",ShieldCheck,"Term Life"]];
+type IconType = ComponentType<{ className?: string }>;
+type Option = { label: string; icon?: IconType };
+const tabs: Array<[string, IconType, string]> = [
+  ["health", HeartPulse, "Health"],
+  ["motor", CarFront, "Motor"],
+  ["term", ShieldCheck, "Term Life"],
+];
 
-function ChoiceGrid({items,value,set,columns}:{items:Option[];value:string;set:(value:string)=>void;columns:string}){return <div className={`grid gap-3 ${columns}`}>{items.map(({label,icon:Icon})=>{const active=value===label;return <button key={label} onClick={()=>set(label)} className={`relative flex min-h-14 min-w-0 items-center justify-center gap-2 rounded-lg border px-2 text-xs ${Icon?"flex-col py-3":""} ${active?"border-violet-600 bg-violet-50 text-violet-700":"border-slate-200 bg-white text-slate-700"}`}>{Icon&&<Icon className="h-6 w-6"/>}{label}{active&&<i className="absolute -right-px -top-px grid h-5 w-5 place-items-center rounded-bl-xl rounded-tr-lg bg-violet-700 text-white"><Check className="h-3 w-3"/></i>}</button>})}</div>}
-function Field({label,children}:{label:string;children:ReactNode}){return <fieldset className="mb-4 border-0 p-0"><legend className="mb-2 text-xs font-semibold text-[#111c4e]">{label}</legend>{children}</fieldset>}
+const productFields: Record<
+  string,
+  Array<{ key: string; label: string; options: Option[] }>
+> = {
+  health: [
+    {
+      key: "policyFor",
+      label: "I want a policy for",
+      options: [
+        { label: "Self", icon: UserRound },
+        { label: "My Family", icon: UsersRound },
+        { label: "My Parents", icon: UserRound },
+        { label: "My Child", icon: Baby },
+      ],
+    },
+    {
+      key: "coverage",
+      label: "Select Coverage Amount",
+      options: ["₹5 Lakhs", "₹10 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
+        (label) => ({ label }),
+      ),
+    },
+  ],
+  motor: [
+    {
+      key: "vehicleType",
+      label: "Select Vehicle Type",
+      options: [
+        { label: "Car", icon: CarFront },
+        { label: "Bike", icon: Bike },
+        { label: "Commercial", icon: WalletCards },
+      ],
+    },
+    {
+      key: "planType",
+      label: "Select Motor Cover",
+      options: ["Comprehensive", "Third Party", "Own Damage"].map(
+        (label) => ({ label }),
+      ),
+    },
+  ],
+  term: [
+    {
+      key: "insuredFor",
+      label: "Life cover required for",
+      options: [
+        { label: "Self", icon: UserRound },
+        { label: "Spouse", icon: UsersRound },
+      ],
+    },
+    {
+      key: "coverage",
+      label: "Select Life Cover",
+      options: ["₹50 Lakhs", "₹1 Crore", "₹2 Crore", "₹5 Crore"].map(
+        (label) => ({ label }),
+      ),
+    },
+  ],
+};
 
-function QuoteFinder(){const[tab,setTab]=useState("health"),[person,setPerson]=useState("Self"),[cover,setCover]=useState("₹10 Lakhs");return <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_16px_45px_rgba(44,37,105,.09)]"><div className="grid h-20 grid-cols-3 border-b border-slate-200">{tabs.map(([id,Icon,label])=><button key={id} onClick={()=>setTab(id)} className={`flex min-w-0 items-center justify-center gap-3 border-0 border-r border-slate-200 bg-white text-sm font-semibold last:border-r-0 ${tab===id?"border-b-[3px] border-b-violet-600 bg-violet-50/60 text-violet-700":"text-[#111c4e]"}`}><Icon className="h-6 w-6"/>{label}</button>)}</div><div className="p-5"><h2 className="mb-4 mt-0 text-lg font-bold text-[#0b174c]">What are you looking for?</h2><Field label="I want a policy for"><ChoiceGrid items={people} value={person} set={setPerson} columns="grid-cols-4 max-[520px]:grid-cols-2"/></Field><Field label="Select Coverage Amount"><ChoiceGrid items={covers} value={cover} set={setCover} columns="grid-cols-5 max-md:grid-cols-3"/></Field><Link href={`/products/${tab}?person=${encodeURIComponent(person)}&cover=${encodeURIComponent(cover)}`} className="flex h-12 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 text-sm font-semibold text-white">View Plans <ArrowRight className="h-5 w-5"/></Link></div></div>}
+function defaultSelections(tab: string) {
+  return Object.fromEntries(
+    productFields[tab].map((field) => [field.key, field.options[0].label]),
+  );
+}
 
-const statItems:Array<[IconType,string,string,string]>=[[UsersRound,"50+","Insurance Partners","Top insurance companies you can trust"],[ShieldCheck,"100+","Insurance Products","Wide range of policies to choose from"],[UsersRound,"2L+","Policies Sold","Trusted by lakhs of happy customers"],[Star,"4.8/5","Customer Rating","Rated excellent by partners & customers"],[IndianRupee,"High","Partner Earnings","Earn attractive commissions on every sale"]];
-function Stats(){return <section className="grid grid-cols-5 rounded-xl border border-slate-200 bg-white p-5 shadow-sm max-lg:grid-cols-4 max-md:grid-cols-2">{statItems.map(([Icon,value,label,copy],i)=><article key={label} className={`${i===4?"max-lg:hidden":""} flex gap-3 border-r border-slate-200 px-4 last:border-0 max-md:border-b max-md:border-r-0 max-md:py-4`}><span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i===1?"bg-emerald-50 text-emerald-500":i===2?"bg-pink-50 text-pink-500":i===3?"bg-amber-50 text-amber-500":"bg-violet-50 text-violet-600"}`}><Icon className="h-5 w-5"/></span><div><strong className="block text-lg text-[#0b174c]">{value}</strong><b className="block text-[10px] text-[#182653]">{label}</b><small className="mt-1 block text-[9px] leading-relaxed text-slate-500">{copy}</small></div></article>)}</section>}
+function ChoiceGrid({
+  items,
+  value,
+  set,
+  columns,
+}: {
+  items: Option[];
+  value: string;
+  set: (value: string) => void;
+  columns: string;
+}) {
+  return (
+    <div className={`quote-choice-grid grid gap-3 ${columns}`}>
+      {items.map(({ label, icon: Icon }) => {
+        const active = value === label;
+        return (
+          <button
+            type="button"
+            key={label}
+            onClick={() => set(label)}
+            className={`relative flex min-h-[62px] min-w-0 items-center justify-center gap-3 rounded-lg border px-2 text-sm font-medium ${active ? "border-violet-600 bg-violet-50 text-violet-700" : "border-slate-200 bg-white text-slate-700"}`}
+          >
+            {Icon && <Icon className="h-6 w-6" />}
+            {label}
+            {active && (
+              <i className="absolute -right-px -top-px grid h-5 w-5 place-items-center rounded-bl-xl rounded-tr-lg bg-violet-700 text-white">
+                <Check className="h-3 w-3" />
+              </i>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <fieldset className="mb-10 border-0 p-0">
+      <legend className="mb-5 text-xl font-semibold text-[#111c4e] max-2xl:text-base">
+        {label}
+      </legend>
+      {children}
+    </fieldset>
+  );
+}
 
-const miniBenefits:Array<[IconType,string,string]>=[[Target,"No Target","Earn from the first policy"],[ShieldCheck,"Every Policy Counts","Extra on every eligible policy you sell"],[Calculator,"Company-wise Calculation","Automatically calculated as per insurer & product"]];
-function PartnerEarning(){return <section className="grid grid-cols-[1.05fr_.95fr] gap-8 rounded-2xl border border-slate-100 bg-white p-8 shadow-sm max-lg:grid-cols-1 max-md:p-5"><div><span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700"><UsersRound className="h-4 w-4"/> PARTNER WITH US</span><h2 className="mb-3 mt-4 text-4xl leading-tight text-[#0b174c] max-md:text-3xl">Join MagikPolicy &amp;<br/>Earn <em className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 bg-clip-text not-italic text-transparent">Up to 20% Extra!</em></h2><p className="max-w-lg text-sm leading-relaxed text-slate-600">Already earning commission as an insurance agent? Switch to MagikPolicy and get up to 20% extra commission on every eligible policy.</p><div className="mt-6 grid grid-cols-3 gap-4">{miniBenefits.map(([Icon,title,copy])=><article key={title} className="border-r border-slate-200 pr-3 last:border-0"><span className="grid h-10 w-10 place-items-center rounded-full bg-emerald-50 text-emerald-500"><Icon className="h-5 w-5"/></span><b className="mt-2 block text-xs text-[#122050]">{title}</b><small className="mt-1 block text-[10px] leading-relaxed text-slate-500">{copy}</small></article>)}</div></div><div className="relative flex min-h-[310px] items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 via-white to-pink-50 p-5"><div className="absolute right-7 top-5 grid h-28 w-28 rotate-6 place-items-center rounded-[2rem] border-4 border-white bg-gradient-to-br from-violet-600 to-fuchsia-500 text-center text-white shadow-xl"><TrendingUp className="h-9 w-9"/><b className="text-xs">MORE EARNING<br/>BETTER GROWTH</b></div>{[["Your Current Commission","₹10,000","bg-violet-50 text-violet-700"],["MagikPolicy Extra Commission","Up to ₹2,000","bg-emerald-50 text-emerald-600"],["Your Total Earning","Up to ₹12,000","bg-orange-50 text-orange-600"]].map(([label,value,tone])=><article className={`z-10 mx-1 flex h-40 w-32 flex-col justify-end rounded-t-2xl p-3 text-center ${tone}`} key={label}><small className="text-[9px] text-slate-600">{label}</small><strong className="mt-3 text-base">{value}</strong><CircleDollarSign className="mx-auto mt-3 h-10 w-10"/></article>)}</div><div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2">{[[TrendingUp,"Increase Your Earnings","Get up to 20% extra"],[IndianRupee,"No Deductions","No hidden charges"],[Headphones,"Dedicated Partner Support","We are here to help"],[ShieldCheck,"Grow Your Business","Access insurers & products"]].map(([Icon,title,copy])=><article className="flex gap-3 rounded-xl border border-slate-200 p-4" key={String(title)}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-violet-50 text-violet-600"><Icon className="h-5 w-5"/></span><div><b className="block text-xs text-[#122050]">{String(title)}</b><small className="text-[10px] text-slate-500">{String(copy)}</small></div></article>)}</div><div className="col-span-2 flex justify-center gap-4 max-lg:col-span-1 max-md:flex-col"><Link className="flex min-h-12 min-w-72 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 px-5 text-sm font-semibold text-white" href="/products">Check My Extra Earning <ArrowRight className="h-4 w-4"/></Link><Link className="flex min-h-12 min-w-72 items-center justify-center gap-3 rounded-lg border border-violet-500 px-5 text-sm font-semibold text-violet-700" href="/partner/register"><UsersRound className="h-5 w-5"/>Become a MagikPolicy Partner</Link></div></section>}
+function QuoteFinder() {
+  const [tab, setTab] = useState("health");
+  const [selections, setSelections] = useState<Record<string, string>>(() => ({
+    ...defaultSelections("health"),
+    coverage: "₹10 Lakhs",
+  }));
+  const [contactStep, setContactStep] = useState(false);
+  const [customerName, setCustomerName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
-const plans:Array<[IconType,string,string,string,string]>=[[HeartPulse,"Health Insurance","Quality healthcare for you & your family","₹458","month"],[CarFront,"Car Insurance","Comprehensive cover for your car","₹1,094","year"],[Bike,"Bike Insurance","Secure your ride instantly","₹457","year"],[ShieldCheck,"Term Insurance","High life cover at low premiums","₹373","month"],[Plane,"Travel Insurance","Travel worry-free anywhere","₹154","trip"],[Umbrella,"Personal Accident","Financial protection against accidents","₹179","trip"]];
-function PopularPlans(){return <section><header className="mb-5 flex items-center justify-between"><h2 className="text-2xl text-[#0b174c]">Popular Insurance Plans</h2><Link className="flex items-center gap-2 text-xs font-semibold text-violet-700" href="/products">View All Plans <ArrowRight className="h-4 w-4"/></Link></header><div className="grid grid-cols-6 gap-4 max-xl:grid-cols-3 max-md:grid-cols-2">{plans.map(([Icon,title,copy,price,unit])=><article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg" key={title}><span className="grid h-14 w-14 place-items-center rounded-full bg-violet-50 text-violet-600"><Icon className="h-7 w-7"/></span><h3 className="mt-4 text-sm text-[#102050]">{title}</h3><p className="min-h-10 text-[10px] leading-relaxed text-slate-500">{copy}</p><small className="text-[9px] text-slate-400">Starting from</small><strong className="mt-1 block text-base text-[#0b174c]">{price}<small className="font-normal"> /{unit}</small></strong><Link className="mt-5 flex items-center gap-1 text-[10px] font-semibold text-emerald-500" href="/products">View Plans <ArrowRight className="h-3 w-3"/></Link></article>)}</div><div className="mt-5 grid grid-cols-4 rounded-xl border border-slate-200 bg-white p-4 max-md:grid-cols-2">{[[ShieldCheck,"100% Secure","Your data is safe with us"],[Target,"Best Prices","Compare & save more"],[Headphones,"Quick Support","We're here for you"],[CheckCircle2,"Claim Assistance","Hassle-free claims"]].map(([Icon,title,copy])=><div className="flex items-center justify-center gap-3 px-3" key={String(title)}><span className="grid h-9 w-9 place-items-center rounded-full bg-violet-50 text-violet-600"><Icon className="h-4 w-4"/></span><p><b className="block text-[10px]">{String(title)}</b><small className="text-[9px] text-slate-500">{String(copy)}</small></p></div>)}</div></section>}
+  function selectTab(nextTab: string) {
+    setTab(nextTab);
+    setSelections(defaultSelections(nextTab));
+    setContactStep(false);
+    setSuccess(false);
+    setError("");
+  }
 
-function ClaimBanner(){return <section className="grid grid-cols-[1.05fr_.8fr_.8fr] items-center gap-7 rounded-2xl bg-gradient-to-r from-violet-50 via-white to-violet-50 p-8 max-lg:grid-cols-1"><div><span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-violet-700">CLAIM CONSULTING</span><h2 className="mb-2 mt-4 text-3xl text-[#0b174c]">Is your claim failed?</h2><h3 className="m-0 text-lg text-[#172454]">Let us know, we will help you to get your claim pass.</h3><p className="text-sm leading-relaxed text-slate-600">We provide you an advocate who assists and helps you legally to approve your claim.</p><div className="mt-5 flex gap-3"><Link className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white" href="/claims">Get Claim Help Now →</Link><Link className="rounded-lg border border-violet-500 px-5 py-3 text-xs font-semibold text-violet-700" href="/resources">How It Works</Link></div></div><div className="relative grid min-h-60 place-items-center"><div className="absolute h-48 w-48 rounded-full bg-violet-100"/><FileCheck2 className="z-10 h-36 w-36 rotate-6 text-violet-600"/><Gavel className="absolute bottom-2 right-5 z-20 h-24 w-24 -rotate-12 text-amber-800"/></div><div className="grid gap-4">{[[Scale,"Legal Expert Support","Get help from experienced advocates"],[UsersRound,"Claim Review","We review your case and find the best solution"],[ShieldCheck,"Higher Success Rate","We work to get your claim legally approved"]].map(([Icon,title,copy])=><article className="flex gap-3" key={String(title)}><span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-violet-100 text-violet-600"><Icon className="h-5 w-5"/></span><p className="m-0"><b className="block text-xs text-[#142151]">{String(title)}</b><small className="text-[10px] leading-relaxed text-slate-500">{String(copy)}</small></p></article>)}</div></section>}
+  async function submitRequest(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/public/quote-requests", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          productType: tab,
+          customerName,
+          mobile,
+          selections,
+          website: "",
+        }),
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Unable to submit request");
+      setSuccess(true);
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Unable to submit your request. Please try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
-function Testimonials(){return <section className="text-center"><span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">CUSTOMER TESTIMONIALS</span><h2 className="mb-2 mt-4 text-4xl text-[#0b174c]">Trusted by Customers.<br/><em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">Loved for the Experience.</em></h2><p className="mx-auto max-w-xl text-xs text-slate-500">Hear from people who have experienced hassle-free policy buying, quick support and smooth claim assistance with MagikPolicy.</p><div className="mt-7 grid grid-cols-[1.1fr_.9fr] gap-4 text-left max-lg:grid-cols-1"><article className="rounded-xl border border-slate-200 bg-white p-7 shadow-sm"><span className="text-6xl leading-none text-violet-200">“</span><p className="text-base font-semibold leading-relaxed text-[#172454]">Buying insurance was never this easy! MagikPolicy helps me compare the best policies and I even saved on my premium. The whole process is simple, transparent and truly hassle-free.</p><div className="mt-6 flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-full bg-slate-200 font-bold">RV</span><p className="m-0"><b className="block text-xs">Rahul Verma</b><small className="text-[9px] text-emerald-500">● Verified Customer</small></p></div></article><div className="grid gap-4">{[["When I had a claim, the support team guided me at every step. The claim was settled quickly and without any stress.","Priya Nair"],["I love how easy it is to manage my policies and renewals in one place.","Amit Kapoor"]].map(([quote,name])=><article className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm" key={name}><div className="text-amber-400">★★★★★</div><p className="text-xs font-medium leading-relaxed text-[#172454]">“{quote}”</p><b className="text-[10px]">{name}</b></article>)}</div></div></section>}
+  return (
+    <div className="overflow-hidden rounded-xl border border-[#ebeaf4] bg-white shadow-[0_16px_45px_rgba(44,37,105,.08)]">
+      <div className="quote-tabs-responsive grid h-[84px] grid-cols-3 border-b border-[#ecebf4]">
+        {tabs.map(([id, Icon, label]) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => selectTab(id)}
+            className={`flex min-w-0 items-center justify-center gap-5 border-0 bg-white text-base font-medium max-md:gap-2 max-md:text-sm ${tab === id ? "border-b-[3px] border-b-violet-600 bg-violet-50/60 text-violet-700" : "text-[#111c4e]"}`}
+          >
+            <Icon className="h-6 w-6" />
+            {label}
+          </button>
+        ))}
+      </div>
+      <div className="px-5 pb-5 pt-10 max-2xl:pt-8 max-md:px-3 max-md:pb-3 max-md:pt-6">
+        {success ? (
+          <div className="grid min-h-[270px] place-items-center text-center">
+            <div>
+              <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500" />
+              <h2 className="mb-2 mt-4 text-2xl text-[#111c4e]">
+                Successfully submitted!
+              </h2>
+              <p className="m-0 text-sm text-slate-600">
+                Thank you. Our insurance expert will contact you shortly.
+              </p>
+            </div>
+          </div>
+        ) : contactStep ? (
+          <form className="grid min-h-[270px] content-center gap-4" onSubmit={submitRequest}>
+            <h2 className="m-0 text-xl text-[#111c4e]">Enter your details</h2>
+            <input
+              required
+              value={customerName}
+              onChange={(event) => setCustomerName(event.target.value)}
+              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600"
+              placeholder="Full name"
+              autoComplete="name"
+            />
+            <input
+              required
+              value={mobile}
+              onChange={(event) => setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))}
+              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600"
+              placeholder="10-digit mobile number"
+              inputMode="numeric"
+              autoComplete="tel"
+              pattern="[6-9][0-9]{9}"
+            />
+            <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+            {error && <p className="m-0 text-sm text-red-600">{error}</p>}
+            <div className="grid grid-cols-[auto_1fr] gap-3">
+              <button
+                type="button"
+                onClick={() => setContactStep(false)}
+                className="h-[54px] rounded-lg border border-violet-500 bg-white px-5 text-sm text-violet-700"
+              >
+                Back
+              </button>
+              <button
+                disabled={submitting}
+                className="flex h-[54px] items-center justify-center gap-3 rounded-lg border-0 bg-gradient-to-r from-[#4b12f0] via-[#a32ba6] to-[#ff570d] text-base font-medium text-white disabled:opacity-60"
+              >
+                {submitting ? "Submitting..." : "Submit Request"}
+                {!submitting && <ArrowRight className="h-5 w-5" />}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            {productFields[tab].map((field) => (
+              <Field label={field.label} key={field.key}>
+                <ChoiceGrid
+                  items={field.options}
+                  value={selections[field.key]}
+                  set={(value) =>
+                    setSelections((current) => ({
+                      ...current,
+                      [field.key]: value,
+                    }))
+                  }
+                  columns={
+                    field.options.length >= 5
+                      ? "grid-cols-5 max-lg:grid-cols-3"
+                      : field.options.length === 4
+                        ? "grid-cols-4 max-[520px]:grid-cols-2"
+                        : "grid-cols-3 max-[520px]:grid-cols-1"
+                  }
+                />
+              </Field>
+            ))}
+            <button
+              type="button"
+              onClick={() => setContactStep(true)}
+              className="flex h-[54px] w-full items-center justify-center gap-4 rounded-lg border-0 bg-gradient-to-r from-[#4b12f0] via-[#a32ba6] to-[#ff570d] text-base font-medium text-white"
+            >
+              View Plans <ArrowRight className="h-5 w-5" />
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
-const advantageCards:Array<[IconType,string,string]>=[[Laptop,"Multiple Insurers","Compare and offer policies from multiple insurance companies"],[Zap,"Quick Policy Access","Find the right product for your customer faster"],[UsersRound,"Customer Management","Keep customers, policies and requirements organized"],[Clock3,"Smart Renewals","Track upcoming renewals and never miss an opportunity"],[WalletCards,"Transparent Earnings","Know your commissions and earnings policy-by-policy"],[Headphones,"Dedicated Support","Get assistance whenever you or your customer needs help"]];
-function Advantage(){return <section className="rounded-2xl bg-gradient-to-br from-white via-violet-50/40 to-pink-50/40 p-2"><div className="grid grid-cols-[1fr_.75fr] items-center gap-7 max-lg:grid-cols-1"><div><span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">MAGIKPOLICY ADVANTAGE</span><h2 className="mb-2 mt-4 text-4xl text-[#0b174c]">The MagikPolicy <em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">Advantage</em></h2><h3 className="m-0 text-xl text-[#172454]">Everything you need to sell more.<br/>All in one place.</h3><p className="max-w-xl text-xs leading-relaxed text-slate-500">From finding the right policy to managing customers, renewals, earnings and your partner network—MagikPolicy helps you run your insurance business smarter.</p></div><div className="relative grid min-h-64 place-items-center"><div className="absolute h-60 w-60 rounded-full bg-gradient-to-br from-violet-100 to-pink-100"/><Laptop className="z-10 h-44 w-44 text-violet-600"/><Image className="absolute z-20 w-24" src="/brand/magikpolicy-logo.png" alt="MagikPolicy platform" width={420} height={140}/></div></div><div className="mt-6 grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-md:grid-cols-1">{advantageCards.map(([Icon,title,copy])=><article className="flex gap-4 rounded-xl border border-slate-200 bg-white p-5" key={title}><span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-600"><Icon className="h-5 w-5"/></span><div><b className="block text-xs text-[#142151]">{title}</b><small className="mt-1 block text-[10px] leading-relaxed text-slate-500">{copy}</small></div><ChevronRight className="ml-auto h-4 w-4 text-violet-400"/></article>)}</div><div className="mt-5 rounded-xl border border-violet-100 bg-white p-5"><h3 className="m-0 text-lg text-[#122050]">And your business doesn't stop after one sale.</h3><p className="text-xs text-slate-500">One customer can become a long-term earning relationship.</p><div className="mt-4 flex items-center justify-between gap-3 overflow-auto">{[[UsersRound,"Customer","First step"],[FileCheck2,"Policy","Build trust"],[IndianRupee,"Commission","You earn"],[Clock3,"Renewal","Earn again"],[TrendingUp,"Repeat Business","More earnings"]].map(([Icon,title,copy],i)=><div className="flex shrink-0 items-center gap-3" key={String(title)}><span className="grid h-11 w-11 place-items-center rounded-full bg-violet-50 text-violet-600"><Icon className="h-5 w-5"/></span><p><b className="block text-[10px]">{String(title)}</b><small className="text-[9px] text-slate-500">{String(copy)}</small></p>{i<4&&<ArrowRight className="h-4 w-4 text-violet-300"/>}</div>)}</div></div><div className="mt-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-violet-50 to-pink-50 p-5 max-md:flex-col max-md:gap-4"><p className="m-0 text-sm font-semibold text-violet-700">Sell yourself. Build your network. Grow both.</p><div className="flex gap-3"><Link className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white" href="/partner/register">Start Growing with MagikPolicy</Link><Link className="rounded-lg border border-violet-500 bg-white px-5 py-3 text-xs font-semibold text-violet-700" href="/for-partners">Explore Partner Benefits</Link></div></div></section>}
+const statItems: Array<[IconType, string, string, string]> = [
+  [
+    UsersRound,
+    "50+",
+    "Insurance Partners",
+    "Top insurance companies you can trust",
+  ],
+  [
+    ShieldCheck,
+    "100+",
+    "Insurance Products",
+    "Wide range of policies to choose from",
+  ],
+  // [UsersRound, "2L+", "Policies Sold", "Trusted by lakhs of happy customers"],
+  [Star, "4.8/5", "Customer Rating", "Rated excellent by partners & customers"],
+  [
+    IndianRupee,
+    "High",
+    "Partner Earnings",
+    "Earn attractive commissions on every sale",
+  ],
+];
+function Stats() {
+  return (
+    <section className="home-stats grid grid-cols-4 rounded-xl border border-slate-200 bg-violet-100 p-5 shadow-sm max-lg:grid-cols-4 max-md:grid-cols-2 max-md:p-2">
+      {statItems.map(([Icon, value, label, copy], i) => (
+        <article
+          key={label}
+          className={`${i === 4 ? "max-lg:hidden" : ""} flex gap-3 border-r border-slate-200 px-4 last:border-0 max-md:items-center max-md:border-b max-md:border-r-0 max-md:px-2 max-md:py-4`}
+        >
+          <span
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 1 ? "bg-emerald-50 text-emerald-500" : i === 2 ? "bg-pink-50 text-pink-500" : i === 3 ? "bg-amber-50 text-amber-500" : "bg-violet-50 text-violet-600"}`}
+          >
+            <Icon className="h-5 w-5" />
+          </span>
+          <div>
+            <strong className="block text-lg text-[#0b174c]">{value}</strong>
+            <b className="block text-[13x] text-[#182653]">{label}</b>
+            <small className="mt-1 block text-[12px] leading-relaxed text-slate-500">
+              {copy}
+            </small>
+          </div>
+        </article>
+      ))}
+    </section>
+  );
+}
 
-export function HomeReference(){return <div className="bg-[#fafaff] text-[#0b174c]"><section className="mx-auto grid w-[92%] max-w-[1500px] grid-cols-[.82fr_1.18fr] gap-8 py-10 max-lg:grid-cols-1"><div className="flex min-w-0 flex-col"><span className="inline-flex w-fit items-center gap-2 rounded-full bg-violet-50 px-3 py-1.5 text-xs font-semibold text-violet-700"><UsersRound className="h-4 w-4"/>Trusted by 10,000+ Partners</span><h1 className="mb-3 mt-6 text-[clamp(3.1rem,4.2vw,5rem)] leading-[1.02] tracking-[-.045em]">Smart Insurance<br/>Choices.<br/><em className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 bg-clip-text not-italic text-transparent">Stronger Tomorrow.</em></h1><p className="max-w-md text-base leading-relaxed text-slate-600">Compare, buy and manage the best insurance policies &amp; investment plans in one place.</p><div className="mt-4 grid grid-cols-4 gap-3">{[[ShieldCheck,"Trusted Insurers"],[Target,"Best Prices"],[Headphones,"24x7 Support"],[LockKeyhole,"100% Secure"]].map(([Icon,label])=><div className="flex items-center gap-2 text-[10px] font-semibold" key={String(label)}><span className="grid h-9 w-9 place-items-center rounded-full bg-violet-50 text-violet-600"><Icon className="h-4 w-4"/></span>{String(label)}</div>)}</div><div className="mt-auto aspect-[1.85/1] bg-[url('/brand/magikpolicy-home-banner.png')] bg-contain bg-bottom bg-no-repeat"/></div><div className="self-center"><QuoteFinder/><div className="mt-4 flex h-12 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-50 to-pink-50 text-[10px]"><ShieldCheck className="h-5 w-5 text-violet-600"/><b>100% Secure Process</b><i>•</i><span>No Spam</span><i>•</i><span>Best Prices Guaranteed</span></div></div><div className="col-span-2 max-lg:col-span-1"><Stats/></div></section><div className="h-20"/><div className="mx-auto grid w-[92%] max-w-[1500px] gap-24 pb-20"><PartnerEarning/><PopularPlans/><ClaimBanner/><Testimonials/><Advantage/></div></div>}
+const miniBenefits: Array<[IconType, string, string]> = [
+  [Target, "No Target", "Earn from the first policy"],
+  [
+    ShieldCheck,
+    "Every Policy Counts",
+    "Extra on every eligible policy you sell",
+  ],
+  [
+    Calculator,
+    "Company-wise Calculation",
+    "Automatically calculated as per insurer & product",
+  ],
+];
+function PartnerEarning() {
+  return (
+    <section className="partner-earning-responsive grid grid-cols-[.9fr_1.1fr] items-center gap-10 rounded-2xl border border-slate-100 bg-white p-10 shadow-sm max-lg:grid-cols-1 max-md:gap-7 max-md:p-5">
+      <div>
+        <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+          <UsersRound className="h-4 w-4" /> PARTNER WITH US
+        </span>
+        <h2 className="mb-3 mt-4 text-4xl leading-tight text-[#0b174c] max-md:text-3xl">
+          Join MagikPolicy &amp;
+          <br />
+          Earn{" "}
+          <em className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 bg-clip-text not-italic text-transparent">
+            Up to 20% Extra!
+          </em>
+        </h2>
+        <p className="max-w-lg text-sm leading-relaxed text-slate-600">
+          Already earning commission as an insurance agent? Switch to
+          MagikPolicy and get up to 20% extra commission on every eligible
+          policy.
+        </p>
+        <div className="mt-6 grid grid-cols-3 gap-4 pt-4">
+          {miniBenefits.map(([Icon, title, copy]) => (
+            <article
+              key={title}
+              className="border-r border-slate-200 pr-3 last:border-0"
+            >
+              <span className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-500">
+                <Icon className="h-8 w-8" />
+              </span>
+              <b className="mt-2 block text-sm text-[#122050]">{title}</b>
+              <small className="mt-1 block text-[12px] leading-relaxed text-slate-500">
+                {copy}
+              </small>
+            </article>
+          ))}
+        </div>
+      </div>
+      <div className="earning-image-responsive flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
+        <Image
+          src="/brand/magikpolicy-earning-calculation.png"
+          alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+          width={794}
+          height={499}
+          className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
+          sizes="(max-width: 640px) calc(100vw - 48px), (max-width: 1024px) min(680px, calc(100vw - 80px)), 52vw"
+        />
+      </div>
+      <div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2 bg-violet-50 p-4 border-0 rounded-lg  ">
+        {[
+          [TrendingUp, "Increase Your Earnings", "Get up to 20% extra"],
+          [IndianRupee, "No Deductions", "No hidden charges"],
+          [Headphones, "Dedicated Partner Support", "We are here to help"],
+          [ShieldCheck, "Grow Your Business", "Access insurers & products"],
+        ].map(([Icon, title, copy]) => (
+          <article
+            className="flex gap-3 rounded-xl border border-slate-200 p-4"
+            key={String(title)}
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-violet-50 text-violet-600">
+              <Icon className="h-5 w-5" />
+            </span>
+            <div>
+              <b className="block text-md pb-1 text-[#122050]">{String(title)}</b>
+              <small className="text-[13px] text-slate-500">
+                {String(copy)}
+              </small>
+            </div>
+          </article>
+        ))}
+      </div>
+      <div className="col-span-2 flex justify-center gap-4 max-lg:col-span-1 max-md:flex-col mt-5">
+        {/* <Link
+          className="flex min-h-12 min-w-72 items-center justify-center gap-3 rounded-lg border border-violet-500 px-5 text-sm font-semibold text-violet-700 bg-violet-50"
+          href="/products"
+        >
+          Check My Extra Earning <ArrowRight className="h-4 w-4" />
+        </Link> */}
+        <Link
+          className="flex min-h-12 min-w-72 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 px-5 text-sm font-semibold text-white"
+          href="/partner/register"
+        >
+          <UsersRound className="h-5 w-5" />
+          Become a MagikPolicy Partner
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+const plans: Array<[IconType, string, string, string, string]> = [
+  [
+    HeartPulse,
+    "Health Insurance",
+    "Quality healthcare for you & your family",
+    "₹458",
+    "month",
+  ],
+  [
+    CarFront,
+    "Car Insurance",
+    "Comprehensive cover for your car",
+    "₹1,094",
+    "year",
+  ],
+  [Bike, "Bike Insurance", "Secure your ride instantly", "₹457", "year"],
+  [
+    ShieldCheck,
+    "Term Insurance",
+    "High life cover at low premiums",
+    "₹373",
+    "month",
+  ],
+  [Plane, "Travel Insurance", "Travel worry-free anywhere", "₹154", "trip"],
+  [
+    Umbrella,
+    "Personal Accident",
+    "Financial protection against accidents",
+    "₹179",
+    "trip",
+  ],
+];
+function PopularPlans() {
+  return (
+    <section>
+      <header className="mb-5 flex items-center justify-between">
+        <h2 className="text-2xl text-[#0b174c]">Popular Insurance Plans</h2>
+        <Link
+          className="flex items-center gap-2 text-xs font-semibold text-violet-700"
+          href="/products"
+        >
+          View All Plans <ArrowRight className="h-4 w-4" />
+        </Link>
+      </header>
+      <div className="grid grid-cols-6 gap-4 max-xl:grid-cols-3 max-md:grid-cols-2">
+        {plans.map(([Icon, title, copy, price, unit]) => (
+          <article
+            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            key={title}
+          >
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-violet-50 text-violet-600">
+              <Icon className="h-7 w-7" />
+            </span>
+            <h3 className="mt-4 text-sm text-[#102050]">{title}</h3>
+            <p className="min-h-10 text-[14px] leading-relaxed text-slate-500">
+              {copy}
+            </p>
+            <small className="text-[10px] font-semibold text-slate-400">Starting from</small>
+            <strong className="mt-1 block text-base text-[#0b174c] text-[22px]">
+              {price}
+              <small className="font-normal"> /{unit}</small>
+            </strong>
+            <Link
+              className="mt-5 flex items-center gap-1 text-[12px] font-semibold text-emerald-500"
+              href="/products"
+            >
+              View Plans <ArrowRight className="h-3 w-3" />
+            </Link>
+          </article>
+        ))}
+      </div>
+      <div className="mt-5 grid grid-cols-4 rounded-xl border border-slate-200 bg-white p-4 max-md:grid-cols-2">
+        {[
+          [ShieldCheck, "100% Secure", "Your data is safe with us"],
+          [Target, "Best Prices", "Compare & save more"],
+          [Headphones, "Quick Support", "We're here for you"],
+          [CheckCircle2, "Claim Assistance", "Hassle-free claims"],
+        ].map(([Icon, title, copy]) => (
+          <div
+            className="flex items-center justify-center gap-3 px-3"
+            key={String(title)}
+          >
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-violet-50 text-violet-600">
+              <Icon className="h-4 w-4" />
+            </span>
+            <p>
+              <b className="block text-[14px]">{String(title)}</b>
+              <small className="text-[12px] text-slate-500">
+                {String(copy)}
+              </small>
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ClaimBanner() {
+  return (
+    <section className="grid grid-cols-[1.05fr_.8fr_.8fr] items-center gap-7 rounded-2xl bg-gradient-to-r from-violet-300 via-white to-violet-100 p-8 max-lg:grid-cols-1">
+      <div>
+        <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-violet-700">
+          CLAIM CONSULTING
+        </span>
+        <h2 className="mb-2 mt-4 text-3xl text-[#0b174c]">
+          Is your claim failed?
+        </h2>
+        <h3 className="m-0 text-lg text-[#172454]">
+          Let us know, we will help you to get your claim pass.
+        </h3>
+        <p className="text-sm leading-relaxed text-slate-600">
+          We provide you an advocate who assists and helps you legally to
+          approve your claim.
+        </p>
+        <div className="mt-5 flex gap-3">
+          <Link
+            className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
+            href="/claims"
+          >
+            Get Claim Help Now →
+          </Link>
+          <Link
+            className="rounded-lg border-2 border-solid border-violet-500 px-5 py-3 text-xs font-semibold text-violet-700"
+            href="/resources"
+          >
+            How It Works
+          </Link>
+        </div>
+      </div>
+      <div className="relative grid min-h-60 place-items-center">
+        {/* <div className="absolute h-48 w-48 rounded-full bg-violet-100" />
+        <FileCheck2 className="z-10 h-36 w-36 rotate-6 text-violet-600" />
+        <Gavel className="absolute bottom-2 right-5 z-20 h-24 w-24 -rotate-12 text-amber-800" /> */}
+        <div className="earning-image-responsive rounded-2xl flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
+          <Image
+            src="/brand/claim-failed.png"
+            alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+            width={794}
+            height={499}
+            className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
+            sizes="(max-width: 640px) calc(100vw - 48px), (max-width: 1024px) min(680px, calc(100vw - 80px)), 52vw"
+          />
+        </div>
+      </div>
+      <div className="grid gap-4">
+        {[
+          [
+            Scale,
+            "Legal Expert Support",
+            "Get help from experienced advocates",
+          ],
+          [
+            UsersRound,
+            "Claim Review",
+            "We review your case and find the best solution",
+          ],
+          [
+            ShieldCheck,
+            "Higher Success Rate",
+            "We work to get your claim legally approved",
+          ],
+        ].map(([Icon, title, copy]) => (
+          <article className="flex gap-3" key={String(title)}>
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-violet-100 text-violet-600">
+              <Icon className="h-7 w-7" />
+            </span>
+            <p className="m-0">
+              <b className="block text-xs text-[#142151]">{String(title)}</b>
+              <small className="text-[11px] leading-relaxed text-slate-500">
+                {String(copy)}
+              </small>
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Testimonials() {
+  return (
+    <section className="text-center w-4/5 mx-auto">
+      <span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+        CUSTOMER TESTIMONIALS
+      </span>
+      <h2 className="mb-2 mt-4 text-4xl text-[#0b174c]">
+        Trusted by Customers.
+        <br />
+        <em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">
+          Loved for the Experience.
+        </em>
+      </h2>
+      <p className="mx-auto max-w-xl text-xs text-slate-500">
+        Hear from people who have experienced hassle-free policy buying, quick
+        support and smooth claim assistance with MagikPolicy.
+      </p>
+      <div className="mt-7 grid grid-cols-[1.1fr_.9fr] gap-4 text-left max-lg:grid-cols-1">
+        <article className="rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
+          <span className="text-6xl leading-none text-violet-200">“</span>
+          <p className="text-base font-semibold leading-relaxed text-[#172454]">
+            Buying insurance was never this easy! MagikPolicy helps me compare
+            the best policies and I even saved on my premium. The whole process
+            is simple, transparent and truly hassle-free.
+          </p>
+          <div className="mt-6 flex items-center gap-3">
+            <span className="grid h-11 w-11 place-items-center rounded-full bg-slate-200 font-bold">
+              RV
+            </span>
+            <p className="m-0">
+              <b className="block text-xs">Rahul Verma</b>
+              <small className="text-[9px] text-emerald-500">
+                ● Verified Customer
+              </small>
+            </p>
+          </div>
+        </article>
+        <div className="grid gap-4">
+          {[
+            [
+              "When I had a claim, the support team guided me at every step. The claim was settled quickly and without any stress.",
+              "Priya Nair",
+            ],
+            [
+              "I love how easy it is to manage my policies and renewals in one place.",
+              "Amit Kapoor",
+            ],
+          ].map(([quote, name]) => (
+            <article
+              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+              key={name}
+            >
+              <div className="text-amber-400">★★★★★</div>
+              <p className="text-xs font-medium leading-relaxed text-[#172454]">
+                “{quote}”
+              </p>
+              <b className="text-[10px]">{name}</b>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const advantageCards: Array<[IconType, string, string]> = [
+  [
+    Laptop,
+    "Multiple Insurers",
+    "Compare and offer policies from multiple insurance companies",
+  ],
+  [
+    Zap,
+    "Quick Policy Access",
+    "Find the right product for your customer faster",
+  ],
+  [
+    UsersRound,
+    "Customer Management",
+    "Keep customers, policies and requirements organized",
+  ],
+  [
+    Clock3,
+    "Smart Renewals",
+    "Track upcoming renewals and never miss an opportunity",
+  ],
+  [
+    WalletCards,
+    "Transparent Earnings",
+    "Know your commissions and earnings policy-by-policy",
+  ],
+  [
+    Headphones,
+    "Dedicated Support",
+    "Get assistance whenever you or your customer needs help",
+  ],
+];
+function Advantage() {
+  return (
+    <section className="rounded-2xl bg-gradient-to-br from-violet-100 to-pink-100 p-4">
+      <div className="grid grid-cols-[1fr_.75fr] items-center gap-7 max-lg:grid-cols-1">
+        <div>
+          <span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+            SUPER OPPORTUNITY
+          </span>
+          <h2 className="mb-2 mt-4 text-5xl text-[#0b174c]">
+            The MagikPolicy{" "}
+            <em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">
+              Advantage
+            </em>
+          </h2>
+          <h3 className="m-0 text-4xl text-[#172454]">
+            Everything you need to sell more.
+            <br />
+            All in <span className="text-violet-700">One place.</span>
+          </h3>
+          <p className="max-w-xl text-md leading-relaxed text-slate-800">
+            From finding the right policy to managing customers, renewals,
+            earnings and your partner network—MagikPolicy helps you run your
+            insurance business smarter.
+          </p>
+        </div>
+        <div className="relative grid min-h-64 place-items-center">
+          {/* <div className="absolute h-60 w-60 rounded-full bg-gradient-to-br from-violet-100 to-pink-100" />
+          <Laptop className="z-10 h-44 w-44 text-violet-600" />
+          <Image
+            className="absolute z-20 w-24"
+            src="/brand/magikpolicy-logo.png"
+            alt="MagikPolicy platform"
+            width={420}
+            height={140}
+          /> */}
+          <div className="earning-image-responsive rounded-2xl flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
+          <Image
+            src="/brand/magikpolicy-super-advantages.png"
+            alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+            width={794}
+            height={499}
+            className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
+            sizes="(max-width: 640px) calc(100vw - 48px), (max-width: 1024px) min(680px, calc(100vw - 80px)), 52vw"
+          />
+        </div>
+        </div>
+      </div>
+      <div className="mt-6 grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-md:grid-cols-1">
+        {advantageCards.map(([Icon, title, copy]) => (
+          <article
+            className="flex gap-4 rounded-xl border border-slate-200 bg-white p-5"
+            key={title}
+          >
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-600">
+              <Icon className="h-7 w-7" />
+            </span>
+            <div>
+              <b className="block text-md text-[#142151]">{title}</b>
+              <small className="mt-1 block text-[12px] font-semibold leading-relaxed text-slate-500">
+                {copy}
+              </small>
+            </div>
+            <ChevronRight className="ml-auto h-4 w-4 text-violet-400" />
+          </article>
+        ))}
+      </div>
+      <div className="mt-5 rounded-xl border border-violet-100 bg-white p-5 hidden">
+        <h3 className="m-0 text-lg text-[#122050]">
+          And your business doesn't stop after one sale.
+        </h3>
+        <p className="text-xs text-slate-500">
+          One customer can become a long-term earning relationship.
+        </p>
+        <div className="mt-4 flex items-center justify-between gap-3 overflow-auto">
+          {[
+            [UsersRound, "Customer", "First step"],
+            [FileCheck2, "Policy", "Build trust"],
+            [IndianRupee, "Commission", "You earn"],
+            [Clock3, "Renewal", "Earn again"],
+            [TrendingUp, "Repeat Business", "More earnings"],
+          ].map(([Icon, title, copy], i) => (
+            <div
+              className="flex shrink-0 items-center gap-3"
+              key={String(title)}
+            >
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-violet-50 text-violet-600">
+                <Icon className="h-5 w-5" />
+              </span>
+              <p>
+                <b className="block text-[10px]">{String(title)}</b>
+                <small className="text-[9px] text-slate-500">
+                  {String(copy)}
+                </small>
+              </p>
+              {i < 4 && <ArrowRight className="h-4 w-4 text-violet-300" />}
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="mt-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-violet-50 to-pink-50 p-5 max-md:flex-col max-md:gap-4">
+        <p className="m-0 text-sm font-semibold text-violet-700">
+          Sell yourself. Build your network. Grow both.
+        </p>
+        <div className="flex gap-3">
+          <Link
+            className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
+            href="/partner/register"
+          >
+            Start Growing with MagikPolicy
+          </Link>
+          <Link
+            className="rounded-lg border border-violet-500 bg-white px-5 py-3 text-xs font-semibold text-violet-700"
+            href="/for-partners"
+          >
+            Explore Partner Benefits
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function HomeReference() {
+  return (
+    <div className="home-responsive overflow-x-hidden bg-[#fafaff] text-[#0b174c]">
+      <section className="home-hero-responsive relative flex w-full flex-col overflow-hidden bg-[url('/brand/magikpolicy-home-banner.png')] bg-[length:auto_440px] bg-center-top bg-no-repeat pb-8 md:bg-[length:auto_560px] xl:aspect-[1942/809] xl:min-h-[680px] xl:block xl:bg-cover xl:bg-center xl:pb-0">
+        <div className="relative z-10 min-h-[420px] px-5 pt-10 md:min-h-[520px] md:px-6 xl:absolute xl:left-[14.8%] xl:top-[12.5%] xl:min-h-0 xl:p-0">
+          <h1 className="m-0 text-[clamp(2.8rem,3.05vw,3.8rem)] font-bold leading-[1.08] tracking-[-.035em] text-[#172454] max-md:text-[2.45rem]">
+            Smart Insurance.
+            <br />
+            Simplified.
+            <br />
+            <em className="bg-gradient-to-r from-violet-700 to-pink-500 bg-clip-text not-italic text-transparent">
+              Magically.
+            </em>
+          </h1>
+          <p className="mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[#172454] max-md:max-w-[19rem] max-md:text-sm">
+            Buy any policy and get good reward instantly.
+          </p>
+        </div>
+        <div className="home-quote-wrap relative z-20 mx-auto mt-4 w-[calc(100vw_-_24px)] min-w-0 max-w-[calc(100vw_-_24px)] md:w-[92%] md:max-w-[92%] xl:absolute xl:right-[10.6%] xl:top-[14.7%] xl:mt-0 xl:w-[31.2%] xl:max-w-none">
+          <QuoteFinder />
+          <div className="mt-4 flex h-10 items-center justify-center gap-5 text-base text-[#172454] max-2xl:text-sm max-md:gap-2 max-md:text-[11px]">
+            <ShieldCheck className="h-5 w-5 text-violet-600" />
+            <span>100% Secure Process</span>
+            <i>•</i>
+            <Sparkles className="h-5 w-5 text-violet-600" />
+            <span>Best Prices</span>
+          </div>
+        </div>
+      </section>
+      <div className="mx-auto mt-5 w-[92%] max-w-[1500px]">
+        <Stats />
+      </div>
+      <div className="h-20 max-md:h-12" />
+      <div className="home-sections mx-auto grid w-[92%] max-w-[1500px] gap-24 pb-20 max-md:w-[calc(100%_-_24px)] max-md:gap-12 max-md:pb-12">
+        <PartnerEarning />
+        <PopularPlans />
+        <ClaimBanner />
+        <Testimonials />
+        <Advantage />
+      </div>
+    </div>
+  );
+}

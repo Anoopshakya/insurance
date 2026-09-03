@@ -12,7 +12,7 @@ type NavItem = { label: string; href: string; icon: IconName; badge?: string };
 const navigation: Array<{ label?: string; items: NavItem[] }> = [
   { items: [{ label: "Dashboard", href: "/admin", icon: "dashboard" }] },
   { label: "Business", items: [
-    { label: "Leads", href: "/admin/leads", icon: "leads", badge: "12" },
+    { label: "Leads", href: "/admin/leads", icon: "leads" },
     { label: "Customers", href: "/admin/users", icon: "users" },
     { label: "Partners / Agents", href: "/admin/partners", icon: "partners" },
     { label: "Policies", href: "/admin/policies", icon: "policies" },

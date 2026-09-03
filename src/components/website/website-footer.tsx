@@ -22,7 +22,7 @@ export function WebsiteFooter() {
       <footer className="site-footer">
         <div>
           <Image
-            src="/brand/magikpolicy-logo.png"
+            src="/brand/magikpolicy-logo-dark.png"
             alt="MagikPolicy"
             width={420}
             height={140}

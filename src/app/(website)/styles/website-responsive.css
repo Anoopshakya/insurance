@@ -1,0 +1,332 @@
+/* Public website responsive safety layer. Imported after all legacy website CSS. */
+.website-shell,
+.website-content,
+.website-shell main,
+.website-shell section,
+.website-shell article,
+.website-shell div {
+  min-width: 0;
+}
+
+.website-shell {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+.website-shell img,
+.website-shell svg,
+.website-shell video {
+  max-width: 100%;
+}
+
+.website-shell img,
+.website-shell video {
+  height: auto;
+}
+
+.website-shell input,
+.website-shell select,
+.website-shell textarea,
+.website-shell button {
+  max-width: 100%;
+}
+
+.website-content,
+.public-site,
+.public-inner,
+.partner-marketing {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 1199px) {
+  .site-hero,
+  .partner-hero,
+  .product-detail,
+  .public-story {
+    min-width: 0;
+  }
+
+  .website-navbar > a {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .website-navbar > a img {
+    width: clamp(8.25rem, 28vw, 15rem) !important;
+  }
+}
+
+@media (max-width: 767px) {
+  .website-content,
+  .website-content > *,
+  .public-site,
+  .partner-marketing {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .website-announcement {
+    min-height: 4.25rem !important;
+    padding: .65rem 1rem !important;
+  }
+
+  .website-announcement > span {
+    overflow-wrap: anywhere;
+  }
+
+  .website-navbar {
+    height: 4.75rem !important;
+    padding-inline: .75rem !important;
+  }
+
+  .website-navbar > a img {
+    width: clamp(7.75rem, 37vw, 9.25rem) !important;
+  }
+
+  .website-nav-actions svg {
+    width: 1.35rem;
+    height: 1.35rem;
+  }
+
+  .public-inner,
+  .partner-marketing > main,
+  .public-site > main:not(.public-inner) {
+    box-sizing: border-box !important;
+    width: calc(100vw - 24px) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 24px) !important;
+    margin-inline: auto !important;
+    padding-inline: 0 !important;
+  }
+
+  .public-inner > *,
+  .partner-marketing > main > * {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .public-page-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
+    padding: 2.75rem 0 2rem !important;
+  }
+
+  .public-page-hero h1,
+  .partner-hero-copy h1 {
+    width: 100%;
+    max-width: 100%;
+    white-space: normal !important;
+    word-break: normal;
+    font-size: clamp(2rem, 11vw, 2.75rem) !important;
+    overflow-wrap: anywhere;
+  }
+
+  .public-page-hero p,
+  .partner-hero-copy p,
+  .product-detail article,
+  .public-card-grid article {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .public-card-grid,
+  .public-story,
+  .product-detail,
+  .expert-row,
+  .testimonials > div,
+  .partner-benefits,
+  .partner-testimonials,
+  .partner-faq > div {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .public-lead-form {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .public-lead-form > *,
+  .public-lead-form label,
+  .public-lead-form button {
+    grid-column: 1 !important;
+  }
+
+  .partner-hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden;
+    display: flex !important;
+    min-height: 0 !important;
+    flex-direction: column !important;
+  }
+
+  .partner-visual {
+    width: 100% !important;
+    height: min(24rem, 105vw) !important;
+  }
+
+  .partner-register-card {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .quote-tabs,
+  .quote-options,
+  .partner-hero-copy > div,
+  .partner-process > div {
+    max-width: 100%;
+  }
+
+  .quote-options button,
+  .quote-options .site-gradient {
+    min-width: 0 !important;
+  }
+
+  .home-quote-wrap {
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    width: calc(100vw - 24px) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .quote-tabs-responsive {
+    width: 100%;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .quote-tabs-responsive button {
+    min-width: 0 !important;
+    padding-inline: .2rem !important;
+    white-space: nowrap;
+  }
+
+  .quote-choice-grid {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .quote-choice-grid button {
+    width: 100%;
+    min-width: 0 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .home-stats {
+    box-sizing: border-box;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .home-stats article {
+    min-width: 0;
+  }
+
+  .partner-earning-responsive {
+    box-sizing: border-box;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .partner-earning-responsive > div {
+    grid-column: 1 !important;
+    min-width: 0;
+  }
+
+  .partner-earning-responsive > div:nth-last-child(2) {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .partner-earning-responsive a {
+    width: 100%;
+    min-width: 0 !important;
+  }
+
+  .earning-image-responsive,
+  .earning-image-responsive img {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .home-sections h2 {
+    font-size: clamp(1.7rem, 8vw, 2.35rem) !important;
+    overflow-wrap: anywhere;
+  }
+
+  .home-sections .grid-cols-6,
+  .home-sections .grid-cols-5,
+  .home-sections .grid-cols-4,
+  .home-sections .grid-cols-3 {
+    min-width: 0;
+  }
+
+  .site-footer {
+    box-sizing: border-box;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 1.5rem 1rem !important;
+    padding: 2rem 1rem 1.25rem !important;
+  }
+
+  .site-footer > div:first-child,
+  .site-footer > small {
+    grid-column: 1 / -1 !important;
+  }
+
+  .site-footer img {
+    width: min(12rem, 70vw) !important;
+  }
+
+  .site-footer a,
+  .site-footer p {
+    overflow-wrap: anywhere;
+  }
+
+  .whatsapp-float {
+    right: .85rem !important;
+    bottom: .85rem !important;
+    width: 3.25rem !important;
+    height: 3.25rem !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .website-navbar > a img {
+    width: 8.1rem !important;
+  }
+
+  .website-nav-actions {
+    right: .45rem !important;
+  }
+
+  .website-nav-actions > * {
+    width: 2rem !important;
+    height: 2.25rem !important;
+  }
+
+  .home-hero-responsive h1 {
+    font-size: clamp(2rem, 10.5vw, 2.5rem) !important;
+  }
+
+  .home-stats {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-footer {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .site-footer > * {
+    grid-column: 1 !important;
+  }
+}
