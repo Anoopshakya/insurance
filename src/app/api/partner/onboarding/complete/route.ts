@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { adminAuth, verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/firebase-admin";
 import { supabaseServer } from "@/lib/supabase-server";
 
 const profileSchema = z.object({
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     await db.from("agent_documents").delete().eq("agent_id", agent.id).in("doc_type", ["pan", "aadhaar"]);
     const { error: documentError } = await db.from("agent_documents").insert(uploads.map((upload) => ({ agent_id: agent.id, doc_type: upload.type, file_url: upload.path, status: "submitted", created_at: now }))); if (documentError) throw documentError;
     await db.from("agents").update({ status: "under_review", kyc_status: "submitted", updated_at: now }).eq("id", agent.id); await db.from("users").update({ status: "pending_approval", updated_at: now }).eq("id", decoded.uid);
-    const authUser = await adminAuth.getUser(decoded.uid); await adminAuth.setCustomUserClaims(decoded.uid, { ...authUser.customClaims, role: "partner", mustCompleteProfile: false }); await db.from("audit_logs").insert({ entity_type: "agent", entity_id: agent.id, action: "profile_submitted", actor_id: decoded.uid, after_state: { status: "under_review", kyc_status: "submitted", pan: `******${input.panNumber.slice(-4)}`, aadhaar: `********${input.aadhaarNumber.slice(-4)}` } });
+    await db.from("audit_logs").insert({ entity_type: "agent", entity_id: agent.id, action: "profile_submitted", actor_id: decoded.uid, after_state: { status: "under_review", kyc_status: "submitted", pan: `******${input.panNumber.slice(-4)}`, aadhaar: `********${input.aadhaarNumber.slice(-4)}` } });
     return NextResponse.json({ ok: true });
   } catch (error) { if (error instanceof z.ZodError) return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid profile details", fields: error.flatten().fieldErrors }, { status: 400 }); return NextResponse.json({ error: error instanceof Error ? error.message : "Profile submission failed" }, { status: 400 }); }
 }

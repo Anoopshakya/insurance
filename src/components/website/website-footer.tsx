@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { products } from "./website-products";
+import { Network, Search, Send, ShieldCheck, Tag } from "lucide-react";
+
+const footerColumns = [
+  { title: "Buy Insurance", links: [["Health Insurance", "/products/health-insurance"], ["Car Insurance", "/products/car-insurance"], ["Bike Insurance", "/products/bike-insurance"], ["Term Life Insurance", "/products/term-life-insurance"], ["Travel Insurance", "/products/travel-insurance"], ["Family Insurance", "/products/family-insurance"], ["Personal Accident Insurance", "/products/personal-accident-insurance"]] },
+  { title: "Partner With Us", links: [["How to Become Partner", "/partner/register"], ["Partner Login", "/partner/login"], ["Partner Resources", "/resources"], ["Training & Support", "/resources"], ["FAQs for Partners", "/partner/register"]] },
+  { title: "Support", links: [["Claim Assistance", "/claims"], ["Policy Renew", "/renew"], ["Complaint", "/resources"], ["FAQs", "/resources"], ["Contact Us", "/contact"]] },
+  { title: "Company", links: [["About Us", "/about"], ["Our Mission", "/about"], ["How It Works", "/about"], ["Careers", "/contact"], ["Blog", "/resources"]] },
+];
 
 export function WebsiteFooter() {
   return (
@@ -19,7 +27,42 @@ export function WebsiteFooter() {
           />
         </svg>
       </a>
-      <footer className="site-footer">
+      <footer className="mp-footer">
+        <div className="mp-footer-main">
+          <div className="mp-footer-brand">
+            <Image src="/brand/magikpolicy-logo.png" alt="MagikPolicy" width={420} height={140} />
+            <p>MagikPolicy is India&apos;s trusted platform for insurance buying, claim assistance and partner growth. Compare, buy, save and earn more with complete transparency and expert support.</p>
+            {/* <ul>
+              <li><span><Search /></span>Compare multiple insurers</li>
+              <li><span><Tag /></span>Best prices, great savings</li>
+              <li><span><ShieldCheck /></span>Quick claim support</li>
+              <li><span><Network /></span>Earn more with MagikPolicy</li>
+            </ul> */}
+             <h3>Follow us on</h3>
+          <div className="mp-socials">
+            <a href="#" aria-label="Facebook">f</a>
+            <a href="#" aria-label="Instagram">◎</a>
+            <a href="#" aria-label="YouTube">▶</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="X">𝕏</a>
+          </div>
+          </div>
+         
+          {footerColumns.map(column => <nav key={column.title} aria-label={column.title}><h3>{column.title}</h3>{column.links.map(([label, href]) => <Link href={href} key={label}>{label}</Link>)}</nav>)}
+          {/* <div className="mp-footer-updates"><h3>Stay Updated</h3><p>Subscribe to get tips, offers and insurance insights.</p><form><input aria-label="Email address" type="email" placeholder="Enter your email" /><button aria-label="Subscribe" type="button"><Send /></button></form></div> */}
+        </div>
+        <div className="mp-footer-bottom"><small>© 2026 MagikPolicy.</small>
+          <nav aria-label="Legal">
+            {/* <Link href="/sitemap">Sitemap</Link> */}
+            <Link href="/disclaimer">Disclaimer</Link>
+            {/* <Link href="/privacy-policy">Privacy Policy</Link> */}
+            <Link href="/terms">Terms &amp; Conditions</Link>
+            {/* <Link href="/refund-policy">Refund Policy</Link> */}
+            {/* <Link href="/contact">Grievance Redressal</Link> */}
+          </nav>
+        </div>
+      </footer>
+      <footer className="site-footer legacy-site-footer">
         <div>
           <Image
             src="/brand/magikpolicy-logo-dark.png"

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  useEffect,
   useState,
   type ComponentType,
   type FormEvent,
@@ -37,6 +38,7 @@ import {
   UserRound,
   UsersRound,
   WalletCards,
+  X,
   Zap,
 } from "lucide-react";
 
@@ -305,7 +307,7 @@ function QuoteFinder() {
             <button
               type="button"
               onClick={() => setContactStep(true)}
-              className="flex h-[54px] w-full items-center justify-center gap-4 rounded-lg border-0 bg-gradient-to-r from-[#4b12f0] via-[#a32ba6] to-[#ff570d] text-base font-medium text-white"
+              className="btn-primary flex h-[54px] w-full items-center justify-center gap-4 rounded-lg border-0 bg-gradient-to-r from-[#4b12f0] via-[#a32ba6] to-[#ff570d] text-base font-medium text-white"
             >
               View Plans <ArrowRight className="h-5 w-5" />
             </button>
@@ -455,7 +457,7 @@ function PartnerEarning() {
           Check My Extra Earning <ArrowRight className="h-4 w-4" />
         </Link> */}
         <Link
-          className="flex min-h-12 min-w-72 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 px-5 text-sm font-semibold text-white"
+          className="btn-primary flex min-h-12 min-w-72 items-center justify-center gap-4 rounded-lg bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 px-5 text-sm font-semibold text-white"
           href="/partner/register"
         >
           <UsersRound className="h-5 w-5" />
@@ -564,8 +566,44 @@ function PopularPlans() {
   );
 }
 
+function ClaimHelpModal({ close }: { close: () => void }) {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setSubmitting(true); setError("");
+    const response = await fetch("/api/public/claim-help", { method: "POST", body: new FormData(event.currentTarget) });
+    const body = await response.json(); setSubmitting(false);
+    if (!response.ok) return setError(body.error || "Unable to submit your request");
+    setSubmitted(true);
+  }
+  return <div className="claim-help-modal fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#08132f]/60 p-4 backdrop-blur-sm" onMouseDown={close}>
+    <section className="relative my-4 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl max-md:p-4" onMouseDown={event => event.stopPropagation()}>
+      <button type="button" onClick={close} aria-label="Close claim help form" className="claim-help-close absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-0 bg-slate-100 text-xl text-slate-600">×</button>
+      {submitted ? <div className="grid min-h-72 place-items-center text-center"><div><CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500"/><h2 className="mb-2 mt-4 text-2xl text-[#101c50]">Request submitted successfully!</h2><p className="text-sm text-slate-600">Our claim assistance team will contact you on WhatsApp shortly.</p><button type="button" onClick={close} className="claim-help-primary mt-4 rounded-lg border-0 bg-violet-600 px-6 py-3 text-sm font-semibold text-white">Close</button></div></div> : <>
+        <div className="pr-12"><span className="text-xs font-semibold text-violet-600">CLAIM ASSISTANCE</span><h2 className="mb-2 mt-2 text-2xl text-[#101c50]">Tell us about your failed claim</h2><p className="mt-0 text-sm text-slate-600">Attach both documents as PDF, JPG, PNG or WEBP files up to 5 MB.</p></div>
+        <form className="mt-5 grid grid-cols-2 gap-4 max-md:grid-cols-1" onSubmit={submit}>
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="Your full name"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">WhatsApp number<input name="whatsappNumber" required inputMode="tel" pattern="[0-9+ ]{10,16}" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="₹ Claim amount"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="City, State"/></label>
+          
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[#172454]">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
+          <label className="col-span-2 grid gap-2 text-sm font-medium text-[#172454] max-md:col-span-1">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
+          <input name="website" className="hidden" tabIndex={-1} autoComplete="off"/>
+          {error && <p className="col-span-2 m-0 text-sm text-red-600 max-md:col-span-1">{error}</p>}
+          <button disabled={submitting} className="claim-help-primary col-span-2 h-12 rounded-lg border-0 bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 text-sm font-semibold text-white disabled:opacity-60 max-md:col-span-1">{submitting ? "Submitting request…" : "Submit Claim Help Request"}</button>
+        </form>
+      </>}
+    </section>
+  </div>;
+}
+
 function ClaimBanner() {
+  const [open, setOpen] = useState(false);
   return (
+    <>
     <section className="grid grid-cols-[1.05fr_.8fr_.8fr] items-center gap-7 rounded-2xl bg-gradient-to-r from-violet-300 via-white to-violet-100 p-8 max-lg:grid-cols-1">
       <div>
         <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-violet-700">
@@ -582,18 +620,19 @@ function ClaimBanner() {
           approve your claim.
         </p>
         <div className="mt-5 flex gap-3">
-          <Link
-            className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
-            href="/claims"
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="claim-help-trigger rounded-lg border-0 bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
           >
             Get Claim Help Now →
-          </Link>
-          <Link
+          </button>
+          {/* <Link
             className="rounded-lg border-2 border-solid border-violet-500 px-5 py-3 text-xs font-semibold text-violet-700"
             href="/resources"
           >
             How It Works
-          </Link>
+          </Link> */}
         </div>
       </div>
       <div className="relative grid min-h-60 place-items-center">
@@ -643,6 +682,8 @@ function ClaimBanner() {
         ))}
       </div>
     </section>
+    {open && <ClaimHelpModal close={() => setOpen(false)} />}
+    </>
   );
 }
 
@@ -744,6 +785,34 @@ const advantageCards: Array<[IconType, string, string]> = [
   ],
 ];
 function Advantage() {
+  const [partnerModalOpen, setPartnerModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (!partnerModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setPartnerModalOpen(false);
+    };
+
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [partnerModalOpen]);
+
+  function submitPartnerApplication(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = new FormData(event.currentTarget);
+    const params = new URLSearchParams({
+      email: String(form.get("email") || ""),
+      mobile: String(form.get("mobile") || ""),
+    });
+    window.location.href = `/partner/register?${params.toString()}`;
+  }
+
   return (
     <section className="rounded-2xl bg-gradient-to-br from-violet-100 to-pink-100 p-4">
       <div className="grid grid-cols-[1fr_.75fr] items-center gap-7 max-lg:grid-cols-1">
@@ -844,23 +913,134 @@ function Advantage() {
       </div>
       <div className="mt-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-violet-50 to-pink-50 p-5 max-md:flex-col max-md:gap-4">
         <p className="m-0 text-sm font-semibold text-violet-700">
-          Sell yourself. Build your network. Grow both.
+          Build Network. Your business doesn't stop after one sell.
         </p>
         <div className="flex gap-3">
-          <Link
-            className="rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
-            href="/partner/register"
+          <button
+            type="button"
+            className="btn-primary rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3 text-xs font-semibold text-white"
+            onClick={() => setPartnerModalOpen(true)}
           >
             Start Growing with MagikPolicy
-          </Link>
+          </button>
           <Link
-            className="rounded-lg border border-violet-500 bg-white px-5 py-3 text-xs font-semibold text-violet-700"
-            href="/for-partners"
+            className="btn-secondary rounded-lg border border-violet-500 bg-white px-5 py-3 text-xs font-semibold text-violet-700"
+            href="/partner/register"
           >
             Explore Partner Benefits
           </Link>
         </div>
       </div>
+      {partnerModalOpen && (
+        <div
+          className="fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-slate-950/55 p-4 backdrop-blur-sm"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setPartnerModalOpen(false);
+          }}
+        >
+          <section
+            aria-labelledby="partner-modal-title"
+            aria-modal="true"
+            className="relative my-6 w-full max-w-xl rounded-2xl bg-white p-6 text-[#172454] shadow-2xl sm:p-8"
+            role="dialog"
+          >
+            <button
+              aria-label="Close partner registration form"
+              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+              onClick={() => setPartnerModalOpen(false)}
+              type="button"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <span className="text-xs font-bold uppercase tracking-[.16em] text-violet-600">
+              Partner with MagikPolicy
+            </span>
+            <h2 className="mb-1 mt-3 pr-10 text-3xl" id="partner-modal-title">
+              Become a Partner
+            </h2>
+            <p className="mb-6 mt-0 text-sm text-slate-500">
+              Fill in your details to begin your partner application.
+            </p>
+            <form
+              className="grid grid-cols-2 gap-4 max-sm:grid-cols-1"
+              onSubmit={submitPartnerApplication}
+            >
+              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+                Full Name
+                <input
+                  autoFocus
+                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  name="name"
+                  placeholder="Enter your full name"
+                  required
+                />
+              </label>
+              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+                Mobile Number
+                <input
+                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  inputMode="tel"
+                  name="mobile"
+                  pattern="[0-9+ ]{10,15}"
+                  placeholder="Enter mobile number"
+                  required
+                />
+              </label>
+              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+                Email Address
+                <input
+                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  name="email"
+                  placeholder="Enter your email address"
+                  required
+                  type="email"
+                />
+              </label>
+              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+                City
+                <input
+                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  name="city"
+                  placeholder="Enter your city"
+                  required
+                />
+              </label>
+              <label className="col-span-2 grid gap-1.5 text-xs font-semibold text-slate-700 max-sm:col-span-1">
+                Business Type
+                <select
+                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  defaultValue=""
+                  name="businessType"
+                  required
+                >
+                  <option disabled value="">Select business type</option>
+                  <option>Individual Advisor</option>
+                  <option>Insurance Agency</option>
+                  <option>Financial Consultant</option>
+                  <option>Corporate Partner</option>
+                </select>
+              </label>
+              <label className="col-span-2 flex items-start gap-2 text-xs leading-relaxed text-slate-500 max-sm:col-span-1">
+                <input className="mt-0.5 accent-violet-600" required type="checkbox" />
+                <span>I agree to the Terms &amp; Conditions and Privacy Policy.</span>
+              </label>
+              <button
+                className="btn-primary col-span-2 rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3.5 text-sm font-semibold text-white max-sm:col-span-1"
+                type="submit"
+              >
+                Submit Application
+              </button>
+            </form>
+            <p className="mb-0 mt-4 text-center text-xs text-slate-500">
+              Already a partner?{" "}
+              <Link className="font-semibold text-violet-700" href="/partner/login">
+                Login here
+              </Link>
+            </p>
+          </section>
+        </div>
+      )}
     </section>
   );
 }

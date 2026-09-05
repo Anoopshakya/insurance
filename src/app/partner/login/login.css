@@ -1,0 +1,108 @@
+.partner-login-panel.partner-register-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 2.5rem;
+  border: 1px solid #e7eaf4;
+  border-radius: 1.2rem;
+  background: #fff;
+  box-shadow: 0 25px 65px rgba(30, 28, 84, 0.12);
+}
+
+.partner-login-panel.partner-register-card h2 {
+  margin: 0;
+  color: #0b1b61;
+  font-size: clamp(2rem, 2.8vw, 3rem);
+  line-height: 1.1;
+}
+
+.partner-login-panel.partner-register-card > p {
+  margin: 0 0 1.2rem;
+  color: #7a86ac;
+  font-size: 1rem;
+}
+
+.partner-login-panel.partner-register-card form {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.partner-login-panel.partner-register-card form > label {
+  gap: 0.65rem;
+  color: #27335f;
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.partner-login-panel.partner-register-card .mp-control {
+  height: 3.75rem;
+  padding: 0 1rem;
+  border-color: #cfd6e7;
+  border-radius: 0.7rem;
+  color: #101b55;
+  font-size: 1rem;
+}
+
+.partner-login-panel.partner-register-card .mp-control::placeholder {
+  color: #8a96b8;
+}
+
+.partner-password-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.partner-password-label button {
+  border: 0;
+  background: transparent;
+  color: #5424ef;
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.partner-login-panel.partner-register-card .partner-input {
+  height: 3rem;
+  border: 1px solid #dce0ec;
+  border-radius: 0.6rem;
+}
+
+.partner-login-panel.partner-register-card .partner-input:focus-within {
+  border-color: #6c42ee;
+  box-shadow: 0 0 0 3px rgba(108, 66, 238, 0.08);
+}
+
+.partner-login-panel.partner-register-card .partner-input input {
+  height: 100%;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+
+.partner-login-panel.partner-register-card .partner-remember input {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.partner-login-panel.partner-register-card .partner-login-submit {
+  height: 3.75rem;
+  border-radius: 0.7rem;
+  font-size: 1.05rem;
+}
+
+.partner-login-panel.partner-register-card .partner-google {
+  height: 3.75rem;
+  border-radius: 0.7rem;
+  font-size: 1rem;
+}
+
+.partner-login-panel.partner-register-card .partner-google b {
+  background: linear-gradient(135deg,#4285f4 20%,#34a853 40%,#fbbc05 62%,#ea4335 80%);
+  background-clip: text;
+  color: transparent;
+  font-size: 1.5rem;
+}
+
+@media (max-width: 800px) {
+  .partner-login-panel.partner-register-card { padding: 1.5rem; }
+}

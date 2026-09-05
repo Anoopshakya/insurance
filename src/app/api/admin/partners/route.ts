@@ -8,7 +8,7 @@ import { partnerInputSchema } from "@/lib/partners/schema";
 async function authorize(req: NextRequest, action: string) {
   const decoded = await verifyRequestToken(req.headers.get("authorization"));
   if (!decoded) return { error: NextResponse.json({ error: "unauthenticated" }, { status: 401 }) };
-  if (!(await ensureAdminPermission(decoded.uid, decoded.email, "agents", action))) return { error: NextResponse.json({ error: "forbidden: admin account is not listed in FIREBASE_ADMIN_EMAILS or lacks the agents permission" }, { status: 403 }) };
+  if (!(await ensureAdminPermission(decoded.uid, decoded.email, "agents", action))) return { error: NextResponse.json({ error: "Your employee role does not include the required partner-management permission." }, { status: 403 }) };
   return { decoded };
 }
 

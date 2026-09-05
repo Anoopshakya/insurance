@@ -1,7 +1,6 @@
-import { adminAuth } from "@/lib/firebase-admin";
 import { supabaseServer } from "@/lib/supabase-server";
 import { sendPartnerWelcome } from "@/lib/notifications/provider";
-import { partnerInputSchema, type PartnerInput } from "./schema";
+import { partnerInputSchema, partnerLoginEmail, type PartnerInput } from "./schema";
 
 export function createAgentCode() {
   return `MP${Date.now().toString(36).toUpperCase()}${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
@@ -21,21 +20,17 @@ export async function createPartner(raw: PartnerInput, actorId: string) {
     sponsorId = sponsor.id;
   }
 
-  let firebaseUser;
-  try {
-    firebaseUser = await adminAuth.createUser({ email: input.email || undefined, phoneNumber: input.mobile || undefined, displayName: input.fullName, disabled: false });
-  } catch (error: unknown) {
-    const code = typeof error === "object" && error && "code" in error ? String(error.code) : "";
-    if (code.includes("already-exists")) throw new Error("A login account with this email or mobile already exists");
-    throw error;
-  }
+  const loginEmail=input.email||partnerLoginEmail(input.mobile);
+  const temporaryPassword=input.mobile?.replace(/\D/g,"").slice(-6)||crypto.randomUUID().slice(0,10);
+  const {data:authData,error:authError}=await db.auth.admin.createUser({email:loginEmail,password:temporaryPassword,email_confirm:true,user_metadata:{full_name:input.fullName,mobile:input.mobile,user_type:"partner"}});
+  if(authError||!authData.user)throw new Error(authError?.message||"Could not create the partner login");
+  const firebaseUser={uid:authData.user.id};
 
   const agentCode = createAgentCode();
   let createdAgentId: string | null = null;
   try {
-    await adminAuth.setCustomUserClaims(firebaseUser.uid, { role: "partner", mustCompleteProfile: true });
     const now = new Date().toISOString();
-    const { error: userError } = await db.from("users").insert({ id: firebaseUser.uid, email: input.email || null, phone: input.mobile || null, full_name: input.fullName, portal: "agent", status: "active", created_at: now, updated_at: now });
+    const { error: userError } = await db.from("users").insert({ id: firebaseUser.uid, email: input.email || loginEmail, phone: input.mobile || null, full_name: input.fullName, portal: "partner", status: "active", created_at: now, updated_at: now });
     if (userError) throw new Error(`Could not save the partner login: ${userError.message}`);
     const baseAgent = { user_id: firebaseUser.uid, agent_code: agentCode, sponsor_id: sponsorId, agent_type: "partner", partner_type: input.partnerType || "standard", source: "admin_invite", region: input.state || null, joining_date: input.joiningDate || now.slice(0, 10), status: "draft", kyc_status: "not_started", performance_level: "starter", created_at: now, updated_at: now };
     let agentResult = await db.from("agents").insert({ ...baseAgent, name: input.fullName, ...(input.agencyName ? { agency_name: input.agencyName } : {}), ...(input.designation ? { designation: input.designation } : {}) }).select().single();
@@ -43,7 +38,7 @@ export async function createPartner(raw: PartnerInput, actorId: string) {
     const { data: agent, error: agentError } = agentResult;
     if (agentError) throw new Error(`Could not save the partner profile: ${agentError.message}`);
     createdAgentId = agent.id;
-    const { data: role, error: roleError } = await db.from("roles").select("id").eq("name", "agent").single();
+    const { data: role, error: roleError } = await db.from("roles").select("id").eq("name", "partner").single();
     if (roleError) throw new Error(`Could not assign the partner role: ${roleError.message}`);
     const { error: roleMapError } = await db.from("user_roles").insert({ user_id: firebaseUser.uid, role_id: role.id });
     if (roleMapError) throw new Error(`Could not assign access permissions: ${roleMapError.message}`);
@@ -63,7 +58,7 @@ export async function createPartner(raw: PartnerInput, actorId: string) {
     const delivery = await sendPartnerWelcome({ mobile: input.mobile || undefined, email: input.email || undefined, fullName: input.fullName, agentCode, inviteUrl, channels: deliveryWasSelected ? requestedChannels : undefined });
     return { ...agent, fullName: input.fullName, mobile: input.mobile, email: input.email, inviteUrl, delivery };
   } catch (error) {
-    await adminAuth.deleteUser(firebaseUser.uid).catch(() => undefined);
+    await db.auth.admin.deleteUser(firebaseUser.uid).catch(() => undefined);
     if (createdAgentId) await db.from("agents").delete().eq("id", createdAgentId);
     await db.from("users").delete().eq("id", firebaseUser.uid);
     throw error;

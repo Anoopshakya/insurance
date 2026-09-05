@@ -8,6 +8,60 @@
   min-width: 0;
 }
 
+.btn-primary,
+.claim-help-trigger,
+.claim-help-primary,
+.claim-help-close {
+  appearance: none;
+  border: 0;
+  
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background-color .18s ease;
+}
+
+.btn-primary:hover,
+.claim-help-trigger:hover,
+.claim-help-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 24px rgba(103, 45, 220, .25);
+}
+
+.btn-primary:active,
+.claim-help-trigger:active,
+.claim-help-primary:active:not(:disabled) {
+  transform: translateY(0) scale(.985);
+  box-shadow: 0 4px 12px rgba(103, 45, 220, .2);
+}
+
+.btn-primary:focus-visible,
+.claim-help-trigger:focus-visible,
+.claim-help-primary:focus-visible,
+.claim-help-close:focus-visible {
+  outline: 3px solid rgba(124, 58, 237, .28);
+  outline-offset: 3px;
+}
+
+.claim-help-primary:disabled {
+  cursor: wait;
+}
+
+.claim-help-close:hover {
+  transform: rotate(6deg) scale(1.06);
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+.btn-secondary{
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, background-color .18s ease;
+}
+.btn-secondary:hover,
+.btn-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 24px rgba(103, 45, 220, .25);
+}
+
 .website-shell {
   width: 100%;
   max-width: 100%;

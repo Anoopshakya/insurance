@@ -1,0 +1,15 @@
+.customer-auth-tabs a {
+  display: grid;
+  height: 2.6rem;
+  place-items: center;
+  border-radius: 0.6rem;
+  color: #667298;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.customer-auth-tabs a.active {
+  background: #fff;
+  color: #5d31eb;
+  box-shadow: 0 4px 14px rgba(48,35,105,.08);
+}

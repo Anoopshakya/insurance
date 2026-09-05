@@ -1,0 +1,61 @@
+.admin-shell .logout-button {
+  display: inline-flex;
+  min-height: 2.55rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0 0.85rem;
+  border: 1px solid #fecaca;
+  border-radius: 0.65rem;
+  background: #fff7f7;
+  color: #dc2626;
+  font-size: 0.72rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.admin-shell .logout-button span {
+  display: inline-block;
+  font-size: 1rem;
+  line-height: 1;
+  transform: rotate(180deg);
+}
+
+.admin-shell .logout-button strong {
+  font: inherit;
+}
+
+.admin-shell .logout-button:hover {
+  border-color: #fca5a5;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.admin-shell .logout-button:focus-visible {
+  outline: 3px solid rgba(220, 38, 38, 0.18);
+  outline-offset: 2px;
+}
+
+html[data-theme="dark"] .admin-shell .logout-button {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fca5a5;
+}
+
+@media (max-width: 850px) {
+  .admin-shell .logout-button {
+    display: inline-flex;
+    width: 2.55rem;
+    padding: 0;
+  }
+
+  .admin-shell .logout-button strong {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}

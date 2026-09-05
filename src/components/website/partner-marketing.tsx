@@ -1,7 +1,29 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import {
+  authenticatedDestination,
+  signInWithGoogle,
+  supabaseAuth,
+} from "@/lib/supabase-client";
+import {
+  BadgeCheck,
+  BarChart3,
+  CalendarDays,
+  ChevronRight,
+  ClipboardPlus,
+  Coins,
+  FileText,
+  Headphones,
+  Lightbulb,
+  Quote,
+  ShieldCheck,
+  TrendingUp,
+  UserRound,
+  UsersRound,
+  WalletCards,
+} from "lucide-react";
 const benefits = [
   [
     "▥",
@@ -35,17 +57,54 @@ const benefits = [
   ],
 ];
 export function PartnerMarketing() {
+  const [socialError, setSocialError] = useState("");
+
+  useEffect(() => {
+    supabaseAuth.auth.getSession().then(async ({ data }) => {
+      if (!data.session) return;
+      const destination = await authenticatedDestination(
+        data.session.access_token,
+      );
+      if (destination) location.replace(destination);
+    });
+  }, []);
+
+  async function googleRegistration() {
+    setSocialError("");
+    try {
+      const session = await signInWithGoogle(
+        `${location.origin}/partner/register?account=1`,
+      );
+      const destination = await authenticatedDestination(session.access_token);
+      if (destination) return location.replace(destination);
+      const response = await fetch("/api/partner/onboarding/start", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+      const body = await response.json();
+      if (!response.ok)
+        throw new Error(body.error || "Partner registration failed.");
+      location.replace("/partner/complete-profile");
+    } catch (caught) {
+      setSocialError(
+        caught instanceof Error
+          ? caught.message
+          : "Google registration could not be started.",
+      );
+    }
+  }
+
   function register(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
-    location.href = `/partner/register?email=${encodeURIComponent(String(form.get("email") || ""))}&mobile=${encodeURIComponent(String(form.get("mobile") || ""))}`;
+    location.href = `/partner/register?account=1&email=${encodeURIComponent(String(form.get("email") || ""))}&mobile=${encodeURIComponent(String(form.get("mobile") || ""))}`;
   }
   return (
     <div className="public-site partner-marketing">
       <main>
-        <p className="partner-crumb">
+        {/* <p className="partner-crumb">
           <Link href="/">Home</Link> › For Partners
-        </p>
+        </p> */}
         <section className="partner-hero">
           <div className="partner-hero-copy">
             <span>✦ Partner with MagikPolicy</span>
@@ -97,12 +156,39 @@ export function PartnerMarketing() {
               priority
             />
           </div>
-          <form className="partner-register-card" onSubmit={register}>
+          <form className="partner-register-card mp-form" onSubmit={register}>
             <h2>Become a Partner</h2>
             <p>Fill in your details to get started</p>
+            <nav className="mp-auth-tabs" aria-label="Partner authentication">
+              <Link
+                className="active"
+                href="/partner/register"
+                aria-current="page"
+              >
+                Register
+              </Link>
+              <Link href="/partner/login">Login</Link>
+            </nav>
+            <button
+              className="partner-google"
+              type="button"
+              onClick={googleRegistration}
+            >
+              <b>G</b> Continue with Google
+            </button>
+            <div className="auth-divider">
+              <span>or continue with details</span>
+            </div>
+            {socialError && (
+              <p className="partner-error mp-form-error">{socialError}</p>
+            )}
             <label>
               Full Name
-              <input name="name" required placeholder="Enter your full name" />
+              <input
+                name="name"
+                required
+                //placeholder="Enter your full name"
+              />
             </label>
             <label>
               Mobile Number
@@ -111,7 +197,7 @@ export function PartnerMarketing() {
                 required
                 inputMode="tel"
                 pattern="[0-9+ ]{10,15}"
-                placeholder="Enter 10 digit mobile number"
+                // placeholder="Enter 10 digit mobile number"
               />
             </label>
             <label>
@@ -120,12 +206,16 @@ export function PartnerMarketing() {
                 name="email"
                 type="email"
                 required
-                placeholder="Enter your email address"
+                //placeholder="Enter your email address"
               />
             </label>
             <label>
               City
-              <input name="city" required placeholder="Enter your city" />
+              <input
+                name="city"
+                required
+                //placeholder="Enter your city"
+              />
             </label>
             <label>
               Business Type
@@ -139,14 +229,16 @@ export function PartnerMarketing() {
                 <option>Corporate Partner</option>
               </select>
             </label>
-            <label className="terms">
+            <label className="terms mp-form-check">
               <input type="checkbox" required />I agree to the Terms &amp;
               Conditions and Privacy Policy
             </label>
-            <button className="site-gradient">Register Now</button>
-            <small>
-              Already a partner? <Link href="/login">Login here</Link>
-            </small>
+            <button className="site-gradient mp-form-action">
+              Register Now
+            </button>
+            {/* <small>
+              Already a partner? <Link href="/partner/login">Login here</Link>
+            </small> */}
           </form>
         </section>
         <section className="partner-section">
@@ -163,8 +255,9 @@ export function PartnerMarketing() {
             ))}
           </div>
         </section>
-        <NetworkEarnings />
-        <section className="partner-process">
+        <PartnerGrowthProgram />
+        <PartnerJourney />
+        <section className="partner-process legacy-partner-section">
           <h2>How It Works</h2>
           <div>
             {[
@@ -208,7 +301,7 @@ export function PartnerMarketing() {
             ))}
           </div>
         </section>
-        <section className="partner-section">
+        <section className="partner-section legacy-partner-section">
           <h2>What Our Partners Say</h2>
           <div className="partner-testimonials">
             {[
@@ -379,5 +472,289 @@ function NetworkEarnings() {
         </strong>
       </div>
     </section>
+  );
+}
+
+function PartnerGrowthProgram() {
+  return (
+    <section className="partner-growth">
+      <header className="partner-growth-heading">
+        <span>Partner Growth Program</span>
+        <h2>
+          Grow From Partner to <em>Team Leader</em>
+        </h2>
+        <h3>Sell policies. Build your team. Earn more together.</h3>
+        <p>
+          Start by selling policies yourself. When you&apos;re ready to grow,
+          onboard partners to your team and earn additional monthly commission
+          on eligible business generated by them.
+        </p>
+      </header>
+
+      <div className="partner-growth-steps">
+        <GrowthStep
+          icon={UserRound}
+          number="01"
+          title="Start as a Partner"
+          copy="Sell policies and earn your regular commission."
+          tone="blue"
+        />
+        <i>›</i>
+        <GrowthStep
+          icon={UsersRound}
+          number="02"
+          title="Build Your Team"
+          copy="Invite agents/partners and help them grow."
+          tone="pink"
+        />
+        <i>›</i>
+        <GrowthStep
+          icon={BarChart3}
+          number="03"
+          title="Unlock Team Earnings"
+          copy="As your team generates eligible business, you receive additional monthly commission."
+          tone="green"
+        />
+      </div>
+
+      <div className="partner-growth-details">
+        <div className="partner-growth-path">
+          <div className="growth-owner">
+            <span>
+              <UserRound />
+            </span>
+            <p>
+              <strong>YOU</strong>
+              <small>Partner / Team Leader</small>
+            </p>
+          </div>
+          <div className="growth-path-branches">
+            <article>
+              <span>
+                <FileText />
+              </span>
+              <p>
+                <strong>Your Business</strong>
+                <small>You sell policies</small>
+              </p>
+              <b>↓</b>
+              <em>
+                <Coins /> Regular Commission
+              </em>
+            </article>
+            <article>
+              <span>
+                <UsersRound />
+              </span>
+              <p>
+                <strong>Your Team&apos;s Business</strong>
+                <small>Your partners sell policies</small>
+              </p>
+              <b>↓</b>
+              <em>
+                <Coins /> Additional Team Commission
+              </em>
+            </article>
+          </div>
+        </div>
+
+        <div className="partner-commission-card">
+          <header>
+            <span>
+              <WalletCards />
+            </span>
+            <h3>Team Commission Structure</h3>
+            <small>
+              <CalendarDays /> Paid Monthly
+            </small>
+          </header>
+          <article className="direct">
+            <span>
+              <UsersRound />
+            </span>
+            <p>
+              <strong>Direct Team Partners</strong>
+              <small>
+                Additional commission on eligible business generated by partners
+                directly onboarded by you.
+              </small>
+            </p>
+            <b>2%</b>
+          </article>
+          <article className="extended">
+            <span>
+              <UsersRound />
+            </span>
+            <p>
+              <strong>Extended Team</strong>
+              <small>
+                Additional commission on eligible business generated by
+                qualifying partners within your team.
+              </small>
+            </p>
+            <b>0.5%</b>
+          </article>
+          <footer>
+            <Lightbulb />
+            <span>
+              Support your partners, help them grow, and create a stronger, more
+              successful journey together.
+            </span>
+          </footer>
+        </div>
+      </div>
+
+      <div className="partner-growth-trust">
+        <span>
+          <ShieldCheck /> Trusted Insurance Brands
+        </span>
+        <span>
+          <Headphones /> Dedicated Support
+        </span>
+        <span>
+          <UsersRound /> Tools to Help You Grow
+        </span>
+      </div>
+    </section>
+  );
+}
+
+function PartnerJourney() {
+  const steps = [
+    {
+      icon: ClipboardPlus,
+      title: "Register",
+      copy: "Sign up and complete your partner profile.",
+      tone: "blue",
+    },
+    {
+      icon: BadgeCheck,
+      title: "Sell Policies",
+      copy: "Help customers choose the right policy and earn your regular commission.",
+      tone: "green",
+    },
+    {
+      icon: UsersRound,
+      title: "Build Your Team",
+      copy: "Onboard agents/partners and support them in growing their business.",
+      tone: "orange",
+    },
+    {
+      icon: TrendingUp,
+      title: "Earn More",
+      copy: "Get additional monthly commission on eligible business generated by your team.",
+      tone: "pink",
+    },
+  ];
+  const stories = [
+    {
+      initials: "AS",
+      name: "Amit Sharma",
+      city: "Jaipur",
+      tone: "blue",
+      quote:
+        "MagikPolicy has given me a great platform to grow my business and earn consistent monthly income. The support team is always with us.",
+    },
+    {
+      initials: "NG",
+      name: "Neha Gupta",
+      city: "Lucknow",
+      tone: "pink",
+      quote:
+        "I love the additional team commission. As my partners grow, my earnings also grow. It’s a great opportunity for serious partners.",
+    },
+    {
+      initials: "RK",
+      name: "Raj Kumar",
+      city: "Indore",
+      tone: "green",
+      quote:
+        "Easy to use platform, wide range of products and timely payouts. Highly recommended!",
+    },
+  ];
+  return (
+    <section className="partner-journey">
+      <header className="journey-heading">
+        <span>Simple Steps to Grow</span>
+        <h2>How It Works</h2>
+        <i />
+        <p>
+          From registration to higher earnings — your growth journey is simple
+          and rewarding.
+        </p>
+      </header>
+      <div className="journey-steps">
+        {steps.map(({ icon: Icon, title, copy, tone }, index) => (
+          <div className="journey-step-wrap" key={title}>
+            <article className={`journey-step ${tone}`}>
+              <i>{index + 1}</i>
+              <span>
+                <Icon />
+              </span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+            {index < steps.length - 1 && (
+              <b>
+                <ChevronRight />
+              </b>
+            )}
+          </div>
+        ))}
+      </div>
+      <header className="journey-heading testimonial-heading">
+        <span>Real Stories. Real Growth</span>
+        <h2>What Our Partners Say</h2>
+        <p>Hear from our partners who are growing their business with us.</p>
+      </header>
+      <div className="journey-testimonials">
+        {stories.map((story) => (
+          <article className={story.tone} key={story.name}>
+            <Quote />
+            <q>{story.quote}</q>
+            <footer>
+              <b>{story.initials}</b>
+              <p>
+                <strong>{story.name}</strong>
+                <small>Partner, {story.city}</small>
+              </p>
+              <i aria-label="5 out of 5 stars">★★★★★</i>
+            </footer>
+          </article>
+        ))}
+      </div>
+      <div className="testimonial-dots">
+        <i />
+        <i />
+        <i />
+      </div>
+    </section>
+  );
+}
+
+function GrowthStep({
+  icon: Icon,
+  number,
+  title,
+  copy,
+  tone,
+}: {
+  icon: typeof UserRound;
+  number: string;
+  title: string;
+  copy: string;
+  tone: string;
+}) {
+  return (
+    <article className={`growth-step ${tone}`}>
+      <span>
+        <Icon />
+      </span>
+      <div>
+        <small>{number}</small>
+        <h3>{title}</h3>
+        <p>{copy}</p>
+      </div>
+    </article>
   );
 }
