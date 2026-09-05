@@ -1,1 +1,1 @@
-export { PartnerDashboardSupabase as default } from "@/components/website/partner-dashboard-supabase";
+export { PartnerDashboard as default } from "@/components/website/partner-dashboard";
