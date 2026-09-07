@@ -4,6 +4,8 @@ import "./partner.css";
 import "./partner-dashboard.css";
 import "./partner-leads.css";
 import "./partner-customers.css";
+import "./partner-earnings.css";
+import "./partner-policies.css";
 export default function PartnerLayout({ children }: { children: ReactNode }) {
   return <PortalRouteGuard portal="partner">{children}</PortalRouteGuard>;
 }

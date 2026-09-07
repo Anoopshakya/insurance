@@ -101,13 +101,33 @@ export async function PATCH(request: NextRequest) {
     if (!allowed.has(input.status))
       return NextResponse.json({ error: "Invalid lead status" }, { status: 400 });
     const table = input.leadType === "website" ? "website_quote_requests" : "leads";
-    const { error } = await supabaseServer()
+    const db = supabaseServer();
+    const { data: lead, error: leadError } = await db
+      .from(table)
+      .select("*")
+      .eq("id", input.id)
+      .maybeSingle();
+    if (leadError || !lead)
+      return NextResponse.json({ error: leadError?.message || "Lead not found" }, { status: 404 });
+    const { error } = await db
       .from(table)
       .update({ status: input.status, updated_at: new Date().toISOString() })
       .eq("id", input.id);
-    return error
-      ? NextResponse.json({ error: error.message }, { status: 400 })
-      : NextResponse.json({ ok: true });
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (input.status !== "converted") return NextResponse.json({ ok: true });
+    if (input.leadType === "website")
+      return NextResponse.json({ ok: true, conversion: { leadId: lead.id, leadType: "website", name: lead.customer_name, contact: lead.mobile } });
+    let { data: customer } = await db.from("customers").select("id").eq("created_from_lead_id", lead.id).maybeSingle();
+    if (!customer && lead.contact) {
+      const existing = await db.from("customers").select("id").eq("agent_id", lead.agent_id).eq("contact", lead.contact).maybeSingle();
+      customer = existing.data;
+    }
+    if (!customer) {
+      const created = await db.from("customers").insert({ agent_id: lead.agent_id, name: lead.name, contact: lead.contact, created_from_lead_id: lead.id }).select("id").single();
+      if (created.error) return NextResponse.json({ error: created.error.message }, { status: 400 });
+      customer = created.data;
+    }
+    return NextResponse.json({ ok: true, conversion: { leadId: lead.id, leadType: "internal", customerId: customer?.id, agentId: lead.agent_id, sectorId: lead.product_sector_id, productTypeId: lead.product_type_id, name: lead.name, contact: lead.contact } });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof z.ZodError ? error.issues[0]?.message : "Could not update lead" },

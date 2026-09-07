@@ -37,6 +37,8 @@ import {
 import { supabaseAuth } from "@/lib/supabase-client";
 import { PartnerLeadsContent } from "@/components/website/partner-leads-content";
 import { PartnerCustomersContent } from "@/components/website/partner-customers-content";
+import { PartnerEarningsContent } from "@/components/website/partner-earnings-content";
+import { PartnerPoliciesContent } from "@/components/website/partner-policies-content";
 
 type IconType = LucideIcon;
 type Profile = {
@@ -320,7 +322,7 @@ function LeadsContent() {
 export function PartnerDashboard({
   view = "dashboard",
 }: {
-  view?: "dashboard" | "leads" | "customers";
+  view?: "dashboard" | "leads" | "customers" | "policies" | "earnings";
 }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [menu, setMenu] = useState(false);
@@ -379,7 +381,7 @@ export function PartnerDashboard({
                 (
                   view === "dashboard"
                     ? index === 0
-                    : label === (view === "leads" ? "Leads" : "Customers")
+                    : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", earnings: "Earnings" } as const)[view]
                 )
                   ? "active"
                   : ""
@@ -452,6 +454,10 @@ export function PartnerDashboard({
             <PartnerLeadsContent />
           ) : view === "customers" ? (
             <PartnerCustomersContent />
+          ) : view === "earnings" ? (
+            <PartnerEarningsContent />
+          ) : view === "policies" ? (
+            <PartnerPoliciesContent />
           ) : (
             <>
               <section className="pd-welcome">
@@ -636,13 +642,13 @@ export function PartnerDashboard({
       </div>
 
       <nav className="pd-bottom-nav">
-        {nav.slice(0, 4).map(([label, href, Icon], index) => (
+        {(view === "earnings" ? [nav[0], nav[1], nav[2], nav[5]] : nav.slice(0, 4)).map(([label, href, Icon], index) => (
           <Link
             className={
               (
                 view === "dashboard"
                   ? index === 0
-                  : label === (view === "leads" ? "Leads" : "Customers")
+                  : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", earnings: "Earnings" } as const)[view]
               )
                 ? "active"
                 : ""

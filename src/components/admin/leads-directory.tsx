@@ -85,7 +85,13 @@ export function LeadsDirectory() {
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ id: lead.id, leadType: lead.leadType, status }),
     });
-    if (!response.ok) return setError((await response.json()).error);
+    const body = await response.json();
+    if (!response.ok) return setError(body.error);
+    if (status === "converted" && body.conversion) {
+      sessionStorage.setItem("policyLeadConversion", JSON.stringify(body.conversion));
+      location.href = "/admin/policies?convert=1";
+      return;
+    }
     await load();
   }
   async function createLead(event: FormEvent<HTMLFormElement>) {
