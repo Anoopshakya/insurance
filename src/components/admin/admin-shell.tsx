@@ -4,9 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { onAuthStateChanged, signOut } from "firebase/auth";
 import { Icon, type IconName } from "./icons";
-import { auth } from "@/lib/firebase-client";
+import { subscribeSession, supabaseAuth } from "@/lib/supabase-client";
 
 type NavItem = { label: string; href: string; icon: IconName; badge?: string };
 const navigation: Array<{ label?: string; items: NavItem[] }> = [
@@ -91,6 +90,9 @@ export function AdminShell({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [authReady, setAuthReady] = useState(false);
+  const [displayName, setDisplayName] = useState("Administrator");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [authAttempt, setAuthAttempt] = useState(0);
 
   useEffect(() => {
     setTheme(
@@ -98,31 +100,52 @@ export function AdminShell({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  useEffect(
-    () =>
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          setAuthReady(true);
-          if (pathname !== "/admin/login")
-            window.location.replace("/admin/login");
-          return;
-        }
+  useEffect(() => {
+    let active = true;
+    let requestId = 0;
+    setAuthReady(false);
+    setAuthError(null);
 
-        const token = await user.getIdToken();
-        const access = await fetch("/api/admin/dashboard", {
+    const unsubscribe = subscribeSession(async (session) => {
+      const currentRequest = ++requestId;
+      const isCurrent = () => active && currentRequest === requestId;
+      setAuthReady(false);
+      setAuthError(null);
+
+      if (!session) {
+        if (pathname !== "/admin/login") window.location.replace("/admin/login");
+        return;
+      }
+
+      try {
+        const token = session.access_token;
+        setDisplayName(session.user.user_metadata?.full_name || "Administrator");
+        if (!isCurrent()) return;
+        const access = await fetch("/api/admin/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
+        if (!isCurrent()) return;
+        if (access.status === 401 || access.status === 403) {
+          if (pathname !== "/admin/login") window.location.replace("/admin/login");
+          return;
+        }
         if (!access.ok) {
-          if (pathname === "/admin/login") setAuthReady(true);
-          if (pathname !== "/admin/login")
-            window.location.replace("/admin/login");
+          setAuthError("Unable to verify admin access right now. Please try again.");
           return;
         }
         setAuthReady(true);
         if (pathname === "/admin/login") window.location.replace("/admin");
-      }),
-    [pathname],
-  );
+      } catch {
+        if (!isCurrent()) return;
+        setAuthError("Unable to connect. Check your connection and try again.");
+      }
+    }, () => setAuthError("Unable to load your session. Please try again."));
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  }, [pathname, authAttempt]);
 
   function toggleTheme() {
     const next = theme === "light" ? "dark" : "light";
@@ -133,6 +156,19 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }
 
   if (pathname === "/admin/login") return <>{children}</>;
+  if (authError)
+    return (
+      <div className="auth-loading" role="alert">
+        <p>{authError}</p>
+        <button type="button" onClick={() => {
+          setAuthError(null);
+          setAuthReady(false);
+          setAuthAttempt((attempt) => attempt + 1);
+        }}>
+          Try again
+        </button>
+      </div>
+    );
   if (!authReady)
     return (
       <div className="auth-loading">
@@ -239,7 +275,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               aria-label="Administrator security settings"
             >
               <span className="admin-avatar">
-                {auth.currentUser?.displayName
+                {displayName
                   ?.split(" ")
                   .map((part) => part[0])
                   .slice(0, 2)
@@ -247,7 +283,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
               </span>
               <span>
                 <strong>
-                  {auth.currentUser?.displayName || "Administrator"}
+                  {displayName || "Administrator"}
                 </strong>
                 <small>Super administrator</small>
               </span>
@@ -258,7 +294,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
               type="button"
               aria-label="Sign out of the admin portal"
               onClick={async () => {
-                await signOut(auth);
+                const { error } = await supabaseAuth.auth.signOut();
+                if (error) { setAuthError("Sign out failed. Please try again."); return; }
                 window.location.replace("/admin/login");
               }}
             >

@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 type Kind = "sectors" | "providers" | "types";
 type Row = {
   id: string;
@@ -39,7 +39,7 @@ const copy = {
   },
 };
 async function api(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, {
     ...init,
     headers: { ...(init.headers || {}), Authorization: `Bearer ${token}` },

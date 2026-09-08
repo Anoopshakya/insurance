@@ -1,12 +1,15 @@
 import type { ReactNode } from "react";
 import { WebsiteHeader } from "./website-header";
 import { WebsiteFooter } from "./website-footer";
+import { WebsiteQuotation } from "./quotation-form";
+import "./website-pages.css";
 
 export function WebsiteShell({ children }: { children: ReactNode }) {
   return (
     <div className="website-shell [&_a]:no-underline [&_a:hover]:no-underline [&_a:focus]:no-underline [&_a:visited]:no-underline [&_button]:no-underline">
       <WebsiteHeader />
       <div className="website-content">{children}</div>
+      <WebsiteQuotation />
       <WebsiteFooter />
     </div>
   );

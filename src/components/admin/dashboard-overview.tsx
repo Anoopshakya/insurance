@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { auth } from "@/lib/firebase-client";
+import { subscribeSession } from "@/lib/supabase-client";
 import { Icon, type IconName } from "@/components/admin/icons";
 type Policy = {
   id: string;
@@ -40,14 +39,14 @@ export function DashboardOverview() {
   const [error, setError] = useState("");
   useEffect(
     () =>
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) return;
+      subscribeSession(async (session) => {
+        if (!session) return;
         const response = await fetch("/api/admin/dashboard", {
-          headers: { Authorization: `Bearer ${await user.getIdToken()}` },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         });
         const body = await response.json();
         response.ok ? setData(body.data) : setError(body.error);
-      }),
+      }, () => setError("Unable to load the dashboard. Please try again.")),
     [],
   );
   if (error)

@@ -1,10 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  devIndicators: false,
-  // Bundle Firebase Admin into the server output. This avoids Vercel trying
-  // to resolve it as an unavailable external runtime module.
-  transpilePackages: ["firebase-admin"],
-};
+const nextConfig: NextConfig = { devIndicators: false };
 
 export default nextConfig;

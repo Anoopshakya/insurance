@@ -3,12 +3,12 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight, Download, FilePlus2, FileText, Filter, MoreVertical, Percent, Plus, Search, ShieldCheck, Upload, WalletCards } from "lucide-react";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 
 type Policy = any; type Options = { customers:any[];agents:any[];sectors:any[];products:any[];productTypes:any[];insurers:any[];plans:any[] }; type Metrics = {total:number;active:number;expiring:number;lapsed:number;cancelled:number;premium:number;commission:number};
 const money = new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0});
 const date = (value:string) => new Date(`${value}T00:00:00`).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
-async function request(init:RequestInit={}){const token=await auth.currentUser?.getIdToken();return fetch("/api/admin/policies",{...init,headers:{...(init.headers||{}),Authorization:`Bearer ${token||""}`}})}
+async function request(init:RequestInit={}){const token=await accessToken();return fetch("/api/admin/policies",{...init,headers:{...(init.headers||{}),Authorization:`Bearer ${token||""}`}})}
 const emptyOptions:Options={customers:[],agents:[],sectors:[],products:[],productTypes:[],insurers:[],plans:[]};
 
 export function PoliciesDirectory(){

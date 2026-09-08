@@ -97,7 +97,7 @@ export function PartnerLoginExperience() {
       const email = await resolvePartnerEmail(identifier);
       const { error: resetError } =
         await supabaseAuth.auth.resetPasswordForEmail(email, {
-          redirectTo: `${location.origin}/partner/login`,
+          redirectTo: `${location.origin}/auth/reset-password`,
         });
       if (resetError) throw resetError;
       setNotice(

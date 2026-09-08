@@ -2,9 +2,9 @@
 -- Extensions
 create extension if not exists "pgcrypto";
 
--- Users (mirrors Firebase-authenticated identities)
+-- Users (mirrors Supabase-authenticated identities)
 create table users (
-  id text primary key,                    -- = firebase uid
+  id text primary key,                    -- = Supabase Auth user ID
   email text unique,
   phone text,
   full_name text not null,

@@ -3,14 +3,14 @@
 export { PartnerDirectoryPage as default } from "@/components/admin/partner-directory";
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 import { Icon } from "@/components/admin/icons";
 
 type Partner = { id: string; agent_code: string; partner_type: string; region: string | null; status: string; kyc_status: string; created_at: string; users: { full_name: string; phone: string; email: string | null } };
 type BulkResult = { total: number; created: number; failed: number; rows: Array<{ row: number; name: string; mobile: string; status: string; agentCode?: string; error?: string }> };
 
 async function authorizedFetch(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, { ...init, headers: { ...(init.headers ?? {}), Authorization: `Bearer ${token}` } });
 }
 

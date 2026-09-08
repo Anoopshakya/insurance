@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type Dispatch, type SetStateAction } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 
 type Sector = { id: string; name: string };
 type CommissionCategory = { id: string; name: string; category_id: string; sector: Sector; type: Sector };
@@ -17,7 +17,7 @@ const defaults: SlabRange[] = [
 ];
 
 async function api(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `Bearer ${token}` } });
 }
 

@@ -1,24 +1,5 @@
-import { LeadForm } from "@/components/website/lead-form";
-import { PublicPage } from "@/components/website/site-shell";
-export default function RenewPage() {
-  return (
-    <PublicPage
-      eyebrow="Policy renewal"
-      title="Stay protected without interruption"
-      copy="Request renewal help and compare updated cover before your current policy expires."
-    >
-      <section className="product-detail">
-        <article>
-          <h2>Renew with confidence</h2>
-          <p>
-            Our team can help review your current coverage, premium and suitable
-            alternatives.
-          </p>
-        </article>
-        <article>
-          <LeadForm kind="policy renewal" />
-        </article>
-      </section>
-    </PublicPage>
-  );
-}
+import { InformationPage } from "@/components/website/information-page";
+import { findInformationPage } from "@/components/website/static-pages";
+const page = findInformationPage("renew")!;
+export const metadata = { title: page.title, description: page.intro };
+export default function Page() { return <InformationPage page={page} />; }

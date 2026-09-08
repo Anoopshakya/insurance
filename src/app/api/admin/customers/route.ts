@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { ensureAdminPermission } from "@/lib/rbac";
 import { supabaseServer } from "@/lib/supabase-server";
 

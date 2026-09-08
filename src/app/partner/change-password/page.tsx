@@ -1,8 +1,24 @@
 "use client";
-
-import Image from "next/image";
-import { EmailAuthProvider, onAuthStateChanged, reauthenticateWithCredential, updatePassword } from "firebase/auth";
-import { FormEvent, useEffect, useState } from "react";
-import { auth } from "@/lib/firebase-client";
-
-export default function PartnerChangePassword(){const[current,setCurrent]=useState("");const[next,setNext]=useState("");const[confirm,setConfirm]=useState("");const[error,setError]=useState("");const[loading,setLoading]=useState(false);useEffect(()=>onAuthStateChanged(auth,(user)=>{if(!user)location.replace("/partner/login")}),[]);async function submit(e:FormEvent){e.preventDefault();setError("");if(next.length<8)return setError("Use at least 8 characters.");if(next!==confirm)return setError("New passwords do not match.");const user=auth.currentUser;if(!user?.email)return setError("Session expired. Sign in again.");setLoading(true);try{await reauthenticateWithCredential(user,EmailAuthProvider.credential(user.email,current));await updatePassword(user,next);const token=await user.getIdToken(true);const response=await fetch("/api/auth/password-changed",{method:"POST",headers:{Authorization:`Bearer ${token}`}});if(!response.ok)throw new Error();await user.getIdToken(true);location.replace("/partner")}catch{setError("Could not change password. Check your temporary password.");setLoading(false)}}return <main className="partner-login-page"><section className="partner-login-card"><Image src="/brand/magikpolicy-logo.png" alt="MagikPolicy" width={420} height={140}/><p className="partner-kicker">Secure your account</p><h1>Create a new password</h1><p>You must replace the temporary password before entering your workspace.</p><form onSubmit={submit}><label>Temporary password<input type="password" value={current} onChange={e=>setCurrent(e.target.value)} required/></label><label>New password<input type="password" value={next} onChange={e=>setNext(e.target.value)} minLength={8} required/></label><label>Confirm new password<input type="password" value={confirm} onChange={e=>setConfirm(e.target.value)} minLength={8} required/></label>{error&&<p className="partner-error">{error}</p>}<button disabled={loading}>{loading?"Securing account…":"Change password & continue"}</button></form></section></main>}
+import { FormEvent, useState } from "react";
+import { changePassword } from "@/lib/supabase-client";
+export default function PartnerChangePassword() {
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault(); setError(""); setBusy(true);
+    const form = new FormData(event.currentTarget);
+    try {
+      const password = String(form.get("password"));
+      if (password !== form.get("confirmPassword")) throw new Error("Passwords do not match.");
+      await changePassword(String(form.get("currentPassword")), password);
+      location.replace("/partner");
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Password change failed."); }
+    finally { setBusy(false); }
+  }
+  return <main className="partner-login-page"><section className="partner-login-card"><h1>Change password</h1><form onSubmit={submit}>
+    <label>Current password<input name="currentPassword" type="password" autoComplete="current-password" required /></label>
+    <label>New password<input name="password" type="password" autoComplete="new-password" minLength={12} required /></label>
+    <label>Confirm new password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} required /></label>
+    {error && <p role="alert">{error}</p>}<button disabled={busy}>{busy ? "Updating..." : "Change password"}</button>
+  </form></section></main>;
+}

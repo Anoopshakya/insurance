@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 
 type Item = { id: string; name: string; icon?: string | null; logo_url?: string | null; category_id?: string };
 type Tier = "high" | "average" | "low";
@@ -14,7 +14,7 @@ const tierInfo = {
 } as const;
 
 async function api(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, { ...init, headers: { ...(init.headers || {}), Authorization: `Bearer ${token}` } });
 }
 

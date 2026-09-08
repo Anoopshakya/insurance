@@ -10,11 +10,14 @@ function welcomeText(input: WelcomeMessage) {
 
 async function deliver(channel: "email" | "sms", input: WelcomeMessage): Promise<DeliveryResult> {
   const url = channel === "email" ? process.env.EMAIL_WEBHOOK_URL : process.env.SMS_WEBHOOK_URL;
-  if (channel === "email" && !url && input.email && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
+  if (channel === "email" && !url && input.email) {
     try {
-      const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${process.env.NEXT_PUBLIC_FIREBASE_API_KEY}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ requestType: "EMAIL_SIGNIN", email: input.email, continueUrl: input.inviteUrl, canHandleCodeInApp: true }) });
-      return response.ok ? { channel, status: "sent" } : { channel, status: "failed", detail: "Firebase email-link delivery failed" };
-    } catch (error) { return { channel, status: "failed", detail: error instanceof Error ? error.message : "Firebase email delivery failed" }; }
+      const { error } = await supabaseServer().auth.signInWithOtp({
+        email: input.email,
+        options: { shouldCreateUser: false, emailRedirectTo: new URL("/auth/callback?next=/partner/complete-profile", input.inviteUrl).toString() },
+      });
+      return error ? { channel, status: "failed", detail: error.message } : { channel, status: "sent" };
+    } catch (error) { return { channel, status: "failed", detail: error instanceof Error ? error.message : "Email delivery failed" }; }
   }
   if (!url) return { channel, status: "queued", detail: "Provider webhook is not configured" };
   try {

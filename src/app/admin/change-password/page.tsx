@@ -1,9 +1,8 @@
 "use client";
 
-import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from "firebase/auth";
 import { FormEvent, useState } from "react";
 import { Icon } from "@/components/admin/icons";
-import { auth } from "@/lib/firebase-client";
+import { changePassword } from "@/lib/supabase-client";
 
 export default function ChangePasswordPage() {
   const [currentPassword, setCurrentPassword] = useState("");
@@ -18,12 +17,9 @@ export default function ChangePasswordPage() {
     if (newPassword.length < 12) return setMessage({ type: "error", text: "Use at least 12 characters for the new password." });
     if (newPassword !== confirmPassword) return setMessage({ type: "error", text: "The new passwords do not match." });
     if (newPassword === currentPassword) return setMessage({ type: "error", text: "Choose a password different from the current one." });
-    const user = auth.currentUser;
-    if (!user?.email) return setMessage({ type: "error", text: "Your session has expired. Sign in again." });
     setLoading(true);
     try {
-      await reauthenticateWithCredential(user, EmailAuthProvider.credential(user.email, currentPassword));
-      await updatePassword(user, newPassword);
+      await changePassword(currentPassword, newPassword);
       setCurrentPassword(""); setNewPassword(""); setConfirmPassword("");
       setMessage({ type: "success", text: "Password changed successfully." });
     } catch {

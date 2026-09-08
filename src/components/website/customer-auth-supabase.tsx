@@ -154,7 +154,7 @@ export function CustomerAuthSupabase({
     setLoading(true);
     const email = String(new FormData(event.currentTarget).get("resetEmail"));
     const { error } = await supabaseAuth.auth.resetPasswordForEmail(email, {
-      redirectTo: `${location.origin}/customer/login`,
+      redirectTo: `${location.origin}/auth/reset-password`,
     });
     setLoading(false);
     error

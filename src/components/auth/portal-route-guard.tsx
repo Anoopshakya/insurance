@@ -55,7 +55,7 @@ export function PortalRouteGuard({
         const profile = (await response.json()).data;
         if (
           profile.profile_setup_required &&
-          pathname !== "/partner/complete-profile"
+          pathname !== "/partner/complete-profile" && pathname !== "/partner/change-password"
         ) {
           location.replace("/partner/complete-profile");
           return;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { supabaseServer } from "@/lib/supabase-server";
 
 async function agentId(request: NextRequest) {

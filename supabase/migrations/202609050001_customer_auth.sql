@@ -1,4 +1,4 @@
--- Customer authentication/profile support. Firebase remains the identity provider;
+-- Customer authentication/profile support. Supabase Auth remains the identity provider;
 -- users/customers store the application identity and customer profile.
 alter table public.users drop constraint if exists users_portal_check;
 alter table public.users add constraint users_portal_check check (portal in ('admin','agent','partner','customer'));

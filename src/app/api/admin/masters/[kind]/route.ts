@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { userHasPermission } from "@/lib/rbac";
 import { supabaseServer } from "@/lib/supabase-server";
 import { slugify } from "@/lib/catalog-master";

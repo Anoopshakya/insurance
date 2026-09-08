@@ -1,12 +1,12 @@
 // Reference implementation of the pattern every protected route follows:
-// 1. Verify the Firebase ID token   -> who is this, really?
+// 1. Verify the Supabase Auth ID token   -> who is this, really?
 // 2. Check role_permissions          -> are they allowed to do this?
 // 3. Only then touch Supabase        -> and log to audit_logs if it mutates data.
 //
 // Copy this structure for /api/leads, /api/policies, /api/commission/rules, etc.
 
 import { NextRequest, NextResponse } from "next/server";
-import { verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { userHasPermission } from "@/lib/rbac";
 import { supabaseServer } from "@/lib/supabase-server";
 

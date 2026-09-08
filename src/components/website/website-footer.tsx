@@ -1,21 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { products } from "./website-products";
-import { Network, Search, Send, ShieldCheck, Tag } from "lucide-react";
-
-const footerColumns = [
-  { title: "Buy Insurance", links: [["Health Insurance", "/products/health-insurance"], ["Car Insurance", "/products/car-insurance"], ["Bike Insurance", "/products/bike-insurance"], ["Term Life Insurance", "/products/term-life-insurance"], ["Travel Insurance", "/products/travel-insurance"], ["Family Insurance", "/products/family-insurance"], ["Personal Accident Insurance", "/products/personal-accident-insurance"]] },
-  { title: "Partner With Us", links: [["How to Become Partner", "/partner/register"], ["Partner Login", "/partner/login"], ["Partner Resources", "/resources"], ["Training & Support", "/resources"], ["FAQs for Partners", "/partner/register"]] },
-  { title: "Support", links: [["Claim Assistance", "/claims"], ["Policy Renew", "/renew"], ["Complaint", "/resources"], ["FAQs", "/resources"], ["Contact Us", "/contact"]] },
-  { title: "Company", links: [["About Us", "/about"], ["Our Mission", "/about"], ["How It Works", "/about"], ["Careers", "/contact"], ["Blog", "/resources"]] },
-];
+import { footerColumns, legalLinks } from "./footer-navigation";
 
 export function WebsiteFooter() {
   return (
     <>
       <a
         className="whatsapp-float"
-        href="https://wa.me/919891824725?text=Hello%20MagikPolicy%2C%20I%20would%20like%20help%20with%20insurance."
+        href="https://wa.me/918920028861?text=Hello%20MagikPolicy%2C%20I%20would%20like%20help%20with%20insurance."
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Chat with MagikPolicy on WhatsApp"
@@ -52,56 +44,10 @@ export function WebsiteFooter() {
           {/* <div className="mp-footer-updates"><h3>Stay Updated</h3><p>Subscribe to get tips, offers and insurance insights.</p><form><input aria-label="Email address" type="email" placeholder="Enter your email" /><button aria-label="Subscribe" type="button"><Send /></button></form></div> */}
         </div>
         <div className="mp-footer-bottom"><small>© 2026 MagikPolicy.</small>
-          <nav aria-label="Legal">
-            {/* <Link href="/sitemap">Sitemap</Link> */}
-            <Link href="/disclaimer">Disclaimer</Link>
-            {/* <Link href="/privacy-policy">Privacy Policy</Link> */}
-            <Link href="/terms">Terms &amp; Conditions</Link>
-            {/* <Link href="/refund-policy">Refund Policy</Link> */}
-            {/* <Link href="/contact">Grievance Redressal</Link> */}
-          </nav>
+          <nav aria-label="Legal">{legalLinks.map(([label, href]) => <Link key={href} href={href}>{label}</Link>)}</nav>
         </div>
       </footer>
-      <footer className="site-footer legacy-site-footer">
-        <div>
-          <Image
-            src="/brand/magikpolicy-logo-dark.png"
-            alt="MagikPolicy"
-            width={420}
-            height={140}
-          />
-          <p>Making insurance simple, accessible and magical for everyone.</p>
-        </div>
-        <div>
-          <h3>Products</h3>
-          {products.map((p) => (
-            <Link key={p.slug} href={`/products/${p.slug}`}>
-              {p.name}
-            </Link>
-          ))}
-        </div>
-        <div>
-          <h3>Company</h3>
-          <Link href="/about">About Us</Link>
-          <Link href="/partner/register">Our Partners</Link>
-          <Link href="/contact">Careers</Link>
-          <Link href="/resources">Blog</Link>
-        </div>
-        <div>
-          <h3>Resources</h3>
-          <Link href="/resources">Help Center</Link>
-          <Link href="/resources">FAQs</Link>
-          <Link href="/claims">Claims</Link>
-          <Link href="/renew">Renew Policy</Link>
-        </div>
-        <div>
-          <h3>Contact Us</h3>
-          <p>Mumbai, Maharashtra</p>
-          <a href="tel:+919876543210">+91 98765 43210</a>
-          <a href="mailto:support@magikpolicy.com">support@magikpolicy.com</a>
-        </div>
-        <small>© 2026 MagikPolicy. All rights reserved.</small>
-      </footer>
+
     </>
   );
 }

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 import { Icon } from "@/components/admin/icons";
 
 const STATES = ["Andaman and Nicobar Islands","Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chandigarh","Chhattisgarh","Dadra and Nagar Haveli and Daman and Diu","Delhi","Goa","Gujarat","Haryana","Himachal Pradesh","Jammu and Kashmir","Jharkhand","Karnataka","Kerala","Ladakh","Lakshadweep","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Puducherry","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
@@ -12,7 +12,7 @@ function displayDate(value?:string|null){if(!value)return "";const match=/^(\d{4
 function isoDate(value:FormDataEntryValue|undefined){if(typeof value!=="string")return value;const match=/^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value.trim());return match?`${match[3]}-${match[2]}-${match[1]}`:value}
 
 async function authorizedFetch(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, { ...init, headers: { ...(init.headers ?? {}), Authorization: `Bearer ${token}` } });
 }
 
@@ -67,7 +67,7 @@ export function PartnerForm({ partnerId }: { partnerId?: string }) {
         <section className="partner-form-section"><header><b>4</b><h2>Login &amp; Access</h2></header><div className="delivery-options">
           <p>A secure profile-completion link is sent instead of a password. The partner verifies their email or mobile before access.</p>
           <label><input type="checkbox" name="sendSms" defaultChecked={!editing}/><span><strong>Send invitation by SMS</strong><small>Uses the configured SMS provider webhook.</small></span></label>
-          <label><input type="checkbox" name="sendEmail" defaultChecked={!editing}/><span><strong>Send invitation by email</strong><small>Uses Firebase email-link delivery or your email webhook.</small></span></label>
+          <label><input type="checkbox" name="sendEmail" defaultChecked={!editing}/><span><strong>Send invitation by email</strong><small>Uses Supabase email-link delivery or your email webhook.</small></span></label>
         </div>{error&&<p className="form-error" role="alert">{error}</p>}</section>
       </div>
       <aside className="partner-preview-column"><section className="partner-preview-card"><h2>Partner Preview</h2><div className="preview-avatar"><Icon name="users"/></div><h3>{name||"Partner name"}</h3><dl><div><dt>Partner ID</dt><dd>{detail?.agent_code||"Auto generated"}</dd></div><div><dt>Agent Code</dt><dd>{detail?.agent_code||"AGT- Auto generated"}</dd></div><div><dt>Referral Code</dt><dd>{detail?`magik-${detail.agent_code.toLowerCase()}`:"magik- Auto generated"}</dd></div></dl></section>

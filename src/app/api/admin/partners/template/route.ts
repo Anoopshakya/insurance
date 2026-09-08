@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
-import { verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { ensureAdminPermission } from "@/lib/rbac";
 
 export async function GET(req: NextRequest) {

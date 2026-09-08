@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --test tests/*.test.cjs tests/*.test.mjs",
+    "test:website": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -17,8 +19,6 @@
     "@tanstack/react-table": "^8.20.0",
     "clsx": "^2.1.0",
     "exceljs": "^4.4.0",
-    "firebase": "^12.18.0",
-    "firebase-admin": "14.3.0",
     "lucide-react": "1.35.0",
     "next": "^16.3.2",
     "react": "^18.3.0",
@@ -29,6 +29,8 @@
     "zod": "^3.23.0"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.8",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^20.14.0",
     "@types/react": "^18.3.0",
     "autoprefixer": "^10.4.0",

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { adminAuth, verifyRequestToken } from "@/lib/firebase-admin";
+import { verifyRequestToken } from "@/lib/auth-server";
 import { ensureAdminPermission } from "@/lib/rbac";
 import { supabaseServer } from "@/lib/supabase-server";
 
@@ -34,7 +34,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const agentUpdate = { ...(input.fullName ? { name: input.fullName } : {}), ...(input.state !== undefined ? { region: input.state || null } : {}), ...(input.partnerType ? { partner_type: input.partnerType } : {}), ...(input.agencyName!==undefined?{agency_name:input.agencyName||null}:{}), ...(input.designation!==undefined?{designation:input.designation||null}:{}), ...(input.joiningDate?{joining_date:input.joiningDate}:{}), ...(input.operationsManagerId !== undefined ? { operations_manager_id: input.operationsManagerId || null } : {}), updated_at: now };
   const { data: agent, error } = await db.from("agents").update(agentUpdate).eq("id", id).select().single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  if (input.fullName) { await db.from("users").update({ full_name: input.fullName, updated_at: now }).eq("id", before.user_id); await adminAuth.updateUser(before.user_id, { displayName: input.fullName }); }
+  if (input.fullName) { await db.from("users").update({ full_name: input.fullName, updated_at: now }).eq("id", before.user_id); const { error: authError } = await db.auth.admin.updateUserById(before.user_id, { user_metadata: { full_name: input.fullName } }); if (authError) return NextResponse.json({ error: authError.message }, { status: 400 }); }
   const hasPersonal=[input.dateOfBirth,input.gender,input.panNumber,input.aadhaarNumber,input.state,input.city,input.postalCode].some(value=>value!==undefined&&value!=="");
   if(hasPersonal){const personalUpdate={agent_id:id,...(input.dateOfBirth?{date_of_birth:input.dateOfBirth}:{}),...(input.gender!==undefined?{gender:input.gender||null}:{}),...(input.panNumber?{pan_number:input.panNumber}:{}),...(input.aadhaarNumber?{aadhaar_last4:input.aadhaarNumber.slice(-4)}:{}),...(input.state!==undefined?{state:input.state||null}:{}),...(input.city!==undefined?{city:input.city||null}:{}),...(input.postalCode!==undefined?{postal_code:input.postalCode||null}:{}),updated_at:now};const{error:personalError}=await db.from("partner_personal_details").upsert(personalUpdate,{onConflict:"agent_id"});if(personalError)return NextResponse.json({error:personalError.message},{status:400})}
   if(input.accountNumber){const bankUpdate={agent_id:id,account_holder:input.accountHolder,bank_name:input.bankName,branch_name:input.branchName||null,account_type:input.accountType,account_number:input.accountNumber,ifsc:input.ifsc,verification_status:"pending"};const{error:bankError}=await db.from("agent_bank_details").upsert(bankUpdate,{onConflict:"agent_id"});if(bankError)return NextResponse.json({error:bankError.message},{status:400})}

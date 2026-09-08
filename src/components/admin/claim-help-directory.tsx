@@ -1,9 +1,9 @@
 "use client";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { auth } from "@/lib/firebase-client";
+import { accessToken } from "@/lib/supabase-client";
 
 type RequestRow = { id:string;name:string;whatsapp_number:string;claim_amount:number;claim_failure_reason:string;location:string;status:string;created_at:string;policyUrl:string|null;failureUrl:string|null };
-async function api(init:RequestInit={}){const token=await auth.currentUser?.getIdToken();return fetch("/api/admin/claim-help",{...init,headers:{...(init.headers??{}),Authorization:`Bearer ${token}`}})}
+async function api(init:RequestInit={}){const token=await accessToken();return fetch("/api/admin/claim-help",{...init,headers:{...(init.headers??{}),Authorization:`Bearer ${token}`}})}
 
 export function ClaimHelpDirectory(){
   const[rows,setRows]=useState<RequestRow[]>([]),[loading,setLoading]=useState(true),[error,setError]=useState(""),[query,setQuery]=useState(""),[active,setActive]=useState<RequestRow|null>(null);

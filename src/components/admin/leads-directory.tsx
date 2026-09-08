@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
-import { auth } from "@/lib/firebase-client";
+import { products } from "@/components/website/website-products";
+import { accessToken } from "@/lib/supabase-client";
 
 type Agent = {
   id: string;
@@ -23,7 +24,7 @@ type Lead = {
 };
 
 async function api(url: string, init: RequestInit = {}) {
-  const token = await auth.currentUser?.getIdToken();
+  const token = await accessToken();
   return fetch(url, {
     ...init,
     headers: { ...(init.headers ?? {}), Authorization: `Bearer ${token}` },
@@ -146,7 +147,7 @@ export function LeadsDirectory() {
                 <tr key={`${lead.leadType}-${lead.id}`}>
                   <td><div className="directory-person"><span>{lead.name.slice(0, 2).toUpperCase()}</span><div><strong>{lead.name}</strong><small>☎ {lead.contact || "—"}</small></div></div></td>
                   <td><span className={`lead-source ${lead.leadType}`}>{lead.leadType === "website" ? "Website" : "Team created"}</span></td>
-                  <td><strong className="lead-product">{lead.product_type?.replace("term", "Term Life") || "General enquiry"}</strong>{lead.selections && <small className="lead-options">{Object.values(lead.selections).join(" · ")}</small>}</td>
+                  <td><strong className="lead-product">{products.find(product => product.type === lead.product_type)?.name || lead.product_type || "General enquiry"}</strong>{lead.selections && <small className="lead-options">{Object.values(lead.selections).join(" · ")}</small>}</td>
                   <td>{agentName(lead.agent)}</td>
                   <td>{new Date(lead.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</td>
                   <td><select className={`lead-status ${lead.status}`} value={lead.status} onChange={(event) => changeStatus(lead, event.target.value)}>

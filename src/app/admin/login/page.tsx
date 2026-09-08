@@ -1,29 +1,44 @@
 "use client";
 
 import Image from "next/image";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { FormEvent, useState } from "react";
 import { Icon } from "@/components/admin/icons";
-import { auth } from "@/lib/firebase-client";
+import { supabaseAuth } from "@/lib/supabase-client";
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState("admin@magikpolicy.com");
-  const [password, setPassword] = useState("Magik@Admin123");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [notice, setNotice] = useState("");
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      const { data, error } = await supabaseAuth.auth.signInWithPassword({ email: email.trim(), password });
+      if (error || !data.session) throw error || new Error("Sign in failed.");
+      const access = await fetch("/api/admin/me", { headers: { Authorization: "Bearer " + data.session.access_token } });
+      if (!access.ok) throw new Error("This account does not have administrator access.");
       window.location.replace("/admin");
-    } catch {
-      setError("The email or password is incorrect. Please try again.");
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Sign in failed. Please try again.");
       setLoading(false);
     }
+  }
+
+  async function forgotPassword() {
+    setError(""); setNotice("");
+    if (!email.trim()) { setError("Enter your email address first."); return; }
+    setLoading(true);
+    try {
+      const { error } = await supabaseAuth.auth.resetPasswordForEmail(email.trim(), { redirectTo: location.origin + "/auth/reset-password" });
+      if (error) throw error;
+      setNotice("If this account exists, password reset instructions have been sent.");
+    } catch (caught) { setError(caught instanceof Error ? caught.message : "Could not send password reset instructions."); }
+    finally { setLoading(false); }
   }
 
   return <main className="login-page">
@@ -45,7 +60,8 @@ export default function AdminLoginPage() {
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button login-submit" disabled={loading}>{loading ? "Signing in…" : "Sign in securely"}</button>
         </form>
-        <div className="default-credentials"><strong>Development administrator</strong><span>admin@magikpolicy.com</span><span>Temporary password: Magik@Admin123</span><small>Change this password immediately after signing in.</small></div>
+        <button type="button" disabled={loading} onClick={forgotPassword}>Forgot password?</button>
+        {notice && <p role="status">{notice}</p>}
       </div>
     </section>
   </main>;

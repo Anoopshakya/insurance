@@ -1,5 +1,6 @@
 "use client";
 import { createBrowserClient } from "@supabase/ssr";
+import type { Session } from "@supabase/supabase-js";
 
 export const supabaseAuth = createBrowserClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -7,9 +8,32 @@ export const supabaseAuth = createBrowserClient(
 );
 
 export async function accessToken() {
-  return (
-    (await supabaseAuth.auth.getSession()).data.session?.access_token || ""
-  );
+  const { data, error } = await supabaseAuth.auth.getSession();
+  if (error) throw error;
+  if (!data.session) throw new Error("Your session has expired. Please sign in again.");
+  return data.session.access_token;
+}
+
+export function subscribeSession(onSession: (session: Session | null) => void | Promise<void>, onError: (error: unknown) => void) {
+  let active = true;
+  const timers = new Set<ReturnType<typeof setTimeout>>();
+  const { data } = supabaseAuth.auth.onAuthStateChange((_event, session) => {
+    const timer = setTimeout(() => {
+      timers.delete(timer);
+      if (active) Promise.resolve().then(() => onSession(session)).catch(error => { if (active) onError(error); });
+    }, 0);
+    timers.add(timer);
+  });
+  return () => { active = false; timers.forEach(clearTimeout); data.subscription.unsubscribe(); };
+}
+
+export async function changePassword(currentPassword: string, password: string) {
+  const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+  if (userError || !user?.email) throw userError || new Error("Please sign in again.");
+  const { error: loginError } = await supabaseAuth.auth.signInWithPassword({ email: user.email, password: currentPassword });
+  if (loginError) throw loginError;
+  const { error } = await supabaseAuth.auth.updateUser({ password });
+  if (error) throw error;
 }
 
 export async function authenticatedDestination(token: string) {
@@ -123,4 +147,28 @@ export function finishOAuthPopup() {
     },
   );
   return true;
+}
+
+// Email links created on the server have no browser PKCE verifier. Accept their
+// returned token pair explicitly; browser-initiated links use the SDK's PKCE exchange.
+export async function completeAuthRedirect() {
+  const query = new URLSearchParams(location.search);
+  const fragment = new URLSearchParams(location.hash.slice(1));
+  const failure = query.get("error_description") || fragment.get("error_description") || query.get("error") || fragment.get("error");
+  if (failure) throw new Error(failure);
+  const access_token = fragment.get("access_token");
+  const refresh_token = fragment.get("refresh_token");
+  if (access_token && refresh_token) {
+    history.replaceState(null, "", location.pathname + location.search);
+    const { data, error } = await supabaseAuth.auth.setSession({ access_token, refresh_token });
+    if (error || !data.session) throw error || new Error("This link is invalid or expired.");
+    return data.session;
+  }
+  if (query.has("code")) {
+    const { error } = await supabaseAuth.auth.initialize();
+    if (error) throw error;
+  }
+  const { data, error } = await supabaseAuth.auth.getSession();
+  if (error || !data.session) throw error || new Error("This link is invalid or expired. Request a new link.");
+  return data.session;
 }
