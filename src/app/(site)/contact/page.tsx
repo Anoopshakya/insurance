@@ -1,5 +1,3 @@
-import { InformationPage } from "@/components/website/information-page";
-import { findInformationPage } from "@/components/website/static-pages";
-const page = findInformationPage("contact")!;
-export const metadata = { title: page.title, description: page.intro };
-export default function Page() { return <InformationPage page={page} />; }
+import { ContactPage } from "@/components/website/contact-page";
+export const metadata = { title: "Contact Us | MagikPolicy", description: "Get in touch with MagikPolicy for insurance questions, policy support and guidance." };
+export default function Page() { return <ContactPage />; }

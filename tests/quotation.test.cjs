@@ -41,3 +41,9 @@ test("invalid enquiries are rejected before database writes",async()=>{
 test("a database failure cannot return a successful quotation",async()=>{
  const route=endpoint(true);assert.equal((await route.api.POST({json:async()=>base})).status,500);
 });
+
+test("optional quotation email is validated and saved without losing selections",async()=>{
+ const route=endpoint();assert.equal((await route.api.POST({json:async()=>({...base,email:"quote@example.com",selections:{product:"Health Insurance"}})})).status,201);assert.equal(route.saved().selections.email,"quote@example.com");assert.equal(route.saved().selections.product,"Health Insurance");
+ const invalid=endpoint();assert.equal((await invalid.api.POST({json:async()=>({...base,email:"invalid"})})).status,400);assert.equal(invalid.saved(),undefined);
+ assert.equal(schema.quoteRequestSchema.safeParse({...base,email:""}).success,true);
+});

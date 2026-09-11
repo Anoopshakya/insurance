@@ -1,10 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { authenticatedDestination, completeAuthRedirect } from "@/lib/supabase-client";
+import { authenticatedDestination, completeAuthRedirect, finishOAuthPopup } from "@/lib/supabase-client";
 export default function AuthCallback() {
   const [error, setError] = useState("");
   useEffect(() => {
+    if (finishOAuthPopup()) return;
     let active = true;
     async function finish() {
       try {

@@ -81,7 +81,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "From enquiry to policy",
         "paragraphs": [
-          "Record the customer?s stated product needs and follow-up preferences. Explain options using the relevant insurer documents, and confirm details before an application is submitted."
+          "Record the customer's stated product needs and follow-up preferences. Explain options using the relevant insurer documents, and confirm details before an application is submitted."
         ],
         "links": [
           {
@@ -98,7 +98,7 @@ export const informationPages: InformationPage[] = [
         "title": "After a policy is issued",
         "bullets": [
           "Check the policy schedule and contact details with the customer.",
-          "Help customers locate the insurer?s claims information.",
+          "Help customers locate the insurer's claims information.",
           "Review approaching renewal dates and any changed requirements."
         ],
         "links": [
@@ -131,7 +131,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "Product conversations",
         "paragraphs": [
-          "Start with a customer?s needs, then work through coverage, exclusions, charges and application requirements. Use the insurer?s current product documents for specific explanations."
+          "Start with a customer's needs, then work through coverage, exclusions, charges and application requirements. Use the insurer's current product documents for specific explanations."
         ],
         "links": [
           {
@@ -237,7 +237,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "Policy or claim complaints",
         "paragraphs": [
-          "Raise a policy-related grievance with the insurer?s grievance redressal officer and retain the acknowledgement. If you are dissatisfied with the insurer?s response or do not receive a response, consult the official escalation guidance."
+          "Raise a policy-related grievance with the insurer's grievance redressal officer and retain the acknowledgement. If you are dissatisfied with the insurer's response or do not receive a response, consult the official escalation guidance."
         ],
         "links": [
           {
@@ -279,7 +279,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "Explore by product",
         "paragraphs": [
-          "Each product page includes a comparison checklist and questions to consider. You can request a quotation from any public information page."
+          "Each product page includes a comparison checklist and questions to consider. You can request a quotation on our health, car, bike, term life, travel, family and personal accident product pages."
         ],
         "links": [
           {
@@ -287,8 +287,8 @@ export const informationPages: InformationPage[] = [
             "href": "/products"
           },
           {
-            "label": "Get quotation",
-            "href": "#get-quotation"
+            "label": "Choose a product",
+            "href": "/products"
           }
         ]
       }
@@ -381,8 +381,8 @@ export const informationPages: InformationPage[] = [
         ],
         "links": [
           {
-            "label": "Get quotation",
-            "href": "#get-quotation"
+            "label": "Choose a product",
+            "href": "/products"
           }
         ]
       },
@@ -395,7 +395,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "4. Apply and keep your records",
         "paragraphs": [
-          "If you decide to proceed, complete the insurer?s application accurately. Check any issued policy schedule and keep the policy, payment confirmation and claims contact details together."
+          "If you decide to proceed, complete the insurer's application accurately. Check any issued policy schedule and keep the policy, payment confirmation and claims contact details together."
         ],
         "links": [
           {
@@ -469,13 +469,13 @@ export const informationPages: InformationPage[] = [
       {
         "title": "General information",
         "paragraphs": [
-          "Website content is provided to explain products and processes in general terms. It does not replace the applicable insurer?s product documents, policy wording or a review of your individual circumstances."
+          "Website content is provided to explain products and processes in general terms. It does not replace the applicable insurer's product documents, policy wording or a review of your individual circumstances."
         ]
       },
       {
         "title": "Quotations and coverage",
         "paragraphs": [
-          "Submitting a quotation request is an enquiry. It does not create insurance cover, confirm eligibility or guarantee a premium. The insurer?s issued policy and schedule determine the cover and its commencement."
+          "Submitting a quotation request is an enquiry. It does not create insurance cover, confirm eligibility or guarantee a premium. The insurer's issued policy and schedule determine the cover and its commencement."
         ]
       },
       {
@@ -502,12 +502,12 @@ export const informationPages: InformationPage[] = [
     "slug": "terms",
     "eyebrow": "Using this website",
     "title": "Terms & Conditions",
-    "intro": "The basis on which you can use MagikPolicy?s website and submit an enquiry.",
+    "intro": "The basis on which you can use MagikPolicy's website and submit an enquiry.",
     "sections": [
       {
         "title": "Website use",
         "paragraphs": [
-          "Use this website for genuine information requests and authorised account activity. Do not attempt to access another person?s account, interfere with the service or submit information you are not entitled to share."
+          "Use this website for genuine information requests and authorised account activity. Do not attempt to access another person's account, interfere with the service or submit information you are not entitled to share."
         ]
       },
       {
@@ -667,7 +667,7 @@ export const informationPages: InformationPage[] = [
       {
         "title": "Support through the policy journey",
         "paragraphs": [
-          "Use the website to explore products and find help with renewal, claims or service questions. The insurer?s documents explain the exact terms of a policy."
+          "Use the website to explore products and find help with renewal, claims or service questions. The insurer's documents explain the exact terms of a policy."
         ],
         "links": [
           {
@@ -701,26 +701,30 @@ export const informationPages: InformationPage[] = [
   {
     "slug": "contact",
     "eyebrow": "Contact us",
-    "title": "Let?s find the right next step",
+    "title": "Let's find the right next step",
     "intro": "Contact the team for insurance enquiries, policy support or help with your partner account.",
     "sections": [
       {
         "title": "Talk to the team",
         "paragraphs": [
-          "For an insurance quotation, use the form below. For other support questions, email us or start a conversation on WhatsApp."
+          "For an insurance quotation, choose a product from our insurance pages. For other support questions, email us or start a conversation on WhatsApp."
         ],
         "links": [
           {
-            "label": "Email support",
-            "href": "mailto:support@magikpolicy.com"
+            "label": "hello@magikpolicy.com",
+            "href": "mailto:hello@magikpolicy.com"
+          },
+          {
+            "label": "+91 8920028861",
+            "href": "tel:+918920028861"
           },
           {
             "label": "WhatsApp support",
             "href": "https://wa.me/918920028861"
           },
           {
-            "label": "Get quotation",
-            "href": "#get-quotation"
+            "label": "Choose a product",
+            "href": "/products"
           }
         ]
       },
@@ -843,12 +847,12 @@ export const informationPages: InformationPage[] = [
       {
         "title": "Request a renewal conversation",
         "paragraphs": [
-          "Select the relevant product in the quotation form below. When the team contacts you, tell them you are enquiring about renewal. Coverage dates and renewal conditions are determined by the insurer."
+          "Open the relevant insurance product page and use its quotation form. When the team contacts you, tell them you are enquiring about renewal. Coverage dates and renewal conditions are determined by the insurer."
         ],
         "links": [
           {
-            "label": "Get quotation",
-            "href": "#get-quotation"
+            "label": "Choose a product",
+            "href": "/products"
           },
           {
             "label": "Contact support",

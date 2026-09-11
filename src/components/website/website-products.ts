@@ -7,7 +7,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "health"
     ],
-    "icon": "?",
+    "icon": "♡",
     "name": "Health Insurance",
     "copy": "Explore health cover for hospital expenses and understand the details before you choose.",
     "overview": "A health insurance plan can help you manage eligible medical expenses. Compare the cover, your share of costs and the hospitals available under each plan.",
@@ -39,7 +39,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "car"
     ],
-    "icon": "?",
+    "icon": "▣",
     "name": "Car Insurance",
     "copy": "Compare car insurance options around your vehicle, its use and your coverage needs.",
     "overview": "Car insurance options differ in the protection they offer. Review third-party liability, own-damage protection and any add-ons separately so you understand what you are choosing.",
@@ -71,7 +71,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "bike"
     ],
-    "icon": "?",
+    "icon": "◇",
     "name": "Bike Insurance",
     "copy": "Find out what to compare when choosing insurance for your two-wheeler.",
     "overview": "Review insurance options for your bike or scooter based on its age, model and use. Check the cover period and what happens if you need to make a claim.",
@@ -104,7 +104,7 @@ export const products: WebsiteProduct[] = [
       "term",
       "term-insurance"
     ],
-    "icon": "?",
+    "icon": "♧",
     "name": "Term Life Insurance",
     "copy": "Explore life protection with your dependants, responsibilities and chosen cover period in mind.",
     "overview": "Term insurance is designed around life protection for a specified period. Compare the sum assured, policy term, premium payment options and eligibility requirements.",
@@ -136,7 +136,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "travel"
     ],
-    "icon": "?",
+    "icon": "✈",
     "name": "Travel Insurance",
     "copy": "Explore protection for your trip, from medical emergencies to specified travel disruptions.",
     "overview": "Travel policies vary by destination, duration and traveller profile. Review the situations covered and the assistance available before you leave.",
@@ -168,7 +168,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "family"
     ],
-    "icon": "?",
+    "icon": "♡",
     "name": "Family Insurance",
     "copy": "Explore family health insurance with the needs of every member in mind.",
     "overview": "Family health cover may use a shared sum insured or individual limits, depending on the plan. Compare these options against the ages and needs of the people you want to insure.",
@@ -200,7 +200,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "personal-accident"
     ],
-    "icon": "?",
+    "icon": "✚",
     "name": "Personal Accident Insurance",
     "copy": "Understand cover for specified accidental injuries and their financial impact.",
     "overview": "Personal accident policies may provide benefits for accidental death or disability, subject to the policy terms. Compare the events covered and the way benefits are calculated.",
@@ -232,7 +232,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "motor"
     ],
-    "icon": "?",
+    "icon": "▣",
     "name": "Motor Insurance",
     "copy": "Explore vehicle cover and choose the insurance category that fits your car or two-wheeler.",
     "overview": "Start with the type of vehicle you want to insure. Our dedicated car and bike pages explain the information to prepare and the features to compare.",
@@ -264,7 +264,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "life"
     ],
-    "icon": "?",
+    "icon": "♧",
     "name": "Life Insurance",
     "copy": "Understand life insurance benefits, commitments and options before choosing a plan.",
     "overview": "Life insurance products can have different protection and savings features. Review the benefit illustration and policy terms to understand the commitments and benefits of a particular product.",
@@ -296,7 +296,7 @@ export const products: WebsiteProduct[] = [
     "aliases": [
       "investment"
     ],
-    "icon": "?",
+    "icon": "₹",
     "name": "Investment Plans",
     "copy": "Discuss your goals and understand product risks, costs and commitments.",
     "overview": "Start with your goal, time horizon and need for access to your money. Review the product documents and understand the risks before making a commitment.",
@@ -326,3 +326,6 @@ export const products: WebsiteProduct[] = [
 
 export function findProduct(slug: string) { return products.find(product => product.slug === slug || product.aliases.includes(slug)); }
 export function productForPath(pathname: string) { const match = pathname.match(/^\/products\/([^/]+)\/?$/); return match ? findProduct(match[1]) : undefined; }
+
+export const quotationPageTypes = ["life", "health", "motor", "car", "bike", "term", "travel", "family", "personal-accident"];
+export function hasQuotationForm(pathname: string) { const product = productForPath(pathname); return Boolean(product && quotationPageTypes.includes(product.type)); }

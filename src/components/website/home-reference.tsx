@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { QuotationModal } from "./quotation-modal";
 import Link from "next/link";
 import {
   useEffect,
@@ -62,13 +63,13 @@ const productFields: Record<
         { label: "Self", icon: UserRound },
         { label: "My Family", icon: UsersRound },
         { label: "My Parents", icon: UserRound },
-        { label: "My Child", icon: Baby },
+        // { label: "My Child", icon: Baby },
       ],
     },
     {
       key: "coverage",
       label: "Select Coverage Amount",
-      options: ["₹5 Lakhs", "₹10 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
+      options: ["₹7 Lakhs", "₹15 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
         (label) => ({ label }),
       ),
     },
@@ -337,7 +338,7 @@ const statItems: Array<[IconType, string, string, string]> = [
     IndianRupee,
     "High",
     "Partner Earnings",
-    "Earn attractive commissions on every sale",
+    "Earn attractive rewards on every sale",
   ],
 ];
 function Stats() {
@@ -391,13 +392,12 @@ function PartnerEarning() {
           <br />
           Earn{" "}
           <em className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 bg-clip-text not-italic text-transparent">
-            Up to 20% Extra!
+             Extra!
           </em>
         </h2>
         <p className="max-w-lg text-sm leading-relaxed text-slate-600">
-          Already earning commission as an insurance agent? Switch to
-          MagikPolicy and get up to 20% extra commission on every eligible
-          policy.
+          Already earning working as an insurance agent? Switch to
+          MagikPolicy and get extra rewards on every eligible policy.
         </p>
         <div className="mt-6 grid grid-cols-3 gap-4 pt-4">
           {miniBenefits.map(([Icon, title, copy]) => (
@@ -418,8 +418,8 @@ function PartnerEarning() {
       </div>
       <div className="earning-image-responsive flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
         <Image
-          src="/brand/magikpolicy-earning-calculation.png"
-          alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+          src="/brand/magikpolicy-extra-earning.png"
+          alt="Example showing current rewards of 10,000 points plus up to 2,000 points MagikPolicy extra rewards equals up to 12,000 points total earning"
           width={794}
           height={499}
           className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
@@ -428,7 +428,7 @@ function PartnerEarning() {
       </div>
       <div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2 bg-violet-50 p-4 border-0 rounded-lg  ">
         {[
-          [TrendingUp, "Increase Your Earnings", "Get up to 20% extra"],
+          [TrendingUp, "Increase Your Earnings", "Do less get more"],
           [IndianRupee, "No Deductions", "No hidden charges"],
           [Headphones, "Dedicated Partner Support", "We are here to help"],
           [ShieldCheck, "Grow Your Business", "Access insurers & products"],
@@ -500,7 +500,9 @@ const plans: Array<[IconType, string, string, string, string]> = [
     "trip",
   ],
 ];
+const popularPlanProducts: Record<string,string> = {"Health Insurance":"health","Car Insurance":"car","Bike Insurance":"bike","Term Insurance":"term","Travel Insurance":"travel","Personal Accident":"personal-accident"};
 function PopularPlans() {
+  const [quoteProduct,setQuoteProduct]=useState<string | null>(null);
   return (
     <section>
       <header className="mb-5 flex items-center justify-between">
@@ -530,12 +532,14 @@ function PopularPlans() {
               {price}
               <small className="font-normal"> /{unit}</small>
             </strong>
-            <Link
-              className="mt-5 flex items-center gap-1 text-[12px] font-semibold text-emerald-500"
-              href="/products"
+            <button
+              type="button"
+              aria-haspopup="dialog"
+              onClick={()=>setQuoteProduct(popularPlanProducts[title])}
+              className="border-0 bg-transparent p-0 cursor-pointer mt-5 flex items-center gap-1 text-[12px] font-semibold text-emerald-500"
             >
-              View Plans <ArrowRight className="h-3 w-3" />
-            </Link>
+              Get Plan Details <ArrowRight className="h-3 w-3" />
+            </button>
           </article>
         ))}
       </div>
@@ -562,6 +566,7 @@ function PopularPlans() {
           </div>
         ))}
       </div>
+      {quoteProduct && <QuotationModal productType={quoteProduct} close={()=>setQuoteProduct(null)} />}
     </section>
   );
 }
@@ -642,7 +647,7 @@ function ClaimBanner() {
         <div className="earning-image-responsive rounded-2xl flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
           <Image
             src="/brand/claim-failed.png"
-            alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+            alt="Example showing current rewards of 10,000 points plus up to 2,000 points MagikPolicy extra rewards equals up to 12,000 points total earning"
             width={794}
             height={499}
             className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
@@ -776,7 +781,7 @@ const advantageCards: Array<[IconType, string, string]> = [
   [
     WalletCards,
     "Transparent Earnings",
-    "Know your commissions and earnings policy-by-policy",
+    "Know your rewards and earnings policy-by-policy",
   ],
   [
     Headphones,
@@ -850,7 +855,7 @@ function Advantage() {
           <div className="earning-image-responsive rounded-2xl flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
           <Image
             src="/brand/magikpolicy-super-advantages.png"
-            alt="Example showing current commission of ₹10,000 plus up to ₹2,000 MagikPolicy extra commission equals up to ₹12,000 total earning"
+            alt="Example showing current rewards of 10,000 points plus up to 2,000 points MagikPolicy extra rewards equals up to 12,000 points total earning"
             width={794}
             height={499}
             className="block h-auto w-full min-w-0 max-w-[794px] object-contain max-lg:max-w-[680px] max-md:max-w-full"
@@ -889,7 +894,7 @@ function Advantage() {
           {[
             [UsersRound, "Customer", "First step"],
             [FileCheck2, "Policy", "Build trust"],
-            [IndianRupee, "Commission", "You earn"],
+            [IndianRupee, "Rewards", "You earn"],
             [Clock3, "Renewal", "Earn again"],
             [TrendingUp, "Repeat Business", "More earnings"],
           ].map(([Icon, title, copy], i) => (

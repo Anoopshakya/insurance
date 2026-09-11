@@ -384,3 +384,11 @@
     grid-column: 1 !important;
   }
 }
+
+/* Keep desktop navigation accessible while the announcement scrolls away. */
+@media (min-width: 1024px) {
+  .website-navbar { position: sticky; top: 0; z-index: 50; }
+  .website-shell { scroll-padding-top: 110px; }
+  .website-shell [id] { scroll-margin-top: 110px; }
+  .product-quotation-sidebar { top: 110px; }
+}

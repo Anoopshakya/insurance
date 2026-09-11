@@ -1,3 +1,4 @@
+import { OAuthPopupBridge } from "@/components/auth/oauth-popup-bridge";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
@@ -23,7 +24,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       <head>
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('assure-theme');if(!t)t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.style.colorScheme=t}catch(e){}})()` }} />
       </head>
-      <body>{children}</body>
+      <body><OAuthPopupBridge />{children}</body>
     </html>
   );
 }

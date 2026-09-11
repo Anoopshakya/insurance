@@ -14,7 +14,7 @@ import {
 
 const defaultAnnouncement = {
   message:
-    "Become a Partner & Earn High Commissions. Join thousands of successful partners with MagikPolicy!",
+    "Become a Partner & Earn Good Reward. Join thousands of successful partners with MagikPolicy!",
   linkText: "Know More",
   linkUrl: "/partner/register",
   active: true,
@@ -102,13 +102,13 @@ export function WebsiteHeader() {
           </label>
           <div className="website-nav-actions absolute right-3 flex items-center gap-1 md:gap-2 xl:static xl:ml-4 xl:gap-4 2xl:ml-6 2xl:gap-[22px]">
             <Link
-              className="hidden h-[60px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-violet-50 px-6 text-sm font-semibold text-[#5527df] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
+              className="hidden h-[40px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-violet-50 px-6 text-sm font-semibold text-[#5527df] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
             href="/customer/login"
             >
               Login / Register
             </Link>
             <Link
-              className="hidden h-[60px] min-w-[172px] place-items-center rounded-[10px] bg-gradient-to-r from-[#4319df] via-[#c018b8] to-[#ff641e] px-5 text-sm font-semibold text-white xl:grid 2xl:min-w-[193px] 2xl:px-7 2xl:text-[16px]"
+              className="hidden h-[40px] min-w-[172px] place-items-center rounded-[10px] bg-gradient-to-r from-[#4319df] via-[#c018b8] to-[#ff641e] px-5 text-sm font-semibold text-white xl:grid 2xl:min-w-[193px] 2xl:px-7 2xl:text-[16px]"
             href="/partner/register"
             >
               Become a Partner
@@ -127,9 +127,10 @@ export function WebsiteHeader() {
               <UserRound />
             </Link>
             <Link
-              className="hidden btn-primary h-9 w-9 place-items-center text-[#6827ef] min-[431px]:grid md:h-11 md:w-11 xl:hidden"
+              className="grid btn-primary h-9 w-9 place-items-center rounded-lg bg-violet-50 text-[#6827ef] md:h-11 md:w-11 xl:hidden"
             href="/partner/register"
-              aria-label="Partners"
+              aria-label="Become a Partner"
+              title="Become a Partner"
             >
               <UsersRound />
             </Link>

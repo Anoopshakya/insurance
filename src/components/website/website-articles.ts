@@ -32,8 +32,8 @@ export const articles: InformationPage[] = [
             "href": "/products"
           },
           {
-            "label": "Request a quotation",
-            "href": "#get-quotation"
+            "label": "Choose a product",
+            "href": "/products"
           }
         ]
       }
@@ -98,7 +98,7 @@ export const articles: InformationPage[] = [
       {
         "title": "When you need to make a claim",
         "paragraphs": [
-          "Locate the insurer?s claims instructions and keep a record of the claim reference, documents submitted and subsequent correspondence. Requirements differ by product and situation."
+          "Locate the insurer's claims instructions and keep a record of the claim reference, documents submitted and subsequent correspondence. Requirements differ by product and situation."
         ],
         "links": [
           {

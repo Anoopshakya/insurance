@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Mail, Phone } from "lucide-react";
 import { footerColumns, legalLinks } from "./footer-navigation";
 
 export function WebsiteFooter() {
@@ -30,13 +31,17 @@ export function WebsiteFooter() {
               <li><span><ShieldCheck /></span>Quick claim support</li>
               <li><span><Network /></span>Earn more with MagikPolicy</li>
             </ul> */}
-             <h3>Follow us on</h3>
+             <address className="mp-footer-contact" aria-label="Contact MagikPolicy">
+              <a href="mailto:hello@magikpolicy.com"><Mail size={18} aria-hidden="true" /><span>hello@magikpolicy.com</span></a>
+              <a href="tel:+918920028861"><Phone size={18} aria-hidden="true" /><span>+91 8920028861</span></a>
+            </address>
+            <h3>Follow us on</h3>
           <div className="mp-socials">
-            <a href="#" aria-label="Facebook">f</a>
+            <a href="https://www.facebook.com/magikpolicy" aria-label="Facebook">f</a>
             <a href="#" aria-label="Instagram">◎</a>
             <a href="#" aria-label="YouTube">▶</a>
             <a href="#" aria-label="LinkedIn">in</a>
-            <a href="#" aria-label="X">𝕏</a>
+            {/* <a href="#" aria-label="X">𝕏</a> */}
           </div>
           </div>
          

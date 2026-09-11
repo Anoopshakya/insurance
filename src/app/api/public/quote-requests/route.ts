@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
         product_type: input.productType,
         customer_name: input.customerName,
         mobile: input.mobile,
-        selections: input.selections,
+        selections: { ...input.selections, ...(input.email ? { email: input.email } : {}) },
         source: input.sourcePath ? `website:${input.sourcePath}` : "homepage_quote_widget",
       })
       .select("id")

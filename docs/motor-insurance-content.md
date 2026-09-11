@@ -1,0 +1,5 @@
+# Motor page
+
+Original MagikPolicy copy; topic reference https://www.policyx.com/motor-insurance/ . Cross-checked general concepts using IRDAI https://irdai.gov.in/web/policy-holder/motor-insurance and https://irdai.gov.in/en/insurers/non-life-insurers plus insurer guidance https://www.hdfcergo.com/motor-insurance and https://www.hdfcergo.com/car-insurance/zero-depreciation-car-insurance . No competitor prices, testimonials, discounts or service guarantees reused.
+
+Asset public/brand/motor-coastal-hero.png generated with built-in imagegen. Prompt: Wide premium photorealistic website hero photograph, silver modern unbranded SUV in three-quarter front view driving on coastal road, vehicle positioned in lower right half of image, ocean and green coastal hills in background, pale blue clear sky and soft daylight, upper left half mostly clean bright white mist and pale sky for headline overlay, road spans bottom edge. No people, no text, no lettering, no logos or recognizable badges, blank dark license plate. Aspect ratio landscape 3:2. Professional automotive advertising photography, realistic wheels, elegant calm composition.

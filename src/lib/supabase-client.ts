@@ -53,99 +53,89 @@ export async function authenticatedDestination(token: string) {
   return null;
 }
 
+const popupStorageKey = "magikpolicy-oauth-popup";
+let googleSignInPending = false;
+let popupCompletionStarted = false;
+
 export async function signInWithGoogle(redirectTo: string) {
-  const popup = window.open(
-    "",
-    "magikpolicy-google-auth",
-    "popup=yes,width=520,height=680,left=200,top=80",
-  );
-  if (!popup)
-    throw new Error("Allow pop-ups for MagikPolicy to continue with Google.");
-  const settingsResponse = await fetch(
-    `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/settings`,
-    {
-      headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! },
-    },
-  );
-  const settings = settingsResponse.ok ? await settingsResponse.json() : null;
-  if (!settings?.external?.google) {
-    popup.close();
-    throw new Error(
-      "Google sign-in is not enabled yet. Please use email or mobile registration, or contact support.",
+  if (googleSignInPending) throw new Error("Google sign-in is already open. Please complete it first.");
+  const returnUrl = new URL(redirectTo);
+  if (returnUrl.origin !== location.origin) throw new Error("Sign-in must return to this website.");
+  const popup = window.open("", "magikpolicy-google-auth", "popup=yes,width=520,height=680,left=200,top=80");
+  if (!popup) throw new Error("Allow pop-ups for MagikPolicy to continue with Google.");
+  googleSignInPending = true;
+  const requestId = crypto.randomUUID();
+  let cleanup = () => {};
+  try {
+    // Persists through provider navigation, even if the callback loses its query string or opener.
+    popup.sessionStorage.setItem(popupStorageKey, JSON.stringify({ requestId, createdAt: Date.now() }));
+    const settingsResponse = await fetch(
+      process.env.NEXT_PUBLIC_SUPABASE_URL + "/auth/v1/settings",
+      { headers: { apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY! } },
     );
-  }
-  const callback = new URL(redirectTo);
-  callback.searchParams.set("oauth_popup", "1");
-  const { data, error } = await supabaseAuth.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo: callback.toString(),
-      skipBrowserRedirect: true,
-      queryParams: { prompt: "select_account" },
-    },
-  });
-  if (error || !data.url) {
-    popup.close();
-    throw error || new Error("Google sign-in could not be started.");
-  }
-  popup.location.href = data.url;
-  await new Promise<void>((resolve, reject) => {
-    const timer = window.setInterval(() => {
-      if (popup.closed) {
+    const settings = settingsResponse.ok ? await settingsResponse.json() : null;
+    if (!settings?.external?.google) throw new Error("Google sign-in is not enabled. Please use email sign-in or contact support.");
+    const { data, error } = await supabaseAuth.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: location.origin + "/auth/callback", skipBrowserRedirect: true, queryParams: { prompt: "select_account" } },
+    });
+    if (error || !data.url) throw error || new Error("Google sign-in could not be started.");
+    await new Promise<void>((resolve, reject) => {
+      const channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel("magikpolicy-oauth-" + requestId) : null;
+      // COOP can report a live provider popup as closed. Wait for the correlated callback.
+      const accept = (message: { type?: string; requestId?: string; error?: string }) => {
+        if (message?.type !== "magikpolicy-oauth-complete" || message.requestId !== requestId) return;
         cleanup();
-        reject(new Error("Google sign-in was cancelled."));
-      }
-    }, 500);
-    const receive = (event: MessageEvent) => {
-      if (
-        event.origin !== location.origin ||
-        event.data?.type !== "magikpolicy-oauth-complete"
-      )
-        return;
-      cleanup();
-      resolve();
-    };
-    function cleanup() {
-      window.clearInterval(timer);
-      window.removeEventListener("message", receive);
-    }
-    window.addEventListener("message", receive);
-  });
-  const { data: sessionData, error: sessionError } =
-    await supabaseAuth.auth.getSession();
-  if (sessionError || !sessionData.session)
-    throw (
-      sessionError ||
-      new Error("Google authentication did not create a session.")
-    );
-  return sessionData.session;
+        message.error ? reject(new Error(message.error)) : resolve();
+      };
+      const receive = (event: MessageEvent) => {
+        if (event.origin === location.origin && event.source === popup) accept(event.data);
+      };
+      const timeout = window.setTimeout(() => { cleanup(); reject(new Error("Google sign-in timed out. Please try again.")); }, 180000);
+      cleanup = () => { window.clearTimeout(timeout); window.removeEventListener("message", receive); channel?.close(); };
+      window.addEventListener("message", receive);
+      if (channel) channel.onmessage = event => accept(event.data);
+      popup.location.href = data.url;
+    });
+    const { data: sessionData, error: sessionError } = await supabaseAuth.auth.getSession();
+    if (sessionError || !sessionData.session) throw sessionError || new Error("Google authentication did not create a session. Please try again.");
+    return sessionData.session;
+  } finally {
+    cleanup();
+    try { popup.close(); } catch { /* The provider may have isolated the popup. */ }
+    googleSignInPending = false;
+  }
 }
 
 export function finishOAuthPopup() {
-  if (
-    typeof window === "undefined" ||
-    new URLSearchParams(location.search).get("oauth_popup") !== "1" ||
-    !window.opener
-  )
-    return false;
-  const complete = () => {
-    window.opener.postMessage(
-      { type: "magikpolicy-oauth-complete" },
-      location.origin,
-    );
+  if (typeof window === "undefined") return false;
+  let requestId = "";
+  try {
+    const stored = sessionStorage.getItem(popupStorageKey);
+    if (stored) {
+      const marker = JSON.parse(stored);
+      if (typeof marker.requestId === "string" && Date.now() - marker.createdAt < 180000) requestId = marker.requestId;
+      else sessionStorage.removeItem(popupStorageKey);
+    }
+  } catch { /* Storage may be unavailable in restricted browsers. */ }
+  const legacyPopup = new URLSearchParams(location.search).get("oauth_popup") === "1" && Boolean(window.opener);
+  if (!requestId && !legacyPopup) return false;
+  if (popupCompletionStarted) return true;
+  popupCompletionStarted = true;
+  void (async () => {
+    let failure: string | undefined;
+    try { await completeAuthRedirect(); }
+    catch (error) { failure = error instanceof Error ? error.message : "Google sign-in failed. Please try again."; }
+    const message = { type: "magikpolicy-oauth-complete", requestId, error: failure };
+    try { window.opener?.postMessage(message, location.origin); } catch { /* BroadcastChannel handles a severed opener. */ }
+    if (requestId && typeof BroadcastChannel !== "undefined") {
+      const channel = new BroadcastChannel("magikpolicy-oauth-" + requestId);
+      channel.postMessage(message);
+      channel.close();
+    }
+    sessionStorage.removeItem(popupStorageKey);
     window.close();
-  };
-  supabaseAuth.auth.getSession().then(({ data }) => {
-    if (data.session) complete();
-  });
-  const { data: listener } = supabaseAuth.auth.onAuthStateChange(
-    (_event, session) => {
-      if (session) {
-        listener.subscription.unsubscribe();
-        complete();
-      }
-    },
-  );
+  })();
   return true;
 }
 
