@@ -62,9 +62,7 @@ export function PartnerMarketing() {
   useEffect(() => {
     supabaseAuth.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
-      const destination = await authenticatedDestination(
-        data.session.access_token,
-      );
+      const destination = await authenticatedDestination(data.session.access_token, "partner");
       if (destination) location.replace(destination);
     });
   }, []);
@@ -75,7 +73,7 @@ export function PartnerMarketing() {
       const session = await signInWithGoogle(
         `${location.origin}/partner/register?account=1`,
       );
-      const destination = await authenticatedDestination(session.access_token);
+      const destination = await authenticatedDestination(session.access_token, "partner");
       if (destination) return location.replace(destination);
       const response = await fetch("/api/partner/onboarding/start", {
         method: "POST",

@@ -1,4 +1,6 @@
 "use client";
+import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
+
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { BarChart3, CalendarDays, ChevronDown, ChevronRight, Coins, FileText, Percent, Users, WalletCards } from "lucide-react";
@@ -9,21 +11,23 @@ const money = new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR
 const dateLabel = (value: string) => value ? new Date(`${value}T00:00:00`).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "";
 
 export function PartnerEarningsContent() {
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState<Data | null>(null);
   const [tab, setTab] = useState<"direct" | "network">("direct");
   const [error, setError] = useState("");
-  const load = useCallback(async () => {
+  const load = useCallback(async () => {setLoading(true);setError("");try {
     const { data: auth } = await supabaseAuth.auth.getSession();
     const response = await fetch("/api/partner/earnings", { headers: { Authorization: `Bearer ${auth.session?.access_token || ""}` } });
     const body = await response.json();
     if (response.ok) setData(body); else setError(body.error || "Earnings could not be loaded.");
-  }, []);
+  } catch { setError("Unable to load earnings. Please refresh and try again."); } finally { setLoading(false); }}, []);
   useEffect(() => { void load(); }, [load]);
   const selected = data?.[tab] || { earnings: 0, policies: 0, businessValue: 0, averageRate: 0 };
   const maxTrend = useMemo(() => Math.max(1, ...(data?.trend || []).flatMap((item: any) => [item.businessValue, item.commission])), [data]);
   const products = tab === "direct" ? (data?.products || []) : [];
   const colors = ["pink", "blue", "red", "violet", "cyan", "gray"];
 
+  if (loading) return <PartnerSkeleton view="earnings" />;
   return (
     <div className="pe-page">
       <div className="pe-heading">

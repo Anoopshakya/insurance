@@ -48,8 +48,8 @@
 
 .claim-help-close:hover {
   transform: rotate(6deg) scale(1.06);
-  background: #ede9fe;
-  color: #6d28d9;
+  background: var(--appearance-surface-raised, #ede9fe);
+  color: var(--appearance-blue, #6d28d9);
 }
 
 .btn-secondary{

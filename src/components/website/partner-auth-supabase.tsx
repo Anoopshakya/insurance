@@ -39,9 +39,7 @@ export function PartnerAuthSupabase() {
     supabaseAuth.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
       try {
-        const destination = await authenticatedDestination(
-          data.session.access_token,
-        );
+        const destination = await authenticatedDestination(data.session.access_token, "partner");
         if (destination) return location.replace(destination);
         await start(data.session.access_token);
         location.replace("/partner/complete-profile");
@@ -69,9 +67,7 @@ export function PartnerAuthSupabase() {
           password,
         });
         if (error || !data.session) throw error || new Error("Sign in failed");
-        const destination = await authenticatedDestination(
-          data.session.access_token,
-        );
+        const destination = await authenticatedDestination(data.session.access_token, "partner");
         if (!destination)
           throw new Error(
             "This account is not registered as a partner. Please register first.",
@@ -107,7 +103,7 @@ export function PartnerAuthSupabase() {
       const session = await signInWithGoogle(
         `${location.origin}/partner/register?account=1`,
       );
-      const destination = await authenticatedDestination(session.access_token);
+      const destination = await authenticatedDestination(session.access_token, "partner");
       if (destination) return location.replace(destination);
       await start(session.access_token);
       location.replace("/partner/complete-profile");

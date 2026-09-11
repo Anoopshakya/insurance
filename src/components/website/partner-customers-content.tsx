@@ -1,4 +1,6 @@
 "use client";
+import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
+
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   ChevronDown,
@@ -51,6 +53,7 @@ async function api(init: RequestInit = {}) {
   });
 }
 export function PartnerCustomersContent() {
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Customer[]>([]),
     [metrics, setMetrics] = useState<Metrics | null>(null),
     [query, setQuery] = useState(""),
@@ -58,14 +61,14 @@ export function PartnerCustomersContent() {
     [saving, setSaving] = useState(false),
     [active, setActive] = useState<Customer | null>(null),
     [error, setError] = useState("");
-  const load = useCallback(async () => {
+  const load = useCallback(async () => {setLoading(true);setError("");try {
     const r = await api(),
       b = await r.json();
     if (r.ok) {
       setRows(b.data || []);
       setMetrics(b.metrics);
     } else setError(b.error || "Customers could not be loaded.");
-  }, []);
+  } catch { setError("Unable to load customers. Please refresh and try again."); } finally { setLoading(false); }}, []);
   useEffect(() => {
     void load();
   }, [load]);
@@ -108,6 +111,7 @@ export function PartnerCustomersContent() {
         ],
       ] as const)
     : [];
+  if (loading) return <PartnerSkeleton view="customers" />;
   return (
     <div className="pc-page">
       <div className="pc-heading">

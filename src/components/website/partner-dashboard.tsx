@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   BarChart3,
   Bell,
@@ -34,6 +34,7 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
+import { usePartnerProfile } from "@/components/auth/portal-route-guard";
 import { supabaseAuth } from "@/lib/supabase-client";
 import { PartnerLeadsContent } from "@/components/website/partner-leads-content";
 import { PartnerCustomersContent } from "@/components/website/partner-customers-content";
@@ -41,14 +42,6 @@ import { PartnerEarningsContent } from "@/components/website/partner-earnings-co
 import { PartnerPoliciesContent } from "@/components/website/partner-policies-content";
 
 type IconType = LucideIcon;
-type Profile = {
-  agent_code: string;
-  status: string;
-  kyc_status: string;
-  users: { full_name: string };
-  profile_setup_required: boolean;
-  profile_setup_skipped: boolean;
-};
 
 const nav: Array<[string, string, IconType]> = [
   ["Dashboard", "/partner", Home],
@@ -324,23 +317,9 @@ export function PartnerDashboard({
 }: {
   view?: "dashboard" | "leads" | "customers" | "policies" | "earnings";
 }) {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const profile = usePartnerProfile();
   const [menu, setMenu] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-
-  useEffect(() => {
-    supabaseAuth.auth.getSession().then(async ({ data }) => {
-      if (!data.session) return location.replace("/partner/login");
-      const response = await fetch("/api/partner/me", {
-        headers: { Authorization: `Bearer ${data.session.access_token}` },
-      });
-      if (!response.ok) return location.replace("/partner/login");
-      const current = (await response.json()).data as Profile;
-      if (current.profile_setup_required)
-        return location.replace("/partner/complete-profile");
-      setProfile(current);
-    });
-  }, []);
 
   async function signOut() {
     setSigningOut(true);

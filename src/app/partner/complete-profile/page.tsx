@@ -1,8 +1,10 @@
 "use client";
+import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { authenticatedDestination, supabaseAuth } from "@/lib/supabase-client";
 export default function CompletePartnerProfile() {
+  const [checking, setChecking] = useState(true);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
@@ -20,8 +22,9 @@ export default function CompletePartnerProfile() {
       }
       const profile = (await response.json()).data;
       if (!["not_started", "skipped"].includes(profile.kyc_status))
-        location.replace("/partner");
-    });
+        return location.replace("/partner");
+      setChecking(false);
+    }).catch(() => { setError("Unable to load your profile. Please refresh and try again."); setChecking(false); });
   }, []);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -60,6 +63,7 @@ export default function CompletePartnerProfile() {
     }
     location.replace("/partner");
   }
+  if (checking) return <PartnerSkeleton fullPage view="form" />;
   return (
     <main className="partner-login-page profile-page">
       <section className="partner-login-card complete-profile-card">

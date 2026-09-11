@@ -36,19 +36,16 @@ export async function changePassword(currentPassword: string, password: string) 
   if (error) throw error;
 }
 
-export async function authenticatedDestination(token: string) {
-  const customer = await fetch("/api/customer/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (customer.ok) return "/customer";
-  const partner = await fetch("/api/partner/me", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (partner.ok) {
-    const body = await partner.json();
-    return body.data?.profile_setup_required
-      ? "/partner/complete-profile"
-      : "/partner";
+export async function authenticatedDestination(token: string, preferred: "customer" | "partner" = "customer") {
+  const portals = preferred === "partner" ? ["partner", "customer"] : ["customer", "partner"];
+  for (const portal of portals) {
+    const response = await fetch("/api/" + portal + "/me", {
+      headers: { Authorization: "Bearer " + token },
+    });
+    if (!response.ok) continue;
+    if (portal === "customer") return "/customer";
+    const body = await response.json();
+    return body.data?.profile_setup_required ? "/partner/complete-profile" : "/partner";
   }
   return null;
 }

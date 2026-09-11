@@ -1,4 +1,6 @@
 "use client";
+import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
+
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   BarChart3,
@@ -53,6 +55,7 @@ async function api(init: RequestInit = {}) {
   });
 }
 export function PartnerLeadsContent() {
+  const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Lead[]>([]),
     [query, setQuery] = useState(""),
     [status, setStatus] = useState("all"),
@@ -63,7 +66,7 @@ export function PartnerLeadsContent() {
     [selectedSector, setSelectedSector] = useState(""),
     [activeLead, setActiveLead] = useState<Lead | null>(null),
     [error, setError] = useState("");
-  const load = useCallback(async () => {
+  const load = useCallback(async () => {setLoading(true);setError("");try {
     const r = await api(),
       b = await r.json();
     if (r.ok) {
@@ -71,7 +74,7 @@ export function PartnerLeadsContent() {
       setSectors(b.sectors || []);
       setProductTypes(b.productTypes || []);
     } else setError(b.error || "Unable to load leads.");
-  }, []);
+  } catch { setError("Unable to load leads. Please refresh and try again."); } finally { setLoading(false); }}, []);
   useEffect(() => {
     void load();
   }, [load]);
@@ -142,6 +145,7 @@ export function PartnerLeadsContent() {
     const digits = (contact || "").replace(/\D/g, "");
     return digits.length === 10 ? `91${digits}` : digits;
   };
+  if (loading) return <PartnerSkeleton view="leads" />;
   return (
     <div className="pl-page">
       <div className="pl-heading">

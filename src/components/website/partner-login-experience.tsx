@@ -33,9 +33,7 @@ export function PartnerLoginExperience() {
     if (finishOAuthPopup()) return;
     supabaseAuth.auth.getSession().then(async ({ data }) => {
       if (!data.session) return;
-      const destination = await authenticatedDestination(
-        data.session.access_token,
-      );
+      const destination = await authenticatedDestination(data.session.access_token, "partner");
       if (destination) return location.replace(destination);
     });
   }, []);
@@ -55,9 +53,7 @@ export function PartnerLoginExperience() {
         });
       if (authError || !data.session)
         throw authError || new Error("Sign in failed.");
-      const destination = await authenticatedDestination(
-        data.session.access_token,
-      );
+      const destination = await authenticatedDestination(data.session.access_token, "partner");
       if (destination) return location.replace(destination);
       throw new Error(
         "This account does not have partner access. Please complete partner registration first.",
@@ -74,7 +70,7 @@ export function PartnerLoginExperience() {
       const session = await signInWithGoogle(
         `${location.origin}/partner/login`,
       );
-      const destination = await authenticatedDestination(session.access_token);
+      const destination = await authenticatedDestination(session.access_token, "partner");
       if (destination) return location.replace(destination);
       throw new Error(
         "This account is not registered as a partner. Please complete partner registration first.",

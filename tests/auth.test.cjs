@@ -88,3 +88,18 @@ test("a failed PKCE exchange cannot use an unrelated existing session", async ()
   const api = client({ initialize: async () => ({ error: Error("expired code") }), getSession: async () => { checked = true; return { data: { session: {} } }; } }, { location: { search: "?code=expired", hash: "" } });
   await assert.rejects(api.completeAuthRedirect(), /expired code/); assert.equal(checked, false);
 });
+
+test("partner login resolves access with one profile request", async () => {
+  const calls = [];
+  const api = client({}, { fetch: async url => { calls.push(url); return { ok: true, json: async () => ({ data: { profile_setup_required: false } }) }; } });
+  assert.equal(await api.authenticatedDestination("token", "partner"), "/partner");
+  assert.deepEqual(calls, ["/api/partner/me"]);
+});
+test("partner login preserves onboarding and cross-portal fallback", async () => {
+  const onboarding = client({}, { fetch: async () => ({ ok: true, json: async () => ({ data: { profile_setup_required: true } }) }) });
+  assert.equal(await onboarding.authenticatedDestination("token", "partner"), "/partner/complete-profile");
+  const calls = [];
+  const fallback = client({}, { fetch: async url => { calls.push(url); return { ok: url === "/api/customer/me" }; } });
+  assert.equal(await fallback.authenticatedDestination("token", "partner"), "/customer");
+  assert.deepEqual(calls, ["/api/partner/me", "/api/customer/me"]);
+});
