@@ -37,7 +37,7 @@ export const footerColumns = [
     "links": [
       [
         "How to Become Partner",
-        "/become-partner"
+        "/partner"
       ],
       [
         "Partner Login",

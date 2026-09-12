@@ -63,7 +63,7 @@ export function WebsiteHeader() {
   return (
     <>
       <AnnouncementBar />
-      <header className="website-navbar relative z-30 flex h-[80px] items-center border-b border-[#e7e9f3] bg-white px-[2.1vw] shadow-[0_4px_20px_rgba(28,32,85,.035)] max-lg:h-24 max-md:h-[92px] max-md:px-4">
+      <header className="website-navbar relative z-30 flex h-[80px] items-center border-b border-[var(--appearance-border,#e7e9f3)] bg-[var(--appearance-surface,#fff)] px-[2.1vw] shadow-[0_4px_20px_rgba(28,32,85,.035)] max-lg:h-24 max-md:h-[92px] max-md:px-4">
         <Link href="/" aria-label="MagikPolicy home">
           <Image
             className="h-auto w-[250px] max-2xl:w-[320px] max-xl:w-[260px] max-md:w-[150px]"
@@ -76,7 +76,7 @@ export function WebsiteHeader() {
         </Link>
         <div className="ml-auto flex items-center justify-end">
           <nav
-            className={`${open ? "grid" : "hidden"} absolute left-0 right-0 top-full bg-white p-5 shadow-xl xl:static xl:flex xl:items-center xl:gap-8 xl:bg-transparent xl:p-0 xl:shadow-none 2xl:gap-[36px]`}
+            className={`${open ? "grid" : "hidden"} absolute left-0 right-0 top-full bg-[var(--appearance-surface,#fff)] p-5 shadow-xl xl:static xl:flex xl:items-center xl:gap-8 xl:bg-transparent xl:p-0 xl:shadow-none 2xl:gap-[36px]`}
           >
             {[
               ["Health", "health"],
@@ -85,7 +85,7 @@ export function WebsiteHeader() {
               ["Term", "term"],
             ].map(([label, slug]) => (
               <Link
-                className="flex items-center py-3 text-[14px] font-normal text-[#111111] max-2xl:text-[17px]"
+                className="flex items-center py-3 text-[14px] font-normal text-[var(--appearance-text,#111111)] max-2xl:text-[17px]"
                 href={`/products/${slug}`}
                 key={slug}
               >
@@ -93,16 +93,16 @@ export function WebsiteHeader() {
               </Link>
             ))}
           </nav>
-          <label className="ml-8 hidden h-[60px] w-[300px] items-center rounded-[10px] border border-[#c8bdf8] bg-white px-[21px] shadow-[0_2px_8px_rgba(83,52,180,.06)] transition-colors focus-within:border-[#6634f1] xl:flex 2xl:ml-[50px]">
+          <label className="ml-8 hidden h-[60px] w-[300px] items-center rounded-[10px] border border-[var(--appearance-border,#c8bdf8)] bg-[var(--appearance-surface,#fff)] px-[21px] shadow-[0_2px_8px_rgba(83,52,180,.06)] transition-colors focus-within:border-[#6634f1] xl:flex 2xl:ml-[50px]">
             <input
-              className="min-w-0 flex-1 border-0 bg-transparent text-[14px] font-normal text-[#536083] outline-none placeholder:text-[#697390] max-2xl:text-[15px]"
+              className="min-w-0 flex-1 border-0 bg-transparent text-[14px] font-normal text-[var(--appearance-muted,#536083)] outline-none placeholder:text-[var(--appearance-muted,#697390)] max-2xl:text-[15px]"
               placeholder="Search policies, plans, insurers..."
             />
-            <Search className="h-[25px] w-[25px] text-[#24305f]" />
+            <Search className="h-[25px] w-[25px] text-[var(--appearance-text,#24305f)]" />
           </label>
           <div className="website-nav-actions absolute right-3 flex items-center gap-1 md:gap-2 xl:static xl:ml-4 xl:gap-4 2xl:ml-6 2xl:gap-[22px]">
             <Link
-              className="hidden h-[40px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-violet-50 px-6 text-sm font-semibold text-[#5527df] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
+              className="hidden h-[40px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-[var(--appearance-surface-raised,#f5f3ff)] px-6 text-sm font-semibold text-[var(--appearance-text,#5527df)] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
             href="/customer/login"
             >
               Login / Register
@@ -114,20 +114,20 @@ export function WebsiteHeader() {
               Become a Partner
             </Link>
             <button
-              className="grid h-9 w-9 place-items-center border-0 bg-white text-[#09164d] md:h-11 md:w-11 xl:hidden"
+              className="grid h-9 w-9 place-items-center border-0 bg-[var(--appearance-surface,#fff)] text-[var(--appearance-text,#09164d)] md:h-11 md:w-11 xl:hidden"
               aria-label="Search"
             >
               <Search />
             </button>
             <Link
-              className="grid h-9 w-9 place-items-center text-[#09164d] md:h-11 md:w-11 xl:hidden"
+              className="grid h-9 w-9 place-items-center text-[var(--appearance-text,#09164d)] md:h-11 md:w-11 xl:hidden"
             href="/customer/login"
               aria-label="Login"
             >
               <UserRound />
             </Link>
             <Link
-              className="grid btn-primary h-9 w-9 place-items-center rounded-lg bg-violet-50 text-[#6827ef] md:h-11 md:w-11 xl:hidden"
+              className="grid btn-primary h-9 w-9 place-items-center rounded-lg bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-text,#6827ef)] md:h-11 md:w-11 xl:hidden"
             href="/partner/register"
               aria-label="Become a Partner"
               title="Become a Partner"
@@ -135,7 +135,7 @@ export function WebsiteHeader() {
               <UsersRound />
             </Link>
             <button
-              className="grid h-9 w-9 place-items-center border-0 bg-white text-[#09164d] md:h-11 md:w-11 xl:hidden"
+              className="grid h-9 w-9 place-items-center border-0 bg-[var(--appearance-surface,#fff)] text-[var(--appearance-text,#09164d)] md:h-11 md:w-11 xl:hidden"
               onClick={() => setOpen(!open)}
               aria-label="Toggle menu"
             >

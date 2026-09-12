@@ -137,7 +137,7 @@ function ChoiceGrid({
             type="button"
             key={label}
             onClick={() => set(label)}
-            className={`relative flex min-h-[62px] min-w-0 items-center justify-center gap-3 rounded-lg border px-2 text-sm font-medium ${active ? "border-violet-600 bg-violet-50 text-violet-700" : "border-slate-200 bg-white text-slate-700"}`}
+            className={`relative flex min-h-[62px] min-w-0 items-center justify-center gap-3 rounded-lg border px-2 text-sm font-medium ${active ? "border-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#6d28d9)]" : "border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] text-[var(--appearance-text,#334155)]"}`}
           >
             {Icon && <Icon className="h-6 w-6" />}
             {label}
@@ -155,7 +155,7 @@ function ChoiceGrid({
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <fieldset className="mb-10 border-0 p-0">
-      <legend className="mb-5 text-xl font-semibold text-[#111c4e] max-2xl:text-base">
+      <legend className="mb-5 text-xl font-semibold text-[var(--appearance-text,#111c4e)] max-2xl:text-base">
         {label}
       </legend>
       {children}
@@ -215,14 +215,14 @@ function QuoteFinder() {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#ebeaf4] bg-white shadow-[0_16px_45px_rgba(44,37,105,.08)]">
-      <div className="quote-tabs-responsive grid h-[84px] grid-cols-3 border-b border-[#ecebf4]">
+    <div className="overflow-hidden rounded-xl border border-[var(--appearance-border,#ebeaf4)] bg-[var(--appearance-surface,#fff)] shadow-[0_16px_45px_rgba(44,37,105,.08)]">
+      <div className="quote-tabs-responsive grid h-[84px] grid-cols-3 border-b border-[var(--appearance-border,#ecebf4)]">
         {tabs.map(([id, Icon, label]) => (
           <button
             key={id}
             type="button"
             onClick={() => selectTab(id)}
-            className={`flex min-w-0 items-center justify-center gap-5 border-0 bg-white text-base font-medium max-md:gap-2 max-md:text-sm ${tab === id ? "border-b-[3px] border-b-violet-600 bg-violet-50/60 text-violet-700" : "text-[#111c4e]"}`}
+            className={`flex min-w-0 items-center justify-center gap-5 border-0 bg-[var(--appearance-surface,#fff)] text-base font-medium max-md:gap-2 max-md:text-sm ${tab === id ? "border-b-[3px] border-b-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)]/60 text-[var(--appearance-violet,#6d28d9)]" : "text-[var(--appearance-text,#111c4e)]"}`}
           >
             <Icon className="h-6 w-6" />
             {label}
@@ -234,17 +234,17 @@ function QuoteFinder() {
           <div className="grid min-h-[270px] place-items-center text-center">
             <div>
               <CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500" />
-              <h2 className="mb-2 mt-4 text-2xl text-[#111c4e]">
+              <h2 className="mb-2 mt-4 text-2xl text-[var(--appearance-text,#111c4e)]">
                 Successfully submitted!
               </h2>
-              <p className="m-0 text-sm text-slate-600">
+              <p className="m-0 text-sm text-[var(--appearance-muted,#475569)]">
                 Thank you. Our insurance expert will contact you shortly.
               </p>
             </div>
           </div>
         ) : contactStep ? (
           <form className="grid min-h-[270px] content-center gap-4" onSubmit={submitRequest}>
-            <h2 className="m-0 text-xl text-[#111c4e]">Enter your details</h2>
+            <h2 className="m-0 text-xl text-[var(--appearance-text,#111c4e)]">Enter your details</h2>
             <input
               required
               value={customerName}
@@ -269,7 +269,7 @@ function QuoteFinder() {
               <button
                 type="button"
                 onClick={() => setContactStep(false)}
-                className="h-[54px] rounded-lg border border-violet-500 bg-white px-5 text-sm text-violet-700"
+                className="h-[54px] rounded-lg border border-violet-500 bg-[var(--appearance-surface,#fff)] px-5 text-sm text-[var(--appearance-violet,#6d28d9)]"
               >
                 Back
               </button>
@@ -343,21 +343,21 @@ const statItems: Array<[IconType, string, string, string]> = [
 ];
 function Stats() {
   return (
-    <section className="home-stats grid grid-cols-4 rounded-xl border border-slate-200 bg-violet-100 p-5 shadow-sm max-lg:grid-cols-4 max-md:grid-cols-2 max-md:p-2">
+    <section className="home-stats grid grid-cols-4 rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-violet-100 p-5 shadow-sm max-lg:grid-cols-4 max-md:grid-cols-2 max-md:p-2">
       {statItems.map(([Icon, value, label, copy], i) => (
         <article
           key={label}
-          className={`${i === 4 ? "max-lg:hidden" : ""} flex gap-3 border-r border-slate-200 px-4 last:border-0 max-md:items-center max-md:border-b max-md:border-r-0 max-md:px-2 max-md:py-4`}
+          className={`${i === 4 ? "max-lg:hidden" : ""} flex gap-3 border-r border-[var(--appearance-border,#e2e8f0)] px-4 last:border-0 max-md:items-center max-md:border-b max-md:border-r-0 max-md:px-2 max-md:py-4`}
         >
           <span
-            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 1 ? "bg-emerald-50 text-emerald-500" : i === 2 ? "bg-pink-50 text-pink-500" : i === 3 ? "bg-amber-50 text-amber-500" : "bg-violet-50 text-violet-600"}`}
+            className={`grid h-11 w-11 shrink-0 place-items-center rounded-full ${i === 1 ? "bg-emerald-50 text-emerald-500" : i === 2 ? "bg-pink-50 text-pink-500" : i === 3 ? "bg-amber-50 text-amber-500" : "bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]"}`}
           >
             <Icon className="h-5 w-5" />
           </span>
           <div>
-            <strong className="block text-lg text-[#0b174c]">{value}</strong>
-            <b className="block text-[13x] text-[#182653]">{label}</b>
-            <small className="mt-1 block text-[12px] leading-relaxed text-slate-500">
+            <strong className="block text-lg text-[var(--appearance-text,#0b174c)]">{value}</strong>
+            <b className="block text-[13x] text-[var(--appearance-text,#182653)]">{label}</b>
+            <small className="mt-1 block text-[12px] leading-relaxed text-[var(--appearance-muted,#64748b)]">
               {copy}
             </small>
           </div>
@@ -382,12 +382,12 @@ const miniBenefits: Array<[IconType, string, string]> = [
 ];
 function PartnerEarning() {
   return (
-    <section className="partner-earning-responsive grid grid-cols-[.9fr_1.1fr] items-center gap-10 rounded-2xl border border-slate-100 bg-white p-10 shadow-sm max-lg:grid-cols-1 max-md:gap-7 max-md:p-5">
+    <section className="partner-earning-responsive grid grid-cols-[.9fr_1.1fr] items-center gap-10 rounded-2xl border border-slate-100 bg-[var(--appearance-surface,#fff)] p-10 shadow-sm max-lg:grid-cols-1 max-md:gap-7 max-md:p-5">
       <div>
-        <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] px-3 py-1 text-[10px] font-bold text-[var(--appearance-violet,#6d28d9)]">
           <UsersRound className="h-4 w-4" /> PARTNER WITH US
         </span>
-        <h2 className="mb-3 mt-4 text-4xl leading-tight text-[#0b174c] max-md:text-3xl">
+        <h2 className="mb-3 mt-4 text-4xl leading-tight text-[var(--appearance-text,#0b174c)] max-md:text-3xl">
           Join MagikPolicy &amp;
           <br />
           Earn{" "}
@@ -395,7 +395,7 @@ function PartnerEarning() {
              Extra!
           </em>
         </h2>
-        <p className="max-w-lg text-sm leading-relaxed text-slate-600">
+        <p className="max-w-lg text-sm leading-relaxed text-[var(--appearance-muted,#475569)]">
           Already earning working as an insurance agent? Switch to
           MagikPolicy and get extra rewards on every eligible policy.
         </p>
@@ -403,13 +403,13 @@ function PartnerEarning() {
           {miniBenefits.map(([Icon, title, copy]) => (
             <article
               key={title}
-              className="border-r border-slate-200 pr-3 last:border-0"
+              className="border-r border-[var(--appearance-border,#e2e8f0)] pr-3 last:border-0"
             >
               <span className="grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-emerald-500">
                 <Icon className="h-8 w-8" />
               </span>
-              <b className="mt-2 block text-sm text-[#122050]">{title}</b>
-              <small className="mt-1 block text-[12px] leading-relaxed text-slate-500">
+              <b className="mt-2 block text-sm text-[var(--appearance-text,#122050)]">{title}</b>
+              <small className="mt-1 block text-[12px] leading-relaxed text-[var(--appearance-muted,#64748b)]">
                 {copy}
               </small>
             </article>
@@ -426,7 +426,7 @@ function PartnerEarning() {
           sizes="(max-width: 640px) calc(100vw - 48px), (max-width: 1024px) min(680px, calc(100vw - 80px)), 52vw"
         />
       </div>
-      <div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2 bg-violet-50 p-4 border-0 rounded-lg  ">
+      <div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2 bg-[var(--appearance-surface-raised,#f5f3ff)] p-4 border-0 rounded-lg  ">
         {[
           [TrendingUp, "Increase Your Earnings", "Do less get more"],
           [IndianRupee, "No Deductions", "No hidden charges"],
@@ -434,15 +434,15 @@ function PartnerEarning() {
           [ShieldCheck, "Grow Your Business", "Access insurers & products"],
         ].map(([Icon, title, copy]) => (
           <article
-            className="flex gap-3 rounded-xl border border-slate-200 p-4"
+            className="flex gap-3 rounded-xl border border-[var(--appearance-border,#e2e8f0)] p-4"
             key={String(title)}
           >
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-violet-50 text-violet-600">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]">
               <Icon className="h-5 w-5" />
             </span>
             <div>
-              <b className="block text-md pb-1 text-[#122050]">{String(title)}</b>
-              <small className="text-[13px] text-slate-500">
+              <b className="block text-md pb-1 text-[var(--appearance-text,#122050)]">{String(title)}</b>
+              <small className="text-[13px] text-[var(--appearance-muted,#64748b)]">
                 {String(copy)}
               </small>
             </div>
@@ -451,7 +451,7 @@ function PartnerEarning() {
       </div>
       <div className="col-span-2 flex justify-center gap-4 max-lg:col-span-1 max-md:flex-col mt-5">
         {/* <Link
-          className="flex min-h-12 min-w-72 items-center justify-center gap-3 rounded-lg border border-violet-500 px-5 text-sm font-semibold text-violet-700 bg-violet-50"
+          className="flex min-h-12 min-w-72 items-center justify-center gap-3 rounded-lg border border-violet-500 px-5 text-sm font-semibold text-[var(--appearance-violet,#6d28d9)] bg-[var(--appearance-surface-raised,#f5f3ff)]"
           href="/products"
         >
           Check My Extra Earning <ArrowRight className="h-4 w-4" />
@@ -506,9 +506,9 @@ function PopularPlans() {
   return (
     <section>
       <header className="mb-5 flex items-center justify-between">
-        <h2 className="text-2xl text-[#0b174c]">Popular Insurance Plans</h2>
+        <h2 className="text-2xl text-[var(--appearance-text,#0b174c)]">Popular Insurance Plans</h2>
         <Link
-          className="flex items-center gap-2 text-xs font-semibold text-violet-700"
+          className="flex items-center gap-2 text-xs font-semibold text-[var(--appearance-violet,#6d28d9)]"
           href="/products"
         >
           View All Plans <ArrowRight className="h-4 w-4" />
@@ -517,18 +517,18 @@ function PopularPlans() {
       <div className="grid grid-cols-6 gap-4 max-xl:grid-cols-3 max-md:grid-cols-2">
         {plans.map(([Icon, title, copy, price, unit]) => (
           <article
-            className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
+            className="rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
             key={title}
           >
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-violet-50 text-violet-600">
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]">
               <Icon className="h-7 w-7" />
             </span>
-            <h3 className="mt-4 text-sm text-[#102050]">{title}</h3>
-            <p className="min-h-10 text-[14px] leading-relaxed text-slate-500">
+            <h3 className="mt-4 text-sm text-[var(--appearance-text,#102050)]">{title}</h3>
+            <p className="min-h-10 text-[14px] leading-relaxed text-[var(--appearance-muted,#64748b)]">
               {copy}
             </p>
             <small className="text-[10px] font-semibold text-slate-400">Starting from</small>
-            <strong className="mt-1 block text-base text-[#0b174c] text-[22px]">
+            <strong className="mt-1 block text-base text-[var(--appearance-text,#0b174c)] text-[22px]">
               {price}
               <small className="font-normal"> /{unit}</small>
             </strong>
@@ -543,7 +543,7 @@ function PopularPlans() {
           </article>
         ))}
       </div>
-      <div className="mt-5 grid grid-cols-4 rounded-xl border border-slate-200 bg-white p-4 max-md:grid-cols-2">
+      <div className="mt-5 grid grid-cols-4 rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] p-4 max-md:grid-cols-2">
         {[
           [ShieldCheck, "100% Secure", "Your data is safe with us"],
           [Target, "Best Prices", "Compare & save more"],
@@ -554,12 +554,12 @@ function PopularPlans() {
             className="flex items-center justify-center gap-3 px-3"
             key={String(title)}
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-violet-50 text-violet-600">
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]">
               <Icon className="h-4 w-4" />
             </span>
             <p>
               <b className="block text-[14px]">{String(title)}</b>
-              <small className="text-[12px] text-slate-500">
+              <small className="text-[12px] text-[var(--appearance-muted,#64748b)]">
                 {String(copy)}
               </small>
             </p>
@@ -583,19 +583,19 @@ function ClaimHelpModal({ close }: { close: () => void }) {
     setSubmitted(true);
   }
   return <div className="claim-help-modal fixed inset-0 z-[100] grid place-items-center overflow-y-auto bg-[#08132f]/60 p-4 backdrop-blur-sm" onMouseDown={close}>
-    <section className="relative my-4 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl max-md:p-4" onMouseDown={event => event.stopPropagation()}>
-      <button type="button" onClick={close} aria-label="Close claim help form" className="claim-help-close absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-0 bg-slate-100 text-xl text-slate-600">×</button>
-      {submitted ? <div className="grid min-h-72 place-items-center text-center"><div><CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500"/><h2 className="mb-2 mt-4 text-2xl text-[#101c50]">Request submitted successfully!</h2><p className="text-sm text-slate-600">Our claim assistance team will contact you on WhatsApp shortly.</p><button type="button" onClick={close} className="claim-help-primary mt-4 rounded-lg border-0 bg-violet-600 px-6 py-3 text-sm font-semibold text-white">Close</button></div></div> : <>
-        <div className="pr-12"><span className="text-xs font-semibold text-violet-600">CLAIM ASSISTANCE</span><h2 className="mb-2 mt-2 text-2xl text-[#101c50]">Tell us about your failed claim</h2><p className="mt-0 text-sm text-slate-600">Attach both documents as PDF, JPG, PNG or WEBP files up to 5 MB.</p></div>
+    <section className="relative my-4 w-full max-w-2xl rounded-2xl bg-[var(--appearance-surface,#fff)] p-6 shadow-2xl max-md:p-4" onMouseDown={event => event.stopPropagation()}>
+      <button type="button" onClick={close} aria-label="Close claim help form" className="claim-help-close absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full border-0 bg-slate-100 text-xl text-[var(--appearance-muted,#475569)]">×</button>
+      {submitted ? <div className="grid min-h-72 place-items-center text-center"><div><CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500"/><h2 className="mb-2 mt-4 text-2xl text-[var(--appearance-text,#101c50)]">Request submitted successfully!</h2><p className="text-sm text-[var(--appearance-muted,#475569)]">Our claim assistance team will contact you on WhatsApp shortly.</p><button type="button" onClick={close} className="claim-help-primary mt-4 rounded-lg border-0 bg-violet-600 px-6 py-3 text-sm font-semibold text-white">Close</button></div></div> : <>
+        <div className="pr-12"><span className="text-xs font-semibold text-[var(--appearance-violet,#7c3aed)]">CLAIM ASSISTANCE</span><h2 className="mb-2 mt-2 text-2xl text-[var(--appearance-text,#101c50)]">Tell us about your failed claim</h2><p className="mt-0 text-sm text-[var(--appearance-muted,#475569)]">Attach both documents as PDF, JPG, PNG or WEBP files up to 5 MB.</p></div>
         <form className="mt-5 grid grid-cols-2 gap-4 max-md:grid-cols-1" onSubmit={submit}>
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="Your full name"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">WhatsApp number<input name="whatsappNumber" required inputMode="tel" pattern="[0-9+ ]{10,16}" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="₹ Claim amount"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="City, State"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="Your full name"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">WhatsApp number<input name="whatsappNumber" required inputMode="tel" pattern="[0-9+ ]{10,16}" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="₹ Claim amount"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="City, State"/></label>
           
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[#172454]">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
-          <label className="col-span-2 grid gap-2 text-sm font-medium text-[#172454] max-md:col-span-1">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
+          <label className="col-span-2 grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] max-md:col-span-1">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
           <input name="website" className="hidden" tabIndex={-1} autoComplete="off"/>
           {error && <p className="col-span-2 m-0 text-sm text-red-600 max-md:col-span-1">{error}</p>}
           <button disabled={submitting} className="claim-help-primary col-span-2 h-12 rounded-lg border-0 bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 text-sm font-semibold text-white disabled:opacity-60 max-md:col-span-1">{submitting ? "Submitting request…" : "Submit Claim Help Request"}</button>
@@ -611,16 +611,16 @@ function ClaimBanner() {
     <>
     <section className="grid grid-cols-[1.05fr_.8fr_.8fr] items-center gap-7 rounded-2xl bg-gradient-to-r from-violet-300 via-white to-violet-100 p-8 max-lg:grid-cols-1">
       <div>
-        <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-violet-700">
+        <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-[var(--appearance-violet,#6d28d9)]">
           CLAIM CONSULTING
         </span>
-        <h2 className="mb-2 mt-4 text-3xl text-[#0b174c]">
+        <h2 className="mb-2 mt-4 text-3xl text-[var(--appearance-text,#0b174c)]">
           Is your claim failed?
         </h2>
-        <h3 className="m-0 text-lg text-[#172454]">
+        <h3 className="m-0 text-lg text-[var(--appearance-text,#172454)]">
           Let us know, we will help you to get your claim pass.
         </h3>
-        <p className="text-sm leading-relaxed text-slate-600">
+        <p className="text-sm leading-relaxed text-[var(--appearance-muted,#475569)]">
           We provide you an advocate who assists and helps you legally to
           approve your claim.
         </p>
@@ -633,7 +633,7 @@ function ClaimBanner() {
             Get Claim Help Now →
           </button>
           {/* <Link
-            className="rounded-lg border-2 border-solid border-violet-500 px-5 py-3 text-xs font-semibold text-violet-700"
+            className="rounded-lg border-2 border-solid border-violet-500 px-5 py-3 text-xs font-semibold text-[var(--appearance-violet,#6d28d9)]"
             href="/resources"
           >
             How It Works
@@ -642,7 +642,7 @@ function ClaimBanner() {
       </div>
       <div className="relative grid min-h-60 place-items-center">
         {/* <div className="absolute h-48 w-48 rounded-full bg-violet-100" />
-        <FileCheck2 className="z-10 h-36 w-36 rotate-6 text-violet-600" />
+        <FileCheck2 className="z-10 h-36 w-36 rotate-6 text-[var(--appearance-violet,#7c3aed)]" />
         <Gavel className="absolute bottom-2 right-5 z-20 h-24 w-24 -rotate-12 text-amber-800" /> */}
         <div className="earning-image-responsive rounded-2xl flex w-full min-w-0 max-w-full items-center justify-center overflow-hidden px-0 max-md:px-1">
           <Image
@@ -674,12 +674,12 @@ function ClaimBanner() {
           ],
         ].map(([Icon, title, copy]) => (
           <article className="flex gap-3" key={String(title)}>
-            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-violet-100 text-violet-600">
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-lg bg-violet-100 text-[var(--appearance-violet,#7c3aed)]">
               <Icon className="h-7 w-7" />
             </span>
             <p className="m-0">
-              <b className="block text-xs text-[#142151]">{String(title)}</b>
-              <small className="text-[11px] leading-relaxed text-slate-500">
+              <b className="block text-xs text-[var(--appearance-text,#142151)]">{String(title)}</b>
+              <small className="text-[11px] leading-relaxed text-[var(--appearance-muted,#64748b)]">
                 {String(copy)}
               </small>
             </p>
@@ -695,24 +695,24 @@ function ClaimBanner() {
 function Testimonials() {
   return (
     <section className="text-center w-4/5 mx-auto">
-      <span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+      <span className="rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] px-3 py-1 text-[10px] font-bold text-[var(--appearance-violet,#6d28d9)]">
         CUSTOMER TESTIMONIALS
       </span>
-      <h2 className="mb-2 mt-4 text-4xl text-[#0b174c]">
+      <h2 className="mb-2 mt-4 text-4xl text-[var(--appearance-text,#0b174c)]">
         Trusted by Customers.
         <br />
         <em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">
           Loved for the Experience.
         </em>
       </h2>
-      <p className="mx-auto max-w-xl text-xs text-slate-500">
+      <p className="mx-auto max-w-xl text-xs text-[var(--appearance-muted,#64748b)]">
         Hear from people who have experienced hassle-free policy buying, quick
         support and smooth claim assistance with MagikPolicy.
       </p>
       <div className="mt-7 grid grid-cols-[1.1fr_.9fr] gap-4 text-left max-lg:grid-cols-1">
-        <article className="rounded-xl border border-slate-200 bg-white p-7 shadow-sm">
+        <article className="rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] p-7 shadow-sm">
           <span className="text-6xl leading-none text-violet-200">“</span>
-          <p className="text-base font-semibold leading-relaxed text-[#172454]">
+          <p className="text-base font-semibold leading-relaxed text-[var(--appearance-text,#172454)]">
             Buying insurance was never this easy! MagikPolicy helps me compare
             the best policies and I even saved on my premium. The whole process
             is simple, transparent and truly hassle-free.
@@ -741,11 +741,11 @@ function Testimonials() {
             ],
           ].map(([quote, name]) => (
             <article
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+              className="rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] p-5 shadow-sm"
               key={name}
             >
               <div className="text-amber-400">★★★★★</div>
-              <p className="text-xs font-medium leading-relaxed text-[#172454]">
+              <p className="text-xs font-medium leading-relaxed text-[var(--appearance-text,#172454)]">
                 “{quote}”
               </p>
               <b className="text-[10px]">{name}</b>
@@ -822,19 +822,19 @@ function Advantage() {
     <section className="rounded-2xl bg-gradient-to-br from-violet-100 to-pink-100 p-4">
       <div className="grid grid-cols-[1fr_.75fr] items-center gap-7 max-lg:grid-cols-1">
         <div>
-          <span className="rounded-full bg-violet-50 px-3 py-1 text-[10px] font-bold text-violet-700">
+          <span className="rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] px-3 py-1 text-[10px] font-bold text-[var(--appearance-violet,#6d28d9)]">
             SUPER OPPORTUNITY
           </span>
-          <h2 className="mb-2 mt-4 text-5xl text-[#0b174c]">
+          <h2 className="mb-2 mt-4 text-5xl text-[var(--appearance-text,#0b174c)]">
             The MagikPolicy{" "}
             <em className="bg-gradient-to-r from-violet-600 to-pink-500 bg-clip-text not-italic text-transparent">
               Advantage
             </em>
           </h2>
-          <h3 className="m-0 text-4xl text-[#172454]">
+          <h3 className="m-0 text-4xl text-[var(--appearance-text,#172454)]">
             Everything you need to sell more.
             <br />
-            All in <span className="text-violet-700">One place.</span>
+            All in <span className="text-[var(--appearance-violet,#6d28d9)]">One place.</span>
           </h3>
           <p className="max-w-xl text-md leading-relaxed text-slate-800">
             From finding the right policy to managing customers, renewals,
@@ -844,7 +844,7 @@ function Advantage() {
         </div>
         <div className="relative grid min-h-64 place-items-center">
           {/* <div className="absolute h-60 w-60 rounded-full bg-gradient-to-br from-violet-100 to-pink-100" />
-          <Laptop className="z-10 h-44 w-44 text-violet-600" />
+          <Laptop className="z-10 h-44 w-44 text-[var(--appearance-violet,#7c3aed)]" />
           <Image
             className="absolute z-20 w-24"
             src="/brand/magikpolicy-logo.png"
@@ -867,15 +867,15 @@ function Advantage() {
       <div className="mt-6 grid grid-cols-3 gap-4 max-lg:grid-cols-2 max-md:grid-cols-1">
         {advantageCards.map(([Icon, title, copy]) => (
           <article
-            className="flex gap-4 rounded-xl border border-slate-200 bg-white p-5"
+            className="flex gap-4 rounded-xl border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] p-5"
             key={title}
           >
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-violet-50 text-violet-600">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]">
               <Icon className="h-7 w-7" />
             </span>
             <div>
-              <b className="block text-md text-[#142151]">{title}</b>
-              <small className="mt-1 block text-[12px] font-semibold leading-relaxed text-slate-500">
+              <b className="block text-md text-[var(--appearance-text,#142151)]">{title}</b>
+              <small className="mt-1 block text-[12px] font-semibold leading-relaxed text-[var(--appearance-muted,#64748b)]">
                 {copy}
               </small>
             </div>
@@ -883,11 +883,11 @@ function Advantage() {
           </article>
         ))}
       </div>
-      <div className="mt-5 rounded-xl border border-violet-100 bg-white p-5 hidden">
-        <h3 className="m-0 text-lg text-[#122050]">
+      <div className="mt-5 rounded-xl border border-violet-100 bg-[var(--appearance-surface,#fff)] p-5 hidden">
+        <h3 className="m-0 text-lg text-[var(--appearance-text,#122050)]">
           And your business doesn't stop after one sale.
         </h3>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-[var(--appearance-muted,#64748b)]">
           One customer can become a long-term earning relationship.
         </p>
         <div className="mt-4 flex items-center justify-between gap-3 overflow-auto">
@@ -902,12 +902,12 @@ function Advantage() {
               className="flex shrink-0 items-center gap-3"
               key={String(title)}
             >
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-violet-50 text-violet-600">
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#7c3aed)]">
                 <Icon className="h-5 w-5" />
               </span>
               <p>
                 <b className="block text-[10px]">{String(title)}</b>
-                <small className="text-[9px] text-slate-500">
+                <small className="text-[9px] text-[var(--appearance-muted,#64748b)]">
                   {String(copy)}
                 </small>
               </p>
@@ -917,7 +917,7 @@ function Advantage() {
         </div>
       </div>
       <div className="mt-5 flex items-center justify-between rounded-xl bg-gradient-to-r from-violet-50 to-pink-50 p-5 max-md:flex-col max-md:gap-4">
-        <p className="m-0 text-sm font-semibold text-violet-700">
+        <p className="m-0 text-sm font-semibold text-[var(--appearance-violet,#6d28d9)]">
           Build Network. Your business doesn't stop after one sell.
         </p>
         <div className="flex gap-3">
@@ -929,7 +929,7 @@ function Advantage() {
             Start Growing with MagikPolicy
           </button>
           <Link
-            className="btn-secondary rounded-lg border border-violet-500 bg-white px-5 py-3 text-xs font-semibold text-violet-700"
+            className="btn-secondary rounded-lg border border-violet-500 bg-[var(--appearance-surface,#fff)] px-5 py-3 text-xs font-semibold text-[var(--appearance-violet,#6d28d9)]"
             href="/partner/register"
           >
             Explore Partner Benefits
@@ -947,44 +947,44 @@ function Advantage() {
           <section
             aria-labelledby="partner-modal-title"
             aria-modal="true"
-            className="relative my-6 w-full max-w-xl rounded-2xl bg-white p-6 text-[#172454] shadow-2xl sm:p-8"
+            className="relative my-6 w-full max-w-xl rounded-2xl bg-[var(--appearance-surface,#fff)] p-6 text-[var(--appearance-text,#172454)] shadow-2xl sm:p-8"
             role="dialog"
           >
             <button
               aria-label="Close partner registration form"
-              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+              className="absolute right-4 top-4 grid h-9 w-9 place-items-center rounded-full bg-slate-100 text-[var(--appearance-muted,#64748b)] transition hover:bg-slate-200 hover:text-slate-800"
               onClick={() => setPartnerModalOpen(false)}
               type="button"
             >
               <X className="h-5 w-5" />
             </button>
-            <span className="text-xs font-bold uppercase tracking-[.16em] text-violet-600">
+            <span className="text-xs font-bold uppercase tracking-[.16em] text-[var(--appearance-violet,#7c3aed)]">
               Partner with MagikPolicy
             </span>
             <h2 className="mb-1 mt-3 pr-10 text-3xl" id="partner-modal-title">
               Become a Partner
             </h2>
-            <p className="mb-6 mt-0 text-sm text-slate-500">
+            <p className="mb-6 mt-0 text-sm text-[var(--appearance-muted,#64748b)]">
               Fill in your details to begin your partner application.
             </p>
             <form
               className="grid grid-cols-2 gap-4 max-sm:grid-cols-1"
               onSubmit={submitPartnerApplication}
             >
-              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
                 Full Name
                 <input
                   autoFocus
-                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                   name="name"
                   placeholder="Enter your full name"
                   required
                 />
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
                 Mobile Number
                 <input
-                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                   inputMode="tel"
                   name="mobile"
                   pattern="[0-9+ ]{10,15}"
@@ -992,29 +992,29 @@ function Advantage() {
                   required
                 />
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
                 Email Address
                 <input
-                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                   name="email"
                   placeholder="Enter your email address"
                   required
                   type="email"
                 />
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-slate-700">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
                 City
                 <input
-                  className="h-11 rounded-lg border border-slate-200 px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                   name="city"
                   placeholder="Enter your city"
                   required
                 />
               </label>
-              <label className="col-span-2 grid gap-1.5 text-xs font-semibold text-slate-700 max-sm:col-span-1">
+              <label className="col-span-2 grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] max-sm:col-span-1">
                 Business Type
                 <select
-                  className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
                   defaultValue=""
                   name="businessType"
                   required
@@ -1026,7 +1026,7 @@ function Advantage() {
                   <option>Corporate Partner</option>
                 </select>
               </label>
-              <label className="col-span-2 flex items-start gap-2 text-xs leading-relaxed text-slate-500 max-sm:col-span-1">
+              <label className="col-span-2 flex items-start gap-2 text-xs leading-relaxed text-[var(--appearance-muted,#64748b)] max-sm:col-span-1">
                 <input className="mt-0.5 accent-violet-600" required type="checkbox" />
                 <span>I agree to the Terms &amp; Conditions and Privacy Policy.</span>
               </label>
@@ -1037,9 +1037,9 @@ function Advantage() {
                 Submit Application
               </button>
             </form>
-            <p className="mb-0 mt-4 text-center text-xs text-slate-500">
+            <p className="mb-0 mt-4 text-center text-xs text-[var(--appearance-muted,#64748b)]">
               Already a partner?{" "}
-              <Link className="font-semibold text-violet-700" href="/partner/login">
+              <Link className="font-semibold text-[var(--appearance-violet,#6d28d9)]" href="/partner/login">
                 Login here
               </Link>
             </p>
@@ -1052,10 +1052,10 @@ function Advantage() {
 
 export function HomeReference() {
   return (
-    <div className="home-responsive overflow-x-hidden bg-[#fafaff] text-[#0b174c]">
+    <div className="home-responsive overflow-x-hidden bg-[var(--appearance-surface,#fafaff)] text-[var(--appearance-text,#0b174c)]">
       <section className="home-hero-responsive relative flex w-full flex-col overflow-hidden bg-[url('/brand/magikpolicy-home-banner.png')] bg-[length:auto_440px] bg-center-top bg-no-repeat pb-8 md:bg-[length:auto_560px] xl:aspect-[1942/809] xl:min-h-[680px] xl:block xl:bg-cover xl:bg-center xl:pb-0">
         <div className="relative z-10 min-h-[420px] px-5 pt-10 md:min-h-[520px] md:px-6 xl:absolute xl:left-[14.8%] xl:top-[12.5%] xl:min-h-0 xl:p-0">
-          <h1 className="m-0 text-[clamp(2.8rem,3.05vw,3.8rem)] font-bold leading-[1.08] tracking-[-.035em] text-[#172454] max-md:text-[2.45rem]">
+          <h1 className="m-0 text-[clamp(2.8rem,3.05vw,3.8rem)] font-bold leading-[1.08] tracking-[-.035em] text-[var(--appearance-text,#172454)] max-md:text-[2.45rem]">
             Smart Insurance.
             <br />
             Simplified.
@@ -1064,17 +1064,17 @@ export function HomeReference() {
               Magically.
             </em>
           </h1>
-          <p className="mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[#172454] max-md:max-w-[19rem] max-md:text-sm">
+          <p className="mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[var(--appearance-text,#172454)] max-md:max-w-[19rem] max-md:text-sm">
             Buy any policy and get good reward instantly.
           </p>
         </div>
         <div className="home-quote-wrap relative z-20 mx-auto mt-4 w-[calc(100vw_-_24px)] min-w-0 max-w-[calc(100vw_-_24px)] md:w-[92%] md:max-w-[92%] xl:absolute xl:right-[10.6%] xl:top-[14.7%] xl:mt-0 xl:w-[31.2%] xl:max-w-none">
           <QuoteFinder />
-          <div className="mt-4 flex h-10 items-center justify-center gap-5 text-base text-[#172454] max-2xl:text-sm max-md:gap-2 max-md:text-[11px]">
-            <ShieldCheck className="h-5 w-5 text-violet-600" />
+          <div className="mt-4 flex h-10 items-center justify-center gap-5 text-base text-[var(--appearance-text,#172454)] max-2xl:text-sm max-md:gap-2 max-md:text-[11px]">
+            <ShieldCheck className="h-5 w-5 text-[var(--appearance-violet,#7c3aed)]" />
             <span>100% Secure Process</span>
             <i>•</i>
-            <Sparkles className="h-5 w-5 text-violet-600" />
+            <Sparkles className="h-5 w-5 text-[var(--appearance-violet,#7c3aed)]" />
             <span>Best Prices</span>
           </div>
         </div>

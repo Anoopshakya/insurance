@@ -38,3 +38,25 @@ test("saved theme survives navigation and quote dropdown works on mobile", async
   await page.goto("/partner/login");
   await expect(page.locator("html")).toHaveAttribute("data-theme","dark");
 });
+
+test("dark cards match their text and quote modal remains usable on mobile", async ({page}) => {
+  await page.emulateMedia({colorScheme:"dark"});
+  await page.setViewportSize({width:390,height:844});
+  for (const [route,selector] of [["/contact",".contact-form-card"],["/products/health-insurance",".health-care-badge"],["/partner/login",".mp-auth-tabs"],["/",".website-navbar"]]) {
+    await page.goto(route);
+    const surface=page.locator(selector).first();
+    await expect(surface).toBeVisible();
+    const color=await surface.evaluate(el=>getComputedStyle(el).backgroundColor);
+    expect(Math.max(...color.match(/\d+/g)!.slice(0,3).map(Number)),selector).toBeLessThan(100);
+  }
+  await page.getByRole("button",{name:"Get Plan Details"}).first().click();
+  const dialog=page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel("Full name").fill("Mobile theme check");
+  await expect(dialog.getByLabel("Full name")).toHaveValue("Mobile theme check");
+  await dialog.getByLabel("Select product").click();
+  await dialog.locator('[role="option"][data-value="motor"]').click();
+  await expect(dialog.getByLabel("Select product")).toHaveAttribute("data-value","motor");
+  await dialog.getByRole("button",{name:"Close quotation form"}).click();
+  await expect(dialog).not.toBeVisible();
+});

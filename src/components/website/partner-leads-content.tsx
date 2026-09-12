@@ -78,6 +78,7 @@ export function PartnerLeadsContent() {
   useEffect(() => {
     void load();
   }, [load]);
+  useEffect(() => { if (new URLSearchParams(window.location.search).get("create") === "1") { setOpen(true); const url=new URL(window.location.href); url.searchParams.delete("create"); window.history.replaceState(window.history.state,"",url.pathname+url.search+url.hash); } }, []);
   const visible = useMemo(
     () =>
       rows.filter(

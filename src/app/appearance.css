@@ -43,3 +43,9 @@ html[data-theme="dark"] .partner-skeleton-block.donut { background: transparent;
   .quotation-product-select li { min-height: 44px; }
   .quotation-modal { max-height: calc(100dvh - 24px); overflow-y: auto; }
 }
+
+html[data-theme="dark"] .mp-auth-tabs { background: #19273c; }
+html[data-theme="dark"] .mp-auth-tabs a { color: #afbed5; }
+html[data-theme="dark"] .mp-auth-tabs a.active { background: #293854; color: #e5d9ff; }
+html[data-theme="dark"] :is(.website-navbar,.pd-brand) img { background: #fff; padding: 6px; border-radius: 8px; }
+html[data-theme="dark"] .home-hero-responsive { background-image: linear-gradient(rgba(7,20,36,.75),rgba(7,20,36,.35)), url('/brand/magikpolicy-home-banner.png'); }
