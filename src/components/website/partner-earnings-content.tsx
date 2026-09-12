@@ -1,4 +1,5 @@
 "use client";
+import { PartnerBusinessEmpty } from "@/components/partner/partner-business-empty";
 import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 
 
@@ -28,6 +29,7 @@ export function PartnerEarningsContent() {
   const colors = ["pink", "blue", "red", "violet", "cyan", "gray"];
 
   if (loading) return <PartnerSkeleton view="earnings" />;
+  if(!data||data.hasActivity===false)return <div className="pe-page"><div className="pe-heading"><h1>Earnings</h1></div>{error?<section className="pd-card" role="alert"><p>{error}</p><button type="button" onClick={()=>void load()}>Try again</button></section>:<PartnerBusinessEmpty kind="earnings"/>}</div>;
   return (
     <div className="pe-page">
       <div className="pe-heading">

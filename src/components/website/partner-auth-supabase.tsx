@@ -16,6 +16,7 @@ import {
 import {
   authenticatedDestination,
   finishOAuthPopup,
+  completeAuthRedirect,
   signInWithGoogle,
   supabaseAuth,
 } from "@/lib/supabase-client";
@@ -28,20 +29,22 @@ async function start(token: string) {
   if (!r.ok) throw new Error(b.error || "Partner registration failed");
 }
 export function PartnerAuthSupabase() {
+  const [invitation,setInvitation]=useState<{name?:string;error?:string}|null>(null);
   const [login, setLogin] = useState(false),
     [error, setError] = useState(""),
     [notice, setNotice] = useState(""),
     [busy, setBusy] = useState(false);
   useEffect(() => {
     if (finishOAuthPopup()) return;
+    fetch("/api/partner/invitation",{cache:"no-store"}).then(r=>r.json()).then(setInvitation).catch(()=>setInvitation({error:"Invitation could not be checked. Refresh to try again."}));
     const q = new URLSearchParams(location.search);
     if (q.get("mode") === "login") setLogin(true);
-    supabaseAuth.auth.getSession().then(async ({ data }) => {
+    (q.has("code")||location.hash.includes("access_token") ? completeAuthRedirect().then(session=>({data:{session}})) : supabaseAuth.auth.getSession()).then(async ({ data }) => {
       if (!data.session) return;
       try {
+        await start(data.session.access_token);
         const destination = await authenticatedDestination(data.session.access_token, "partner");
         if (destination) return location.replace(destination);
-        await start(data.session.access_token);
         location.replace("/partner/complete-profile");
       } catch (caught) {
         setError(
@@ -50,7 +53,7 @@ export function PartnerAuthSupabase() {
             : "Partner registration could not be completed",
         );
       }
-    });
+    }).catch(caught=>setError(caught instanceof Error?caught.message:"Could not complete registration."));
   }, []);
   async function submit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,6 +70,7 @@ export function PartnerAuthSupabase() {
           password,
         });
         if (error || !data.session) throw error || new Error("Sign in failed");
+        await start(data.session.access_token);
         const destination = await authenticatedDestination(data.session.access_token, "partner");
         if (!destination)
           throw new Error(
@@ -82,6 +86,7 @@ export function PartnerAuthSupabase() {
           email,
           password,
           options: {
+            emailRedirectTo: location.origin + "/partner/register?account=1",
             data: { full_name: fullName, mobile, user_type: "partner" },
           },
         });
@@ -98,14 +103,15 @@ export function PartnerAuthSupabase() {
     setBusy(false);
   }
   async function google() {
+    setBusy(true);
     setError("");
     try {
       const session = await signInWithGoogle(
         `${location.origin}/partner/register?account=1`,
       );
+      await start(session.access_token);
       const destination = await authenticatedDestination(session.access_token, "partner");
       if (destination) return location.replace(destination);
-      await start(session.access_token);
       location.replace("/partner/complete-profile");
     } catch (caught) {
       setError(
@@ -113,7 +119,7 @@ export function PartnerAuthSupabase() {
           ? caught.message
           : "Google sign-in could not be started.",
       );
-    }
+    } finally { setBusy(false); }
   }
   return (
     <main className="partner-login-page">
@@ -147,7 +153,10 @@ export function PartnerAuthSupabase() {
             Login
           </Link>
         </nav>
-        <button className="social-button" onClick={google}>
+        {invitation?.name&&<p role="status">You were invited by <strong>{invitation.name}</strong>. Your team is assigned when registration completes.</p>}
+        {invitation?.error&&<p role="alert">{invitation.error}</p>}
+        {(invitation?.name||invitation?.error)&&<button type="button" className="social-button" onClick={async()=>{const r=await fetch("/api/partner/invitation",{method:"DELETE"});if(r.ok){setInvitation({});setError("");history.replaceState(null,"","/partner/register?account=1");}}}>Continue without an invitation</button>}
+        <button className="social-button" disabled={busy||!invitation||!!invitation.error} onClick={google}>
           Continue with Google
         </button>
         <div className="auth-divider">
@@ -194,7 +203,7 @@ export function PartnerAuthSupabase() {
           {notice && (
             <p className="partner-success mp-form-success">{notice}</p>
           )}
-          <button className="mp-form-action" disabled={busy}>
+          <button className="mp-form-action" disabled={busy||!invitation||!!invitation.error}>
             {busy
               ? "Please wait…"
               : login

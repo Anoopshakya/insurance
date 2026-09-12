@@ -1,0 +1,44 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {PGlite} from '@electric-sql/pglite';
+
+test('team migration: unique codes, immutable relationships, expiry, depth, role isolation and idempotent registration',async()=>{
+ const db=new PGlite();
+ try{
+ await db.exec(`create role anon;create role authenticated;create role service_role;
+ create table users(id text primary key,email text unique,phone text,full_name text,portal text,status text);
+ create table roles(id uuid primary key default gen_random_uuid(),name text unique);
+ create table user_roles(user_id text references users(id),role_id uuid references roles(id),primary key(user_id,role_id));
+ insert into roles(name) values('partner'),('super_admin');`);
+ await db.exec(readFileSync('supabase/migrations/002_agents_network.sql','utf8'));
+ await db.exec(`insert into users values('root','root@test',null,'Root','partner','active');insert into agents(user_id,agent_code,status) values('root','ROOT','active');`);
+ await db.exec(readFileSync('supabase/migrations/202609120001_partner_team.sql','utf8'));
+ const root=(await db.query("select * from agents where user_id='root'")).rows[0];assert.match(root.invite_code,/^[a-f0-9]{64}$/);
+ const register=(id,code=null)=>db.query('select register_partner($1,$2,$3,$4,$5,$6) as result',[id,id+'@test',null,id,'AGENT-'+id,code]);
+ await register('child',root.invite_code);
+ const child=(await db.query("select * from agents where user_id='child'")).rows[0];assert.equal(child.sponsor_id,root.id);assert.notEqual(child.invite_code,root.invite_code);
+ await Promise.all([register('child',root.invite_code),register('child',root.invite_code)]);
+ assert.equal((await db.query("select count(*)::int n from agents where user_id='child'")).rows[0].n,1);
+ assert.equal((await db.query("select roles.name from user_roles join roles on roles.id=role_id where user_id='child'")).rows[0].name,'partner');
+ await assert.rejects(register('root',root.invite_code),/refer yourself/);
+ await assert.rejects(register('child',child.invite_code),/refer yourself/);
+ await register('other');const other=(await db.query("select * from agents where user_id='other'")).rows[0];
+ await assert.rejects(register('child',other.invite_code),/cannot be changed/);
+ await assert.rejects(db.query('update agents set sponsor_id=$1 where id=$2',[other.id,child.id]),/Changing sponsor_id/);
+ await assert.rejects(register('invalid','invalid'),/invalid or expired/);
+ assert.equal((await db.query("select count(*)::int n from users where id='invalid'")).rows[0].n,0);
+ await db.query('update agents set invite_expires_at=now()-interval \'1 day\' where id=$1',[other.id]);
+ await assert.rejects(register('expired',other.invite_code),/invalid or expired/);
+ await db.query('update agents set invite_enabled=false where id=$1',[root.id]);
+ await assert.rejects(register('disabled',root.invite_code),/invalid or expired/);
+ await db.query('update agents set invite_enabled=true where id=$1',[root.id]);
+ await register('grandchild',child.invite_code);const grandchild=(await db.query("select * from agents where user_id='grandchild'")).rows[0];
+ await register('level3',grandchild.invite_code);const level3=(await db.query("select * from agents where user_id='level3'")).rows[0];
+ await assert.rejects(register('level4',level3.invite_code),/three-level limit/);
+ const depths=(await db.query('select depth from network_closure where ancestor_id=$1 order by depth',[root.id])).rows.map(r=>r.depth);assert.deepEqual(depths,[0,1,2,3]);
+ await db.exec("insert into users values('customer','customer@test',null,'Customer','customer','active')");
+ await assert.rejects(register('customer',root.invite_code),/cannot register/);
+ const privileges=(await db.query("select has_function_privilege('anon','register_partner(text,text,text,text,text,text)','execute') a,has_function_privilege('authenticated','register_partner(text,text,text,text,text,text)','execute') b,has_function_privilege('service_role','register_partner(text,text,text,text,text,text)','execute') c,has_table_privilege('authenticated','agents','insert') d")).rows[0];assert.deepEqual(privileges,{a:false,b:false,c:true,d:false});
+ }finally{await db.close()}
+});

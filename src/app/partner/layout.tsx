@@ -10,3 +10,5 @@ import "./partner-policies.css";
 export default function PartnerLayout({ children }: { children: ReactNode }) {
   return <PortalRouteGuard portal="partner">{children}</PortalRouteGuard>;
 }
+
+import "./partner-team.css";

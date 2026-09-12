@@ -12,6 +12,8 @@ import { PartnerCustomersContent } from "@/components/website/partner-customers-
 import { PartnerEarningsContent } from "@/components/website/partner-earnings-content";
 import { PartnerPoliciesContent } from "@/components/website/partner-policies-content";
 
+import { PartnerTeam } from "@/components/partner/partner-team";
+
 type IconType = LucideIcon;
 
 const nav: Array<[string, string, IconType]> = [
@@ -21,16 +23,17 @@ const nav: Array<[string, string, IconType]> = [
   ["Policies", "/partner/policies", FileText],
   ["Renewals", "/partner/renewals", RefreshCw],
   ["Earnings", "/partner/earnings", BarChart3],
-  ["Reports", "/partner/reports", PieChart],
-  ["Marketing Tools", "/partner/marketing", Megaphone],
-  ["Documents", "/partner/documents", Folder],
-  ["Support", "/partner/support", Headphones],
+  ["My Team", "/partner/team", Users],
+  // ["Reports", "/partner/reports", PieChart],
+  // ["Marketing Tools", "/partner/marketing", Megaphone],
+  // ["Documents", "/partner/documents", Folder],
+  // ["Support", "/partner/support", Headphones],
 ];
 
 export function PartnerDashboard({
   view = "dashboard",
 }: {
-  view?: "dashboard" | "leads" | "customers" | "policies" | "earnings";
+  view?: "dashboard" | "leads" | "customers" | "policies" | "earnings" | "renewals" | "team";
 }) {
   const profile = usePartnerProfile();
   const [menu, setMenu] = useState(false);
@@ -75,7 +78,7 @@ export function PartnerDashboard({
                 (
                   view === "dashboard"
                     ? index === 0
-                    : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", earnings: "Earnings" } as const)[view]
+                    : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings" } as const)[view]
                 )
                   ? "active"
                   : ""
@@ -147,6 +150,10 @@ export function PartnerDashboard({
             <PartnerCustomersContent />
           ) : view === "earnings" ? (
             <PartnerEarningsContent />
+          ) : view === "team" ? (
+            <PartnerTeam />
+          ) : view === "renewals" ? (
+            <PartnerPoliciesContent renewals />
           ) : view === "policies" ? (
             <PartnerPoliciesContent />
           ) : (
@@ -162,7 +169,7 @@ export function PartnerDashboard({
               (
                 view === "dashboard"
                   ? index === 0
-                  : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", earnings: "Earnings" } as const)[view]
+                  : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings" } as const)[view]
               )
                 ? "active"
                 : ""

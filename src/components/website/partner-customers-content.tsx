@@ -1,4 +1,5 @@
 "use client";
+import { PartnerCustomersEmpty } from "@/components/partner/partner-customers-empty";
 import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -126,6 +127,7 @@ export function PartnerCustomersContent() {
           <Plus /> Add Customer
         </button>
       </div>
+      {rows.length===0 ? (error ? <section className="pd-card" role="alert"><p>{error}</p><button type="button" onClick={()=>void load()}>Try again</button></section> : <PartnerCustomersEmpty onAdd={()=>setOpen(true)}/>) : <>
       <section className="pc-stats">
         {cards.map(([label, value, Icon, tone]) => (
           <article key={label}>
@@ -181,6 +183,7 @@ export function PartnerCustomersContent() {
             <span>Joined</span>
             <span />
           </div>
+          {visible.length===0&&<div className="pl-no-matches" role="status"><h3>No matching customers</h3><p>Try another name, email or mobile number.</p><button type="button" onClick={()=>setQuery("")}>Clear search</button></div>}
           {visible.map((row) => (
             <div className="pc-row" key={row.id}>
               <span className="pc-person">
@@ -216,6 +219,7 @@ export function PartnerCustomersContent() {
           ))}
         </div>
       </section>
+      </>}
       {open && (
         <div className="pl-modal" onMouseDown={() => setOpen(false)}>
           <section onMouseDown={(e) => e.stopPropagation()}>

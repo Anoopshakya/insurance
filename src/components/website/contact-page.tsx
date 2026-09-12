@@ -29,11 +29,11 @@ export function ContactPage() {
    <p className="contact-eyebrow">CONTACT US</p>
    <h1 id="contact-title">We&apos;re Here<br />to <span>Help</span> <Sparkles aria-hidden="true" /></h1>
    <p className="contact-description">Have a question, need support, or just want to know more? Our team is always ready to assist you.</p>
-   <div className="contact-benefits">
+   {/* <div className="contact-benefits">
     <div><span className="contact-icon green"><MessageCircle /></span><p>Quick<br />Response</p></div>
     <div><span className="contact-icon purple"><Users /></span><p>Friendly<br />Support Team</p></div>
     <div><span className="contact-icon orange"><Shield /></span><p>Reliable<br />Guidance</p></div>
-   </div>
+   </div> */}
    <div className="contact-art"><Image src="/brand/contact-support.png" width={640} height={640} alt="Friendly MagikPolicy support representative wearing a headset" priority /><p>Let&apos;s make<br />insurance simple<br />&mdash; together!</p></div>
   </section>
   <section className="contact-form-card" aria-labelledby="message-title">

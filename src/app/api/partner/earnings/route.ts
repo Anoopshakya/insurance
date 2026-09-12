@@ -36,6 +36,8 @@ export async function GET(request: NextRequest) {
   trendStart.setMonth(trendStart.getMonth() - 5);
 
   const db = supabaseServer();
+  const activity=await db.from("earning_ledger").select("id",{count:"exact",head:true}).eq("agent_id",agentId);
+  if(activity.error||activity.count===null)return NextResponse.json({error:"Unable to load earnings activity."},{status:500});
   const { data, error } = await db
     .from("earning_ledger")
     .select("id,amount,generation_level,status,created_at,policy:policies!policy_id(id,policy_number,agent_id,premium,start_date,created_at,customer:customers!customer_id(name),product:products!product_id(id,name),insurer:insurers!insurer_id(name))")
@@ -121,6 +123,7 @@ export async function GET(request: NextRequest) {
   }));
 
   return NextResponse.json({
+    hasActivity: activity.count > 0,
     period: { start, end },
     summary: {
       totalEarnings: directSummary.earnings + networkSummary.earnings,

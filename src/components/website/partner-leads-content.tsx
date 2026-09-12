@@ -1,4 +1,5 @@
 "use client";
+import { PartnerLeadsEmpty } from "@/components/partner/partner-leads-empty";
 import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
@@ -160,6 +161,7 @@ export function PartnerLeadsContent() {
           <Plus /> Add Lead
         </button>
       </div>
+      {rows.length===0 ? (error ? <section className="pd-card" role="alert"><p>{error}</p><button type="button" onClick={()=>void load()}>Try again</button></section> : <PartnerLeadsEmpty onAdd={()=>setOpen(true)}/>) : <>
       <section className="pl-stats">
         {summary.map(([label, value, growth, Icon, tone]) => (
           <article key={label}>
@@ -235,6 +237,7 @@ export function PartnerLeadsContent() {
             <span>Priority</span>
             <span>Actions</span>
           </div>
+          {visible.length===0&&<div className="pl-no-matches" role="status"><h3>No matching leads</h3><p>Try another search or clear your filters.</p><button type="button" onClick={()=>{setQuery("");setStatus("all");}}>Clear filters</button></div>}
           {visible.map((row, index) => (
             <div
               className="pl-row live"
@@ -303,6 +306,7 @@ export function PartnerLeadsContent() {
           </span>
         </footer>
       </section>
+      </>}
       {open && (
         <div className="pl-modal" onMouseDown={() => setOpen(false)}>
           <section onMouseDown={(e) => e.stopPropagation()}>
