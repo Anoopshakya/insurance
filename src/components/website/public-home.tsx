@@ -223,7 +223,7 @@ export function PublicHome() {
         <section className="partner-banner">
           <div>
             <h2>Become a Partner &amp; Grow Your Business</h2>
-            <p>Join thousands of partners and earn attractive commissions.</p>
+            <p>Join thousands of partners and earn attractive rewards.</p>
           </div>
           <Link href="/partner/register">Join as a Partner →</Link>
         </section>

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabaseAuth } from "@/lib/supabase-client";
-type Customer = { name: string };
+type Customer = { name: string; customer_code: string };
 export function CustomerDashboard() {
   const [customer, setCustomer] = useState<Customer | null>(null),
     [error, setError] = useState("");
@@ -48,6 +48,7 @@ export function CustomerDashboard() {
             <p className="customer-kicker">Customer dashboard</p>
             <h1>Welcome, {customer.name}</h1>
             <p>Manage your insurance journey in one place.</p>
+            <small>Customer ID: {customer.customer_code}</small>
           </section>
           <section className="customer-dashboard-grid">
             <article>

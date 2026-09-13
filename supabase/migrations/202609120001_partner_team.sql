@@ -5,7 +5,18 @@ alter table public.agents add column if not exists invite_code text not null def
 create unique index if not exists agents_invite_code_unique on public.agents(invite_code);
 alter table public.agents add column if not exists invite_enabled boolean not null default true;
 alter table public.agents add column if not exists invite_expires_at timestamptz;
-alter table public.agents add constraint agents_no_self_sponsor check (sponsor_id is distinct from id);
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conrelid = 'public.agents'::regclass
+      and conname = 'agents_no_self_sponsor'
+  ) then
+    alter table public.agents
+      add constraint agents_no_self_sponsor check (sponsor_id is distinct from id);
+  end if;
+end $$;
 
 -- Team data is served through authenticated, scoped server endpoints only.
 revoke all on public.agents, public.network_closure from anon, authenticated;

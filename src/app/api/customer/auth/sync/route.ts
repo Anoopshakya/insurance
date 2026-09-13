@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyRequestToken } from "@/lib/auth-server";
 import { customerSyncSchema } from "@/lib/customers/schema";
+import { createIdentityCode } from "@/lib/identity-code";
 import { supabaseServer } from "@/lib/supabase-server";
 
 export async function POST(request: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
   const { data: existing } = await db
     .from("customers")
-    .select("id,user_id,name,contact,email")
+    .select("id,user_id,name,contact,email,customer_code")
     .eq("user_id", decoded.uid)
     .maybeSingle();
   if (existing) {
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     );
   const { data: emailMatch } = await db
     .from("customers")
-    .select("id,user_id,email,contact")
+    .select("id,user_id,email,contact,customer_code")
     .ilike("email", email)
     .maybeSingle();
   const { data: mobileMatch } = parsed.data.mobile
@@ -137,6 +138,7 @@ export async function POST(request: NextRequest) {
     : db.from("customers").insert({
         user_id: decoded.uid,
         agent_id: null,
+        customer_code: createIdentityCode("customer", fullName),
         name: fullName,
         contact: parsed.data.mobile || authUser?.phone || null,
         email,
@@ -144,7 +146,7 @@ export async function POST(request: NextRequest) {
         updated_at: now,
       });
   const { data: customer, error: customerError } = await customerMutation
-    .select("id,user_id,name,contact,email")
+    .select("id,user_id,name,contact,email,customer_code")
     .single();
   if (customerError) {
     if (!identity) await db.from("users").delete().eq("id", decoded.uid);

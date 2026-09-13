@@ -132,7 +132,7 @@ export function PartnerLoginExperience() {
             <small>
               Higher
               <br />
-              Commissions
+              Rewards
             </small>
           </article>
           <article>

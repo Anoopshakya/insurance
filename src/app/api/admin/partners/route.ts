@@ -15,7 +15,7 @@ async function authorize(req: NextRequest, action: string) {
 export async function GET(req: NextRequest) {
   const auth = await authorize(req, "view"); if (auth.error) return auth.error;
   const db = supabaseServer();
-  const { data, error } = await db.from("agents").select("id,name,agent_code,partner_type,region,status,kyc_status,joining_date,created_at,users:users!agents_user_id_fkey!inner(full_name,phone,email)").order("created_at", { ascending: false }).limit(1000);
+  const { data, error } = await db.from("agents").select("id,agent_code,partner_type,region,status,kyc_status,joining_date,created_at,users:users!agents_user_id_fkey!inner(full_name,phone,email)").order("created_at", { ascending: false }).limit(1000);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   const ids=(data??[]).map(agent=>agent.id);
   const [{data:policies},{data:earnings}]=ids.length?await Promise.all([db.from("policies").select("agent_id,premium").in("agent_id",ids),db.from("earning_ledger").select("agent_id,amount").in("agent_id",ids)]):[{data:[]},{data:[]}];

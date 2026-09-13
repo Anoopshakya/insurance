@@ -5,7 +5,7 @@ const steps = [
   {title:"Add a Customer",text:"Start with someone you know. Add your first customer or lead.",Icon:Users,tone:"blue",href:"/partner/customers"},
   {title:"Get a Quote",text:"Explore suitable plans and share the options with your customer.",Icon:FileCheck2,tone:"green",href:"/products"},
   {title:"Close the Policy",text:"Help your customer choose the right protection.",Icon:ShieldCheck,tone:"orange",href:"/partner/policies"},
-  {title:"Earn & Grow",text:"Track your commissions and build lasting customer relationships.",Icon:BarChart3,tone:"violet",href:"/partner/earnings"},
+  {title:"Earn & Grow",text:"Track your rewards and build lasting customer relationships.",Icon:BarChart3,tone:"violet",href:"/partner/earnings"},
 ];
 export function PartnerWelcome({name}:{name:string}) {
  return <section className="partner-welcome-start" aria-labelledby="partner-welcome-title">

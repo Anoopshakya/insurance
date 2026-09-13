@@ -8,7 +8,7 @@ export async function GET(request:NextRequest) {
   if(!decoded)return NextResponse.json({error:"unauthenticated"},{status:401});
   if(!(await ensureAdminPermission(decoded.uid,decoded.email,"crm","view")))return NextResponse.json({error:"forbidden"},{status:403});
   const db=supabaseServer();
-  const {data,error}=await db.from("customers").select("id,user_id,name,contact,email,address,created_at,updated_at,users:users!customers_user_id_fkey(full_name,email,phone,status)").order("created_at",{ascending:false}).limit(1000);
+  const {data,error}=await db.from("customers").select("id,user_id,customer_code,name,contact,email,address,created_at,updated_at,users:users!customers_user_id_fkey(full_name,email,phone,status)").order("created_at",{ascending:false}).limit(1000);
   if(error)return NextResponse.json({error:error.message},{status:500});
   const ids=(data||[]).map(customer=>customer.id);
   const {data:policies}=ids.length?await db.from("policies").select("customer_id,premium,status").in("customer_id",ids):{data:[]};

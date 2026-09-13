@@ -1,9 +1,10 @@
 import { supabaseServer } from "@/lib/supabase-server";
 import { sendPartnerWelcome } from "@/lib/notifications/provider";
 import { partnerInputSchema, partnerLoginEmail, type PartnerInput } from "./schema";
+import { createIdentityCode } from "@/lib/identity-code";
 
-export function createAgentCode() {
-  return `MP${Date.now().toString(36).toUpperCase()}${crypto.randomUUID().slice(0, 4).toUpperCase()}`;
+export function createAgentCode(fullName: string) {
+  return createIdentityCode("partner", fullName);
 }
 
 export async function createPartner(raw: PartnerInput, actorId: string) {
@@ -26,7 +27,7 @@ export async function createPartner(raw: PartnerInput, actorId: string) {
   if(authError||!authData.user)throw new Error(authError?.message||"Could not create the partner login");
   const authUser={uid:authData.user.id};
 
-  const agentCode = createAgentCode();
+  const agentCode = createAgentCode(input.fullName);
   let createdAgentId: string | null = null;
   try {
     const now = new Date().toISOString();
