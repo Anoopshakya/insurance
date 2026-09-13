@@ -44,8 +44,7 @@ export async function authenticatedDestination(token: string, preferred: "custom
     });
     if (!response.ok) continue;
     if (portal === "customer") return "/customer";
-    const body = await response.json();
-    return body.data?.profile_setup_required ? "/partner/complete-profile" : "/partner";
+    return "/partner";
   }
   return null;
 }

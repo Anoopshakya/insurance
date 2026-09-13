@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BarChart3, CircleHelp, FileText, Folder, Headphones, Home, LogOut, Menu, Megaphone, PieChart, RefreshCw, Search, UserRound, Users, X, type LucideIcon } from "lucide-react";
 import { PartnerOverview } from "@/components/partner/partner-overview";
 import { usePartnerProfile } from "@/components/auth/portal-route-guard";
@@ -13,6 +13,8 @@ import { PartnerEarningsContent } from "@/components/website/partner-earnings-co
 import { PartnerPoliciesContent } from "@/components/website/partner-policies-content";
 
 import { PartnerTeam } from "@/components/partner/partner-team";
+
+import { PartnerProfileForm, PartnerProfileModal } from "@/components/partner/partner-profile-form";
 
 type IconType = LucideIcon;
 
@@ -33,11 +35,24 @@ const nav: Array<[string, string, IconType]> = [
 export function PartnerDashboard({
   view = "dashboard",
 }: {
-  view?: "dashboard" | "leads" | "customers" | "policies" | "earnings" | "renewals" | "team";
+  view?: "dashboard" | "leads" | "customers" | "policies" | "earnings" | "renewals" | "team" | "profile";
 }) {
   const profile = usePartnerProfile();
   const [menu, setMenu] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const incomplete = !!profile && ["not_started", "skipped", "rejected"].includes(profile.kyc_status);
+  useEffect(() => {
+    if (view !== "dashboard" || !incomplete) return;
+    const requested = new URLSearchParams(location.search).has("completeProfile");
+    if (requested || (profile?.profile_setup_required && sessionStorage.getItem(`profile-dismissed:${profile.agent_code}`) !== "1")) setProfileOpen(true);
+  }, [view, incomplete, profile]);
+  function closeProfile() {
+    setProfileOpen(false);
+    if (profile) sessionStorage.setItem(`profile-dismissed:${profile.agent_code}`, "1");
+    const url = new URL(location.href); url.searchParams.delete("completeProfile"); history.replaceState(null, "", url);
+  }
 
   async function signOut() {
     setSigningOut(true);
@@ -78,7 +93,7 @@ export function PartnerDashboard({
                 (
                   view === "dashboard"
                     ? index === 0
-                    : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings" } as const)[view]
+                    : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings", profile: "Profile" } as const)[view]
                 )
                   ? "active"
                   : ""
@@ -90,7 +105,7 @@ export function PartnerDashboard({
               <span>{label}</span>
             </Link>
           ))}
-          <Link className="pd-profile-nav" href="/partner/profile">
+          <Link className={`pd-profile-nav ${view === "profile" ? "active" : ""}`} href="/partner/profile">
             <UserRound />
             <span>Profile</span>
           </Link>
@@ -152,7 +167,8 @@ export function PartnerDashboard({
         </header>
 
         <main className="pd-content">
-          {view === "leads" ? (
+          {view === "dashboard" && incomplete && <section className="pd-profile-cta"><div><strong>Complete your partner profile</strong><p>Add your personal, identity and bank details to finish verification.</p></div><button type="button" onClick={() => setProfileOpen(true)}>Complete profile</button></section>}
+          {view === "profile" ? <PartnerProfileForm onComplete={() => location.reload()} /> : view === "leads" ? (
             <PartnerLeadsContent />
           ) : view === "customers" ? (
             <PartnerCustomersContent />
@@ -170,6 +186,8 @@ export function PartnerDashboard({
         </main>
       </div>
 
+      {profileOpen && <PartnerProfileModal onClose={closeProfile} onComplete={() => location.replace("/partner")} />}
+
       <nav className="pd-bottom-nav">
         {(view === "earnings" ? [nav[0], nav[1], nav[2], nav[5]] : nav.slice(0, 4)).map(([label, href, Icon], index) => (
           <Link
@@ -177,7 +195,7 @@ export function PartnerDashboard({
               (
                 view === "dashboard"
                   ? index === 0
-                  : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings" } as const)[view]
+                  : label === ({ leads: "Leads", customers: "Customers", policies: "Policies", renewals: "Renewals", team: "My Team", earnings: "Earnings", profile: "Profile" } as const)[view]
               )
                 ? "active"
                 : ""

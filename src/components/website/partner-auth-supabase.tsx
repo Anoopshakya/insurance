@@ -25,7 +25,7 @@ export function PartnerAuthSupabase() {
         if (!data.session) return;
         await start(data.session.access_token);
         const destination = await authenticatedDestination(data.session.access_token, "partner");
-        location.replace(destination || "/partner/complete-profile");
+        location.replace(destination || "/partner");
       })
       .catch((caught) => setError(caught instanceof Error ? caught.message : "Could not complete registration."));
   }, []);
@@ -37,7 +37,7 @@ export function PartnerAuthSupabase() {
       const session = await signInWithGoogle(`${location.origin}/partner/register?account=1`);
       await start(session.access_token);
       const destination = await authenticatedDestination(session.access_token, "partner");
-      location.replace(destination || "/partner/complete-profile");
+      location.replace(destination || "/partner");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Google sign-in could not be started.");
     } finally {

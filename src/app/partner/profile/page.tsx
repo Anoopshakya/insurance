@@ -1,3 +1,2 @@
-import { redirect } from "next/navigation";
-
-export default function PartnerProfile() { redirect("/partner/complete-profile"); }
+import { PartnerDashboard } from "@/components/website/partner-dashboard";
+export default function PartnerProfile() { return <PartnerDashboard view="profile" />; }

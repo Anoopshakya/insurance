@@ -82,7 +82,7 @@ export function PartnerMarketing() {
       const body = await response.json();
       if (!response.ok)
         throw new Error(body.error || "Partner registration failed.");
-      location.replace("/partner/complete-profile");
+      location.replace("/partner");
     } catch (caught) {
       setSocialError(
         caught instanceof Error
