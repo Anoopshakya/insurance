@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { BarChart3, CircleHelp, FileText, Folder, Headphones, Home, LogOut, Menu, Megaphone, PieChart, RefreshCw, Search, Users, X, type LucideIcon } from "lucide-react";
+import { BarChart3, CircleHelp, FileText, Folder, Headphones, Home, LogOut, Menu, Megaphone, PieChart, RefreshCw, Search, UserRound, Users, X, type LucideIcon } from "lucide-react";
 import { PartnerOverview } from "@/components/partner/partner-overview";
 import { usePartnerProfile } from "@/components/auth/portal-route-guard";
 import { supabaseAuth } from "@/lib/supabase-client";
@@ -90,6 +90,10 @@ export function PartnerDashboard({
               <span>{label}</span>
             </Link>
           ))}
+          <Link className="pd-profile-nav" href="/partner/profile">
+            <UserRound />
+            <span>Profile</span>
+          </Link>
         </nav>
         <div className="pd-help">
           <Headphones />
@@ -132,6 +136,10 @@ export function PartnerDashboard({
               <b>{name}</b>
               <small>Partner ID: {profile?.agent_code || "..."}</small>
             </span>
+            <Link className="pd-profile-link" href="/partner/profile">
+              <UserRound />
+              Profile
+            </Link>
             <button
               className="pd-signout"
               onClick={signOut}

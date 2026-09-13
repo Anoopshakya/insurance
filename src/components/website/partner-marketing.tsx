@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   authenticatedDestination,
   signInWithGoogle,
@@ -92,11 +92,6 @@ export function PartnerMarketing() {
     }
   }
 
-  function register(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const form = new FormData(event.currentTarget);
-    location.href = `/partner/register?account=1&email=${encodeURIComponent(String(form.get("email") || ""))}&mobile=${encodeURIComponent(String(form.get("mobile") || ""))}`;
-  }
   return (
     <div className="public-site partner-marketing">
       <main>
@@ -154,9 +149,9 @@ export function PartnerMarketing() {
               priority
             />
           </div>
-          <form className="partner-register-card mp-form" onSubmit={register}>
+          <section className="partner-register-card mp-form">
             <h2>Become a Partner</h2>
-            <p>Fill in your details to get started</p>
+            <p>Use your Google account to get started securely.</p>
             <nav className="mp-auth-tabs" aria-label="Partner authentication">
               <Link
                 className="active"
@@ -174,70 +169,10 @@ export function PartnerMarketing() {
             >
               <b>G</b> Continue with Google
             </button>
-            <div className="auth-divider">
-              <span>or continue with details</span>
-            </div>
             {socialError && (
               <p className="partner-error mp-form-error">{socialError}</p>
             )}
-            <label>
-              Full Name
-              <input
-                name="name"
-                required
-                //placeholder="Enter your full name"
-              />
-            </label>
-            <label>
-              Mobile Number
-              <input
-                name="mobile"
-                required
-                inputMode="tel"
-                pattern="[0-9+ ]{10,15}"
-                // placeholder="Enter 10 digit mobile number"
-              />
-            </label>
-            <label>
-              Email Address
-              <input
-                name="email"
-                type="email"
-                required
-                //placeholder="Enter your email address"
-              />
-            </label>
-            <label>
-              City
-              <input
-                name="city"
-                required
-                //placeholder="Enter your city"
-              />
-            </label>
-            <label>
-              Business Type
-              <select name="businessType" required defaultValue="">
-                <option value="" disabled>
-                  Select business type
-                </option>
-                <option>Individual Advisor</option>
-                <option>Insurance Agency</option>
-                <option>Financial Consultant</option>
-                <option>Corporate Partner</option>
-              </select>
-            </label>
-            <label className="terms mp-form-check">
-              <input type="checkbox" required />I agree to the Terms &amp;
-              Conditions and Privacy Policy
-            </label>
-            <button className="site-gradient mp-form-action">
-              Register Now
-            </button>
-            {/* <small>
-              Already a partner? <Link href="/partner/login">Login here</Link>
-            </small> */}
-          </form>
+          </section>
         </section>
         <section className="partner-section">
           <h2>Why Partner with MagikPolicy?</h2>
