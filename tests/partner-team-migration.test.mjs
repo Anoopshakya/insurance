@@ -14,10 +14,17 @@ test('team migration: unique codes, immutable relationships, expiry, depth, role
  await db.exec(readFileSync('supabase/migrations/002_agents_network.sql','utf8'));
  await db.exec(`insert into users values('root','root@test',null,'Root','partner','active');insert into agents(user_id,agent_code,status) values('root','ROOT','active');`);
  await db.exec(readFileSync('supabase/migrations/202609120001_partner_team.sql','utf8'));
- const root=(await db.query("select * from agents where user_id='root'")).rows[0];assert.match(root.invite_code,/^[a-f0-9]{64}$/);
+ const oldCode=(await db.query("select invite_code from agents where user_id='root'")).rows[0].invite_code;
+ await db.exec(readFileSync('supabase/migrations/202609130003_short_partner_invite_codes.sql','utf8'));
+ const root=(await db.query("select * from agents where user_id='root'")).rows[0];assert.match(root.invite_code,/^[A-Z0-9]{8}$/);
+ assert.notEqual(root.invite_code,oldCode);
+ await db.exec(readFileSync('supabase/migrations/202609130003_short_partner_invite_codes.sql','utf8'));
+ assert.equal((await db.query("select invite_code from agents where user_id='root'")).rows[0].invite_code,root.invite_code);
+ await assert.rejects(db.query("update agents set invite_code='TOO-LONG-CODE' where user_id='root'"),/agents_invite_code_format/);
  const register=(id,code=null)=>db.query('select register_partner($1,$2,$3,$4,$5,$6) as result',[id,id+'@test',null,id,'AGENT-'+id,code]);
+ await assert.rejects(register('old-link',oldCode),/invalid or expired/);
  await register('child',root.invite_code);
- const child=(await db.query("select * from agents where user_id='child'")).rows[0];assert.equal(child.sponsor_id,root.id);assert.notEqual(child.invite_code,root.invite_code);
+ const child=(await db.query("select * from agents where user_id='child'")).rows[0];assert.equal(child.sponsor_id,root.id);assert.notEqual(child.invite_code,root.invite_code);assert.match(child.invite_code,/^[A-Z0-9]{8}$/);
  await Promise.all([register('child',root.invite_code),register('child',root.invite_code)]);
  assert.equal((await db.query("select count(*)::int n from agents where user_id='child'")).rows[0].n,1);
  assert.equal((await db.query("select roles.name from user_roles join roles on roles.id=role_id where user_id='child'")).rows[0].name,'partner');
@@ -39,6 +46,9 @@ test('team migration: unique codes, immutable relationships, expiry, depth, role
  const depths=(await db.query('select depth from network_closure where ancestor_id=$1 order by depth',[root.id])).rows.map(r=>r.depth);assert.deepEqual(depths,[0,1,2,3]);
  await db.exec("insert into users values('customer','customer@test',null,'Customer','customer','active')");
  await assert.rejects(register('customer',root.invite_code),/cannot register/);
+ await db.exec("insert into users(id,email,portal,status) select 'bulk-'||n,'bulk-'||n||'@test','partner','active' from generate_series(1,500) n; insert into agents(user_id,agent_code) select 'bulk-'||n,'BULK-'||n from generate_series(1,500) n;");
+ const codes=(await db.query("select invite_code from agents")).rows.map(row=>row.invite_code);
+ assert.equal(new Set(codes).size,codes.length);for(const code of codes)assert.match(code,/^[A-Z0-9]{8}$/);
  const privileges=(await db.query("select has_function_privilege('anon','register_partner(text,text,text,text,text,text)','execute') a,has_function_privilege('authenticated','register_partner(text,text,text,text,text,text)','execute') b,has_function_privilege('service_role','register_partner(text,text,text,text,text,text)','execute') c,has_table_privilege('authenticated','agents','insert') d")).rows[0];assert.deepEqual(privileges,{a:false,b:false,c:true,d:false});
  }finally{await db.close()}
 });

@@ -1,6 +1,6 @@
 import {test,expect,type Page} from '@playwright/test';
 import fs from 'node:fs';import path from 'node:path';import ts from 'typescript';import QRCode from 'qrcode';
-const code='a'.repeat(64),base={code,canInvite:true,expiresAt:null,members:[],total:0,counts:[0,0,0],page:1};
+const code='ABCD2345',base={code,canInvite:true,expiresAt:null,members:[],total:0,counts:[0,0,0],page:1};
 async function mount(page:Page,theme='light'){
  const css=['src/app/appearance.css','src/app/partner/partner-dashboard.css','src/app/partner/partner-skeleton.css','src/app/partner/partner-team.css'].map(p=>fs.readFileSync(p,'utf8')).join('\n');
  await page.route('**/__team_fixture',r=>r.fulfill({contentType:'text/html',body:'<html data-theme="'+theme+'"><style>body{margin:0}*{box-sizing:border-box}'+css+'</style><div class="pd-shell"><main class="pd-content" id="root"></main></div></html>'}));await page.goto('/__team_fixture');
@@ -11,10 +11,29 @@ async function mount(page:Page,theme='light'){
 }
 for(const theme of ['light','dark'])for(const width of [390,1440])test('team invitations '+theme+' '+width,async({page})=>{
  await page.setViewportSize({width,height:900});await page.route('**/api/partner/team?*',r=>{expect(r.request().headers().authorization).toBe('Bearer test-token');return r.fulfill({json:base})});await mount(page,theme);
- await expect(page.getByRole('heading',{name:'Your team starts with one invitation'})).toBeVisible();await expect(page.getByLabel('Your invitation link')).toHaveValue('http://localhost:3100/invite/'+code);await expect(page.getByRole('link',{name:'Share via WhatsApp'})).toHaveAttribute('href',/https:\/\/wa.me\/\?text=/);await expect(page.getByRole('img',{name:/Scan to register/})).toBeVisible();
- const download=page.waitForEvent('download');await page.getByRole('button',{name:'Download QR',exact:true}).click();expect((await download).suggestedFilename()).toBe('magikpolicy-partner-invite.png');
- expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);if(theme==='dark')expect(await page.locator('.pt-card').first().evaluate(e=>getComputedStyle(e).backgroundColor)).toBe('rgba(0, 0, 0, 0)');await page.screenshot({path:'test-results/team-'+theme+'-'+width+'.png',fullPage:true});
+ await expect(page.getByRole('heading',{name:'Your Team is Empty for Now'})).toBeVisible();await page.screenshot({path:'test-results/team-empty-'+theme+'-'+width+'.png',fullPage:true});await page.getByRole('button',{name:'Invite Partner',exact:true}).click();await expect(page.getByRole('dialog',{name:'Invite a Partner'})).toBeVisible();await expect(page.getByLabel('Your Invitation Link',{exact:true})).toHaveValue('http://localhost:3100/invite/'+code);await expect(page.getByRole('link',{name:'Share on WhatsApp'})).toHaveAttribute('href',/https:\/\/wa.me\/\?text=/);await expect(page.getByRole('img',{name:/Scan to register/})).toBeVisible();
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Download QR Code',exact:true}).click();expect((await download).suggestedFilename()).toBe('magikpolicy-partner-invite.png');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);expect(await page.getByRole('dialog').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);await page.screenshot({path:'test-results/team-'+theme+'-'+width+'.png',fullPage:true});await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 test('team error retry, members and level filter',async({page})=>{
- let calls=0;await page.route('**/api/partner/team?*',r=>{calls++;return r.fulfill(calls===1?{status:500,json:{error:'Temporary failure'}}:{json:{...base,counts:[1,0,0],total:1,members:new URL(r.request().url()).searchParams.get('level')==='2'?[]:[{depth:1,member:{id:'one',agent_code:'MP-ONE',status:'draft',region:null,created_at:'2026-09-12',users:{full_name:'Test Partner'}}}]}})});await mount(page);await expect(page.getByRole('alert')).toContainText('Temporary failure');await expect(page.getByText('Your team starts with one invitation')).toHaveCount(0);await page.getByRole('button',{name:'Try again'}).click();await expect(page.getByText('Test Partner',{exact:true})).toBeVisible();await page.getByLabel('Team level').selectOption('2');await expect(page.getByText('No partners at this level',{exact:true})).toBeVisible();
+ let calls=0;await page.route('**/api/partner/team?*',r=>{calls++;return r.fulfill(calls===1?{status:500,json:{error:'Temporary failure'}}:{json:{...base,counts:[1,0,0],total:1,members:new URL(r.request().url()).searchParams.get('level')==='2'?[]:[{depth:1,member:{id:'one',agent_code:'MP-ONE',status:'draft',region:null,created_at:'2026-09-12',users:{full_name:'Test Partner'}}}]}})});await mount(page);await expect(page.getByRole('alert')).toContainText('Temporary failure');await expect(page.getByText('Your Team is Empty for Now')).toHaveCount(0);await page.getByRole('button',{name:'Try again'}).click();await expect(page.getByText('Test Partner',{exact:true})).toBeVisible();await page.getByLabel('Team level').selectOption('2');await expect(page.getByText('No partners match these filters',{exact:true})).toBeVisible();
+});
+
+test('populated team table, filters, export and partner details',async({page})=>{
+ const member={depth:1,business:285000,commission:14250,member:{id:'one',agent_code:'AGT0012',status:'active',region:'Mumbai',created_at:'2026-09-12',users:{full_name:'Rohit Verma',phone:'9876543210'}}};
+ const requests:string[]=[];
+ await page.route('**/api/partner/team?*',r=>{const params=new URL(r.request().url()).searchParams;requests.push(params.toString());if(params.get('export')==='1')return r.fulfill({contentType:'text/csv',body:'Name,Code\nRohit Verma,AGT0012'});return r.fulfill({json:{...base,counts:[12,8,0],total:12,page:params.get('page')==='2'?2:1,pageSize:10,members:[member]}})});
+ await mount(page);await expect(page.getByRole('table')).toContainText('Rohit Verma');await expect(page.getByRole('table')).toContainText('2,85,000');await expect(page.getByRole('table')).toContainText('14,250');
+ await page.getByRole('button',{name:'View Rohit Verma details'}).click();await expect(page.getByRole('dialog',{name:'Partner details'})).toContainText('Mumbai');await page.keyboard.press('Escape');
+ await page.getByLabel('Sort by').selectOption('business');await page.getByLabel('Status',{exact:true}).selectOption('active');await page.getByLabel('Search by name, code or mobile').fill('Rohit');await expect.poll(()=>requests.at(-1)).toContain('search=Rohit');
+ const download=page.waitForEvent('download');await page.getByRole('button',{name:'Export',exact:true}).click();expect((await download).suggestedFilename()).toBe('my-team.csv');
+ await page.getByRole('button',{name:'Reset',exact:true}).click();await expect(page.getByLabel('Search by name, code or mobile')).toHaveValue('');await expect(page.getByLabel('Status',{exact:true})).toHaveValue('all');
+ await page.screenshot({path:'test-results/team-populated-desktop.png',fullPage:true});
+ await page.setViewportSize({width:390,height:844});expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:'test-results/team-populated-mobile.png',fullPage:true});
+});
+
+test('guide and personalised invitation open reviewable WhatsApp draft',async({page})=>{
+ await page.route('**/api/partner/team?*',r=>r.fulfill({json:base}));await mount(page);await page.getByRole('button',{name:'View Guide'}).click();await expect(page.getByRole('dialog',{name:'Team guide'})).toContainText('Existing partners keep their current team');await page.keyboard.press('Escape');
+ await page.getByRole('button',{name:'Invite Partner',exact:true}).click();await page.getByRole('tab',{name:'Invite via Details'}).click();await page.getByLabel('Partner name',{exact:true}).fill('Priya');await page.getByLabel('Mobile number',{exact:true}).fill('9876543210');
+ await page.evaluate(()=>{window.open=((url?:string|URL)=>{(window as any).inviteDraft=String(url);return null}) as typeof window.open});await page.getByRole('button',{name:'Continue to WhatsApp'}).click();expect(await page.evaluate(()=>(window as any).inviteDraft)).toContain('https://wa.me/919876543210?text=Hi%20Priya');await expect(page.getByRole('dialog')).toBeVisible();
 });

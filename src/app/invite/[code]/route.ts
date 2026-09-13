@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabase-server";
 export async function GET(req:NextRequest,{params}:{params:Promise<{code:string}>}){
- const {code}=await params;
+ const {code: rawCode}=await params;
+ const code=rawCode.toUpperCase();
  let valid=false;
- if(/^[a-f0-9]{64}$/.test(code)){
+ if(/^[A-Z0-9]{8}$/.test(code)){
   const {data,error}=await supabaseServer().from("agents").select("id,status,invite_enabled,invite_expires_at").eq("invite_code",code).maybeSingle();
   if(error)return new NextResponse("Invitation could not be checked. Please try again.",{status:503});
   valid=!!data&&data.invite_enabled&&!['suspended','rejected','deactivated'].includes(data.status)&&(!data.invite_expires_at||Date.parse(data.invite_expires_at)>Date.now());

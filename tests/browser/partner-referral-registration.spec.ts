@@ -1,7 +1,7 @@
 import {test,expect} from '@playwright/test';
 import fs from 'node:fs';import path from 'node:path';import ts from 'typescript';
 for(const provider of ['email','google'])test(provider+' registration retains invite across reload and submits through the shared endpoint',async({page,context})=>{
- const code='b'.repeat(64);await context.addCookies([{name:'partner_invite',value:code,domain:'localhost',path:'/',httpOnly:true,sameSite:'Lax'}]);
+ const code='WXYZ6789';await context.addCookies([{name:'partner_invite',value:code,domain:'localhost',path:'/',httpOnly:true,sameSite:'Lax'}]);
  let calls=0;await page.route('**/api/partner/invitation',r=>r.fulfill({json:{invited:true,name:'Inviting Partner'}}));await page.route('**/api/partner/onboarding/start',r=>{calls++;expect(r.request().headers().cookie).toContain('partner_invite='+code);expect(r.request().headers().authorization).toBe('Bearer session-token');return r.fulfill({json:{data:{id:'new-agent'}}})});await page.route(/\/partner(?:\/complete-profile)?$/, r=>r.fulfill({contentType:'text/html',body:'<h1>Partner Dashboard</h1>'}));
  const compiled=ts.transpileModule(fs.readFileSync('src/components/website/partner-auth-supabase.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX,esModuleInterop:true}}).outputText;
  await page.route('**/__register_fixture',r=>r.fulfill({contentType:'text/html',body:'<div id="root"></div>'}));

@@ -6,9 +6,17 @@ The migration adds a unique user constraint, backfills random 64-character invit
 
 The migration restricts direct anonymous/authenticated access to agents and network_closure; this application accesses those tables through service-role server routes. register_partner is executable only by service_role. Partner authorization continues through verifyRequestToken and database roles; the invite never determines privileges or approval.
 
+## Short invite codes
+
+Apply `supabase/migrations/202609130003_short_partner_invite_codes.sql` after the original team migration. It replaces the default generator and regenerates every legacy code as eight uppercase alphanumeric characters. Generation excludes confusing I/O/0/1 characters, retries collisions, and preserves the unique index. Lowercase invite URLs are accepted and normalized to uppercase.
+
+Existing partner IDs, sponsors, team relationships, expiry dates and enabled settings are preserved. Previously shared links and QR codes stop working; partners should share their new link from My Team after rollout. Reapplying the migration preserves the new codes. Apply the migration and deploy the route validation change together. The live database must be updated through the Supabase SQL editor or an authorized database connection.
+
 ## Behaviour
 
-- /partner/team shows direct, level 2 and level 3 counts, paginated members (20 per page), status and region. It does not expose member email, phone, bank or KYC information.
+- /partner/team shows the illustrated empty state until the downline contains members. Populated teams show 10 members per page, direct and level 2 summaries, and a level 3 card when present. The scoped table includes name, code, phone, join date, status, issued policy premium and net earned commission. Row actions open partner details.
+- Search matches name, code and mobile. Status, team level and join-date filters apply before sorting and pagination. Date filters use the current India calendar month/year; business and commission remain all-time totals. Business includes active, issued and expired policies, excluding cancelled/proposal records. Commission includes adjustments and clawbacks. Export downloads all matching rows as CSV, with spreadsheet formula protection.
+- Invite Partner opens a modal with code/link copying, WhatsApp sharing and QR download/sharing. Invite via Details prepares a personalised WhatsApp draft using a name and mobile number; it does not create a partner record or automatically send a message. View Guide explains registration and team levels.
 - Invite URL: /invite/<random-code>. Validation sets an HTTP-only, SameSite=Lax, secure-on-HTTPS cookie on the current hostname, lasting 30 days. Reloads and same-origin Google popup completion retain it. Successful registration clears it. Failed registration keeps it for retry.
 - Use the same canonical hostname throughout authentication. Email confirmation redirects to /partner/register?account=1; allow this URL in Supabase Auth redirect settings for each environment, alongside the existing /auth/callback Google URL.
 - Registration opened on a different browser/device does not have the invitation cookie. Open the original invite link on that device before completing partner registration. No referral is inferred from editable user metadata.
