@@ -14,7 +14,7 @@ import {
 
 const defaultAnnouncement = {
   message:
-    "Become a Partner & Earn Good Reward. Join thousands of successful partners with MagikPolicy!",
+    "Become a Partner & Grow Magically. Join thousands of successful partners with MagikPolicy! ",
   linkText: "Know More",
   linkUrl: "/partner/register",
   active: true,

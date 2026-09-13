@@ -1065,7 +1065,7 @@ export function HomeReference() {
             </em>
           </h1>
           <p className="mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[var(--appearance-text,#172454)] max-md:max-w-[19rem] max-md:text-sm">
-            Buy any policy and get good reward instantly.
+            Buy policy and get secured instantly.
           </p>
         </div>
         <div className="home-quote-wrap relative z-20 mx-auto mt-4 w-[calc(100vw_-_24px)] min-w-0 max-w-[calc(100vw_-_24px)] md:w-[92%] md:max-w-[92%] xl:absolute xl:right-[10.6%] xl:top-[14.7%] xl:mt-0 xl:w-[31.2%] xl:max-w-none">
