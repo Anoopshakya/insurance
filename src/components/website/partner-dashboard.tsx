@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { BarChart3, CircleHelp, FileText, Folder, Headphones, Home, LogOut, Menu, Megaphone, PieChart, RefreshCw, Search, UserRound, Users, X, type LucideIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BarChart3, ChevronDown, CircleHelp, FileText, Folder, Headphones, Home, LogOut, Menu, Megaphone, PieChart, RefreshCw, Search, UserRound, Users, X, type LucideIcon } from "lucide-react";
 import { PartnerOverview } from "@/components/partner/partner-overview";
 import { usePartnerProfile } from "@/components/auth/portal-route-guard";
 import { supabaseAuth } from "@/lib/supabase-client";
@@ -39,6 +39,27 @@ export function PartnerDashboard({
 }) {
   const profile = usePartnerProfile();
   const [menu, setMenu] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement>(null);
+  const accountTrigger = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!accountOpen) return;
+    function dismiss(event: PointerEvent) {
+      if (!accountRef.current?.contains(event.target as Node)) setAccountOpen(false);
+    }
+    function escape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setAccountOpen(false);
+        accountTrigger.current?.focus();
+      }
+    }
+    document.addEventListener("pointerdown", dismiss);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("pointerdown", dismiss);
+      document.removeEventListener("keydown", escape);
+    };
+  }, [accountOpen]);
   const [signingOut, setSigningOut] = useState(false);
 
   const [profileOpen, setProfileOpen] = useState(false);
@@ -145,24 +166,33 @@ export function PartnerDashboard({
             <input placeholder="Search customers, policies, leads..." />
           </label>
           <div className="pd-top-actions">
-
-            <div className="pd-avatar">{initials}</div>
-            <span>
-              <b>{name}</b>
-              <small>Partner ID: {profile?.agent_code || "..."}</small>
-            </span>
-            <Link className="pd-profile-link" href="/partner/profile">
-              <UserRound />
-              Profile
-            </Link>
-            <button
-              className="pd-signout"
-              onClick={signOut}
-              disabled={signingOut}
-            >
-              <LogOut />
-              {signingOut ? "Signing out" : "Sign out"}
-            </button>
+            <div className="pd-account" ref={accountRef} onBlur={event => {
+              if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setAccountOpen(false);
+            }}>
+              <button
+                type="button"
+                className="pd-account-trigger"
+                ref={accountTrigger}
+                aria-expanded={accountOpen}
+                aria-controls="partner-account-dropdown"
+                onClick={() => setAccountOpen(open => !open)}
+              >
+                <span className="pd-avatar" aria-hidden="true">{initials}</span>
+                <span className="pd-account-name">{name}</span>
+                <ChevronDown className={accountOpen ? "expanded" : ""} aria-hidden="true" />
+              </button>
+              {accountOpen && <div className="pd-account-dropdown" id="partner-account-dropdown">
+                <small className="pd-account-id">Partner ID: {profile?.agent_code || "..."}</small>
+                <Link href="/partner/profile" onClick={() => setAccountOpen(false)}>
+                  <UserRound aria-hidden="true" />
+                  Profile
+                </Link>
+                <button type="button" onClick={signOut} disabled={signingOut}>
+                  <LogOut aria-hidden="true" />
+                  {signingOut ? "Signing out..." : "Sign out"}
+                </button>
+              </div>}
+            </div>
           </div>
         </header>
 

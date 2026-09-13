@@ -221,7 +221,7 @@ export function PartnerProfileModal({ onClose, onComplete }: { onClose: () => vo
     return () => { document.body.style.overflow = overflow; previous?.focus(); };
   }, []);
   return <dialog ref={dialog} className="partner-profile-modal" aria-labelledby="partner-profile-title" onCancel={event => { event.preventDefault(); onClose(); }}>
-    <button type="button" className="profile-modal-close" onClick={onClose} aria-label="Close profile setup">?</button>
+    <button type="button" className="profile-modal-close" onClick={onClose} aria-label="Close profile setup">×</button>
     <PartnerProfileForm onComplete={onComplete} />
   </dialog>;
 }
