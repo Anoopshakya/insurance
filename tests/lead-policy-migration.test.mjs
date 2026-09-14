@@ -1,0 +1,23 @@
+﻿import {test} from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {PGlite} from '@electric-sql/pglite';
+test('lead policy creation is scoped, atomic, validated and idempotent',async()=>{const db=new PGlite();try{
+await db.exec(`create role anon;create role authenticated;create role service_role;
+create table users(id text primary key,status text);create table agents(id uuid primary key default gen_random_uuid(),user_id text,status text);
+create table leads(id uuid primary key default gen_random_uuid(),agent_id uuid,name text,contact text,status text);
+create table customers(id uuid primary key default gen_random_uuid(),agent_id uuid,name text,contact text,created_from_lead_id uuid,customer_code text not null unique,created_at timestamptz default now());
+create table categories(id uuid primary key default gen_random_uuid(),active boolean);create table product_types(id uuid primary key default gen_random_uuid(),category_id uuid,active boolean);create table insurers(id uuid primary key default gen_random_uuid(),active boolean);
+create table policies(id uuid primary key default gen_random_uuid(),policy_number text unique,customer_id uuid,agent_id uuid,category_id uuid,product_type_id uuid,insurer_id uuid,premium numeric,coverage numeric,start_date date,expiry_date date,business_type text,status text);
+create table policy_status_history(policy_id uuid,from_status text,to_status text,changed_by text);
+insert into users values('owner','active'),('other','active');insert into agents(user_id,status) values('owner','active'),('other','active');insert into categories(active) values(true);insert into product_types(category_id,active) select id,true from categories;insert into insurers(active) values(true);
+insert into leads(agent_id,name,contact,status) select id,'Test Customer','9876543210','converted' from agents where user_id='owner';`);
+await db.exec(readFileSync('supabase/migrations/202609140001_partner_lead_policy.sql','utf8'));
+const lead=(await db.query('select id from leads')).rows[0].id;const sector=(await db.query('select id from categories')).rows[0].id;const type=(await db.query('select id from product_types')).rows[0].id;const insurer=(await db.query('select id from insurers')).rows[0].id;
+const details={policyNumber:'POL-001',sectorId:sector,productTypeId:type,insurerId:insurer,premium:1500,coverage:100000,startDate:'2026-09-14',expiryDate:'2027-09-13',businessType:'fresh'};
+const create=(user='owner',body=details,id=lead)=>db.query('select create_partner_lead_policy($1,$2,$3) as policy',[user,id,JSON.stringify(body)]);
+await assert.rejects(create('other'),/your converted leads/);await assert.rejects(create('owner',{...details,expiryDate:'2020-01-01'}),/valid policy details/);assert.equal((await db.query('select count(*)::int n from customers')).rows[0].n,0);
+const first=(await create()).rows[0].policy;assert.equal(first.status,'pending');assert.equal(first.source_lead_id,lead);assert.match((await db.query('select customer_code from customers')).rows[0].customer_code,/^MPCTE[A-F0-9]{6}$/);
+assert.equal((await create()).rows[0].policy.id,first.id);assert.equal((await db.query('select count(*)::int n from policies')).rows[0].n,1);
+await db.exec("insert into leads(agent_id,name,contact,status) select id,'Second Customer','9876543211','converted' from agents where user_id='owner'");const second=(await db.query('select id from leads where contact=$1',['9876543211'])).rows[0].id;
+await assert.rejects(create('owner',details,second),/unique/);assert.equal((await db.query('select count(*)::int n from customers')).rows[0].n,1);
+await db.exec("update leads set status='new' where contact='9876543211'");await assert.rejects(create('owner',{...details,policyNumber:'POL-002'},second),/converted leads/);
+assert.equal((await db.query("select has_function_privilege('authenticated','create_partner_lead_policy(text,uuid,jsonb)','execute') allowed")).rows[0].allowed,false);
+}finally{await db.close()}});

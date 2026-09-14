@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     if (agentError || !agent) return NextResponse.json({ error: "Unable to load partner account." }, { status: 403 });
     const leads = [];
     for (let from = 0; ; from += 500) {
-      const { data, error } = await db.from("leads").select("id,name,contact,status,priority,source,created_at,updated_at,product_sector:categories!leads_product_sector_id_fkey(name),product_type:product_types!leads_product_type_id_fkey(name)")
+      const { data, error } = await db.from("leads").select("id,name,contact,status,priority,source,created_at,updated_at,product_sector_id,product_type_id,policy:policies!policies_source_lead_id_fkey(id,policy_number,status,review_status,review_note),product_sector:categories!leads_product_sector_id_fkey(name),product_type:product_types!leads_product_type_id_fkey(name)")
         .eq("agent_id", agent.id).eq("status", "converted").order("updated_at", { ascending: false }).order("id").range(from, from + 499);
       if (error || !data) throw Error("Lead query failed");
       leads.push(...data);
