@@ -237,10 +237,10 @@ export function CustomerAuthSupabase({
               Mobile Number
               <input
                 name="mobile"
-                inputMode="tel"
-                pattern="[0-9+ ]{10,16}"
+                inputMode="numeric"
+
                 required
-              />
+               maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
             </label>
             <label>
               Email Address

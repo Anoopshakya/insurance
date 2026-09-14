@@ -261,8 +261,8 @@ function QuoteFinder() {
               placeholder="10-digit mobile number"
               inputMode="numeric"
               autoComplete="tel"
-              pattern="[6-9][0-9]{9}"
-            />
+
+             maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
             <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
             {error && <p className="m-0 text-sm text-red-600">{error}</p>}
             <div className="grid grid-cols-[auto_1fr] gap-3">
@@ -589,10 +589,10 @@ function ClaimHelpModal({ close }: { close: () => void }) {
         <div className="pr-12"><span className="text-xs font-semibold text-[var(--appearance-violet,#7c3aed)]">CLAIM ASSISTANCE</span><h2 className="mb-2 mt-2 text-2xl text-[var(--appearance-text,#101c50)]">Tell us about your failed claim</h2><p className="mt-0 text-sm text-[var(--appearance-muted,#475569)]">Attach both documents as PDF, JPG, PNG or WEBP files up to 5 MB.</p></div>
         <form className="mt-5 grid grid-cols-2 gap-4 max-md:grid-cols-1" onSubmit={submit}>
           <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="Your full name"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">WhatsApp number<input name="whatsappNumber" required inputMode="tel" pattern="[0-9+ ]{10,16}" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">WhatsApp number<input name="whatsappNumber" required inputMode="numeric" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number" maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></label>
           <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="₹ Claim amount"/></label>
           <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="City, State"/></label>
-          
+
           <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
           <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
           <label className="col-span-2 grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] max-md:col-span-1">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
@@ -985,12 +985,12 @@ function Advantage() {
                 Mobile Number
                 <input
                   className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
-                  inputMode="tel"
+                  inputMode="numeric"
                   name="mobile"
-                  pattern="[0-9+ ]{10,15}"
+
                   placeholder="Enter mobile number"
                   required
-                />
+                 maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
               </label>
               <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
                 Email Address

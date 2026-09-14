@@ -166,7 +166,7 @@ export function LeadsDirectory() {
         <button className="modal-close" onClick={() => setCreateOpen(false)}>×</button><h2>Create Lead</h2><p>Create an internal lead and assign it to a partner or agent for follow-up.</p>
         <form className="lead-create-form" onSubmit={createLead}>
           <label>Customer name<input name="name" required minLength={2} /></label>
-          <label>Mobile number<input name="contact" required inputMode="tel" minLength={10} /></label>
+          <label>Mobile number<input name="contact" required inputMode="numeric"  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></label>
           <label>Assign partner / agent<select name="agentId" required defaultValue=""><option value="" disabled>Select partner / agent</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agentName(agent)}</option>)}</select></label>
           <label>Priority<select name="priority" defaultValue="medium"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
           <div className="modal-buttons"><button type="button" className="secondary-button" onClick={() => setCreateOpen(false)}>Cancel</button><button className="primary-button" disabled={saving}>{saving ? "Creating…" : "Create Lead"}</button></div>

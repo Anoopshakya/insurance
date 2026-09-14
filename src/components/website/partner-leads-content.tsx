@@ -322,7 +322,7 @@ export function PartnerLeadsContent() {
               </label>
               <label>
                 Mobile number
-                <input name="contact" inputMode="tel" minLength={10} required />
+                <input name="contact" inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
               </label>
               <label>
                 Priority

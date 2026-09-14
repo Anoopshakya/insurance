@@ -1,0 +1,12 @@
+﻿const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const {NextRequest,NextResponse}=require('next/server');
+function setup({user={uid:'admin'},allowed=true,fail=false,total=1}={}){
+ const calls=[],permissions=[];const records=Array.from({length:total},(_,i)=>({id:String(i),name:'Contact '+i,mobile:'9876543210',email:'contact@example.test',state:'Delhi',message:'Please call me about insurance.',consent:true,status:'new',created_at:'2026-09-14T10:00:00Z'}));
+ const db={from(table){calls.push(table);const q={select(){return q},order(){return q},range:async(a,b)=>({data:fail?null:records.slice(a,b+1),error:fail?{message:'offline'}:null})};return q}};
+ const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/app/api/admin/contact-requests/route.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports,require:name=>({'next/server':{NextRequest,NextResponse},'@/lib/auth-server':{verifyRequestToken:async()=>user},'@/lib/rbac':{ensureAdminPermission:async(...args)=>{permissions.push(args);return allowed}},'@/lib/supabase-server':{supabaseServer:()=>db}})[name]});
+ return {calls,permissions,get:()=>exports.GET(new NextRequest('https://site.test/api/admin/contact-requests'))};
+}
+test('contact requests reject anonymous and unauthorized users before database reads',async()=>{for(const options of [{user:null},{allowed:false}]){const s=setup(options);assert.equal((await s.get()).status,403);assert.equal(s.calls.length,0)}});
+test('admin reads existing contact table with leads view permission, preserving full messages',async()=>{const s=setup();const response=await s.get();assert.equal(response.status,200);assert.equal(response.headers.get('cache-control'),'private, no-store');const body=await response.json();assert.equal(body.data[0].message,'Please call me about insurance.');assert.deepEqual(s.calls,['website_contact_requests']);assert.deepEqual(s.permissions[0],['admin',undefined,'leads','view'])});
+test('existing submissions beyond the database page limit remain available',async()=>{const s=setup({total:1001});assert.equal((await(await s.get()).json()).data.length,1001);assert.equal(s.calls.length,3)});
+test('database errors do not look like an empty contact inbox',async()=>{const response=await setup({fail:true}).get();assert.equal(response.status,500);assert.ok((await response.json()).error)});

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { createIdentityCode } from "@/lib/identity-code";
 import { verifyRequestToken } from "@/lib/auth-server";
 import { supabaseServer } from "@/lib/supabase-server";
 
@@ -71,7 +72,7 @@ export async function GET(request: NextRequest) {
 }
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
-  contact: z.string().trim().min(10).max(20),
+  contact: z.string().trim().regex(/^[0-9]{10}$/, "Enter exactly 10 digits for the mobile number"),
   email: z.string().trim().email().optional().or(z.literal("")),
   address: z.string().trim().max(500).optional().or(z.literal("")),
 });
@@ -85,6 +86,7 @@ export async function POST(request: NextRequest) {
         .from("customers")
         .insert({
           agent_id: agent,
+          customer_code: createIdentityCode("customer", input.name),
           name: input.name,
           contact: input.contact,
           email: input.email || null,

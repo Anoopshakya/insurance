@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
     const name = String(form.get("name") || "").trim();
-    const whatsappNumber = String(form.get("whatsappNumber") || "").replace(/\D/g, "");
+    const whatsappNumber = String(form.get("whatsappNumber") || "").trim();
     const claimAmount = Number(form.get("claimAmount"));
     const reason = String(form.get("reason") || "").trim();
     const location = String(form.get("location") || "").trim();
@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     if (website) return NextResponse.json({ ok: true }, { status: 201 });
     if (name.length < 2 || name.length > 100)
       return NextResponse.json({ error: "Enter your full name" }, { status: 400 });
-    if (!/^\d{10,15}$/.test(whatsappNumber))
-      return NextResponse.json({ error: "Enter a valid WhatsApp number" }, { status: 400 });
+    if (!/^\d{10}$/.test(whatsappNumber))
+      return NextResponse.json({ error: "Enter a valid 10-digit WhatsApp number" }, { status: 400 });
     if (!Number.isFinite(claimAmount) || claimAmount <= 0)
       return NextResponse.json({ error: "Enter a valid claim amount" }, { status: 400 });
     if (reason.length < 10 || reason.length > 1000)

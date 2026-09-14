@@ -1,0 +1,11 @@
+﻿const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const {NextRequest,NextResponse}=require('next/server');
+function load(file,imports={}){const exports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports,require:n=>imports[n]||require(n),crypto:require('node:crypto')});return exports;}
+function setup(role='partner'){
+ let inserted;const db={from:table=>{const q={select:()=>q,eq:()=>q,insert:row=>{inserted=row;return q},single:async()=>table==='agents'?{data:{id:'verified-agent'}}:!inserted.customer_code?{error:{code:'23502',message:'customer_code is required'}}:{data:{id:'customer-one',...inserted}}};return q}};
+ const api=load('src/app/api/partner/customers/route.ts',{'next/server':{NextRequest,NextResponse},'@/lib/auth-server':{verifyRequestToken:async()=>({uid:'verified-user',role})},'@/lib/supabase-server':{supabaseServer:()=>db},'@/lib/identity-code':load('src/lib/identity-code.ts')});
+ return {post:values=>api.POST(new NextRequest('https://site.test/api/partner/customers',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(values)})),inserted:()=>inserted};
+}
+test('partner customer creation supplies the required generated code and verified ownership',async()=>{const s=setup();const response=await s.post({name:'Rahul Sharma',contact:'9876543210',email:'rahul@example.test',customer_code:'attacker',agent_id:'other-agent'});assert.equal(response.status,201);const body=await response.json();assert.match(body.data.customer_code,/^MPCRA[A-F0-9]{6}$/);assert.equal(body.data.agent_id,'verified-agent');assert.equal(body.data.name,'Rahul Sharma');assert.equal(body.data.contact,'9876543210')});
+test('invalid customer form never inserts a record',async()=>{const s=setup();assert.equal((await s.post({name:'Rahul',contact:'98765432101'})).status,400);assert.equal(s.inserted(),undefined)});
+test('customer accounts cannot create partner-owned customers',async()=>{const s=setup('customer');assert.equal((await s.post({name:'Rahul',contact:'9876543210'})).status,403);assert.equal(s.inserted(),undefined)});

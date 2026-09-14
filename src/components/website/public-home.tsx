@@ -110,10 +110,10 @@ export function PublicHome() {
             <form onSubmit={callback}>
               <input
                 required
-                inputMode="tel"
-                pattern="[0-9+ ]{10,15}"
+                inputMode="numeric"
+
                 placeholder="Enter Mobile Number"
-              />
+               maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
               <button className="site-gradient">Request a Call</button>
             </form>
             {message && <small>{message}</small>}

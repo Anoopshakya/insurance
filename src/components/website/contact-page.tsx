@@ -41,7 +41,7 @@ export function ContactPage() {
    <form onSubmit={submit} noValidate aria-busy={busy}>
     <div className="contact-fields">
      <label>Full Name <b>*</b><input name="name" autoComplete="name" placeholder="Enter your full name" required maxLength={100} /></label>
-     <label>Mobile Number <b>*</b><span className="contact-input-icon"><Phone size={18} aria-hidden="true" /><input name="mobile" type="tel" autoComplete="tel" placeholder="+91 98765 43210" required maxLength={20} /></span></label>
+     <label>Mobile Number <b>*</b><span className="contact-input-icon"><Phone size={18} aria-hidden="true" /><input name="mobile" type="tel" autoComplete="tel" placeholder="10-digit mobile number" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span></label>
      <label>Email Address <b>*</b><span className="contact-input-icon"><Mail size={18} aria-hidden="true" /><input name="email" type="email" autoComplete="email" placeholder="you@example.com" required maxLength={254} /></span></label>
      <label>State<select aria-label="State" name="state" autoComplete="address-level1" defaultValue=""><option value="">Select your state</option>{contactStates.map(state => <option key={state}>{state}</option>)}</select></label>
      <label className="contact-message">Your Message <b>*</b><textarea name="message" placeholder="Type your message here..." required minLength={10} maxLength={4000} rows={6} /></label>

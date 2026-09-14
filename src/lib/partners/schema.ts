@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export function normalizeMobile(value: string) {
-  const digits = value.replace(/\D/g, "");
+  const digits = value.replace(/[\s()+-]/g, "");
   if (digits.length === 10) return `+91${digits}`;
   return value;
 }

@@ -5,7 +5,7 @@ import { supabaseServer } from "@/lib/supabase-server";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(100),
-  contact: z.string().trim().min(10).max(20),
+  contact: z.string().trim().regex(/^[0-9]{10}$/, "Enter exactly 10 digits for the mobile number"),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   productSectorId: z.string().uuid(),
   productTypeId: z.string().uuid(),

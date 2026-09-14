@@ -15,6 +15,7 @@ const navigation: Array<{ label?: string; items: NavItem[] }> = [
     items: [
       { label: "Leads", href: "/admin/leads", icon: "leads" },
       { label: "Claim Help", href: "/admin/claim-help", icon: "support" },
+      { label: "Contact Requests", href: "/admin/contact-requests", icon: "support" },
       { label: "Customers", href: "/admin/customers", icon: "users" },
       { label: "Partners / Agents", href: "/admin/partners", icon: "partners" },
       { label: "Policies", href: "/admin/policies", icon: "policies" },
