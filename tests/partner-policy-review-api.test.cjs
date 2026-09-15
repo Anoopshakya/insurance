@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 const {NextRequest,NextResponse}=require('next/server');
 function setup(path,allowed=true,role='admin'){
  const calls=[],exports={};
- vm.runInNewContext(ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports,require:n=>({'next/server':{NextRequest,NextResponse},zod:require('zod'),'@/lib/auth-server':{verifyRequestToken:async()=>({uid:'signed-in-user',role})},'@/lib/rbac':{ensureAdminPermission:async()=>allowed},'@/lib/supabase-server':{supabaseServer:()=>({rpc:async(name,args)=>{calls.push({name,args});return {data:{id:'created'}}}})}})[n]});
+ vm.runInNewContext(ts.transpileModule(fs.readFileSync(path,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText,{exports,File:require("node:buffer").File,require:n=>({'next/server':{NextRequest,NextResponse},zod:require('zod'),'@/lib/auth-server':{verifyRequestToken:async()=>({uid:'signed-in-user',role})},'@/lib/rbac':{ensureAdminPermission:async()=>allowed},'@/lib/supabase-server':{supabaseServer:()=>({rpc:async(name,args)=>{calls.push({name,args});return {data:{id:'created'}}}})}})[n]});
  return {calls,post:body=>exports.POST(new NextRequest('https://site.test/api/policy',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)}))};
 }
 const id='11111111-1111-4111-8111-111111111111';

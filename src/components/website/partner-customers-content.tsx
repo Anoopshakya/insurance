@@ -1,4 +1,5 @@
 "use client";
+import {LeadForm} from "@/components/partner/lead-form";
 import { PartnerCustomersEmpty } from "@/components/partner/partner-customers-empty";
 import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 
@@ -54,6 +55,7 @@ async function api(init: RequestInit = {}) {
   });
 }
 export function PartnerCustomersContent() {
+  const [newCustomer,setNewCustomer]=useState<Customer|null>(null),[addLead,setAddLead]=useState(false);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Customer[]>([]),
     [metrics, setMetrics] = useState<Metrics | null>(null),
@@ -95,6 +97,7 @@ export function PartnerCustomersContent() {
     setSaving(false);
     if (!r.ok) return setError(b.error || "Could not add customer.");
     setOpen(false);
+    setNewCustomer(b.data);
     await load();
   }
   const cards = metrics
@@ -220,6 +223,8 @@ export function PartnerCustomersContent() {
         </div>
       </section>
       </>}
+      {newCustomer&&!addLead&&<div className="pl-modal" role="dialog" aria-modal="true" aria-label="Customer added"><section><h2>Customer added</h2><p>Add a lead for {newCustomer.name}?</p><button onClick={()=>setNewCustomer(null)}>Not now</button><button onClick={()=>setAddLead(true)}>Yes, add lead</button></section></div>}
+      {newCustomer&&addLead&&<LeadForm customer={newCustomer} close={()=>{setNewCustomer(null);setAddLead(false)}} saved={()=>{setNewCustomer(null);setAddLead(false)}}/>}
       {open && (
         <div className="pl-modal" onMouseDown={() => setOpen(false)}>
           <section onMouseDown={(e) => e.stopPropagation()}>

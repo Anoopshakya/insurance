@@ -1,4 +1,7 @@
 "use client";
+import {LeadForm} from "@/components/partner/lead-form";
+import {LeadPolicyForm} from "@/components/partner/lead-policy-form";
+import "@/app/partner/partner-policies.css";
 import { PartnerLeadsEmpty } from "@/components/partner/partner-leads-empty";
 import { PartnerSkeleton } from "@/components/partner/partner-skeleton";
 
@@ -21,6 +24,7 @@ import {
 import { supabaseAuth } from "@/lib/supabase-client";
 type Lead = {
   id: string;
+  policy?:Array<{id:string}>;
   name: string;
   contact: string | null;
   source: string | null;
@@ -56,6 +60,7 @@ async function api(init: RequestInit = {}) {
   });
 }
 export function PartnerLeadsContent() {
+  const [editing,setEditing]=useState<Lead|null>(null),[policyLead,setPolicyLead]=useState<Lead|null>(null),[menu,setMenu]=useState<string|null>(null);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Lead[]>([]),
     [query, setQuery] = useState(""),
@@ -116,22 +121,9 @@ export function PartnerLeadsContent() {
       "green",
     ],
   ] as const;
-  async function create(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setSaving(true);
-    setError("");
-    const r = await api({
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(Object.fromEntries(new FormData(e.currentTarget))),
-      }),
-      b = await r.json();
-    setSaving(false);
-    if (!r.ok) return setError(b.error || "Could not create lead.");
-    setOpen(false);
-    await load();
-  }
   async function update(id: string, next: string) {
+    const lead=rows.find(row=>row.id===id);
+    if(next==="converted"&&lead&&!lead.policy?.length){setActiveLead(null);setPolicyLead(lead);return;}
     const r = await api({
       method: "PATCH",
       headers: { "content-type": "application/json" },
@@ -295,7 +287,8 @@ export function PartnerLeadsContent() {
               <span className="pl-actions">
                 <Phone />
                 <MessageCircle />
-                <MoreVertical />
+                <button aria-label={`More actions for ${row.name}`} aria-expanded={menu===row.id} onClick={e=>{e.stopPropagation();setMenu(menu===row.id?null:row.id)}}><MoreVertical /></button>
+                {menu===row.id&&<span className="pl-action-menu" onClick={e=>e.stopPropagation()}><button onClick={()=>{setEditing(row);setOpen(true);setMenu(null)}}>Edit lead</button><button onClick={async()=>{setMenu(null);if(!window.confirm(`Delete lead for ${row.name}?`))return;try{const r=await api({method:"DELETE",headers:{"content-type":"application/json"},body:JSON.stringify({id:row.id})});if(!r.ok)throw Error((await r.json()).error);await load()}catch(e){setError(e instanceof Error?e.message:"Unable to delete lead")}}}>Delete lead</button></span>}
               </span>
             </div>
           ))}
@@ -307,94 +300,8 @@ export function PartnerLeadsContent() {
         </footer>
       </section>
       </>}
-      {open && (
-        <div className="pl-modal" onMouseDown={() => setOpen(false)}>
-          <section onMouseDown={(e) => e.stopPropagation()}>
-            <button className="pl-modal-close" onClick={() => setOpen(false)}>
-              ×
-            </button>
-            <h2>Add Lead</h2>
-            <p>Add a customer enquiry to your pipeline.</p>
-            <form onSubmit={create}>
-              <label>
-                Customer name
-                <input name="name" minLength={2} required />
-              </label>
-              <label>
-                Mobile number
-                <input name="contact" inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
-              </label>
-              <label>
-                Priority
-                <select name="priority" defaultValue="medium">
-                  <option value="low">Low</option>
-                  <option value="medium">Medium</option>
-                  <option value="high">High</option>
-                </select>
-              </label>
-              <label>
-                Product sector
-                <select
-                  name="productSectorId"
-                  value={selectedSector}
-                  onChange={(event) => setSelectedSector(event.target.value)}
-                  required
-                >
-                  <option value="" disabled>
-                    Select product sector
-                  </option>
-                  {sectors.map((sector) => (
-                    <option value={sector.id} key={sector.id}>
-                      {sector.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                Product type
-                <select
-                  name="productTypeId"
-                  defaultValue=""
-                  required
-                  disabled={!selectedSector}
-                >
-                  <option value="" disabled>
-                    Select product type
-                  </option>
-                  {productTypes
-                    .filter((type) => type.category_id === selectedSector)
-                    .map((type) => (
-                      <option value={type.id} key={type.id}>
-                        {type.name}
-                      </option>
-                    ))}
-                </select>
-              </label>
-              <label>
-                When are they planning to buy?
-                <select name="purchaseTimeline" defaultValue="" required>
-                  <option value="" disabled>
-                    Select purchase timeline
-                  </option>
-                  <option value="immediately">Immediately</option>
-                  <option value="within_7_days">Within 7 days</option>
-                  <option value="within_30_days">Within 30 days</option>
-                  <option value="within_3_months">Within 3 months</option>
-                  <option value="researching">Just researching</option>
-                </select>
-              </label>
-              <div>
-                <button type="button" onClick={() => setOpen(false)}>
-                  Cancel
-                </button>
-                <button disabled={saving}>
-                  {saving ? "Creating..." : "Add Lead"}
-                </button>
-              </div>
-            </form>
-          </section>
-        </div>
-      )}
+      {open&&<LeadForm lead={editing} close={()=>{setOpen(false);setEditing(null)}} saved={()=>{setOpen(false);setEditing(null);void load()}}/>}
+      {policyLead&&<LeadPolicyForm lead={policyLead} close={()=>setPolicyLead(null)} saved={()=>{setPolicyLead(null);void load()}}/>}
       {activeLead && (
         <div className="pl-lead-modal" onMouseDown={() => setActiveLead(null)}>
           <section onMouseDown={(event) => event.stopPropagation()}>

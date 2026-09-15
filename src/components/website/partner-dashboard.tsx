@@ -20,8 +20,8 @@ type IconType = LucideIcon;
 
 const nav: Array<[string, string, IconType]> = [
   ["Dashboard", "/partner", Home],
-  ["Leads", "/partner/leads", Users],
   ["Customers", "/partner/customers", Users],
+  ["Leads", "/partner/leads", Users],
   ["Policies", "/partner/policies", FileText],
   ["Renewals", "/partner/renewals", RefreshCw],
   ["Earnings", "/partner/earnings", BarChart3],
