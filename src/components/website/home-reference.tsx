@@ -41,6 +41,8 @@ import {
   WalletCards,
   X,
   Zap,
+  Bomb,
+  HeartPlus,
 } from "lucide-react";
 
 type IconType = ComponentType<{ className?: string }>;
@@ -49,6 +51,7 @@ const tabs: Array<[string, IconType, string]> = [
   ["health", HeartPulse, "Health"],
   ["motor", CarFront, "Motor"],
   ["term", ShieldCheck, "Term Life"],
+  ["personal-accident", Umbrella, "Accidental"],
 ];
 
 const productFields: Record<
@@ -61,15 +64,15 @@ const productFields: Record<
       label: "I want a policy for",
       options: [
         { label: "Self", icon: UserRound },
-        { label: "My Family", icon: UsersRound },
-        { label: "My Parents", icon: UserRound },
-        // { label: "My Child", icon: Baby },
+        { label: "My Family", icon: Baby },
+        { label: "My Parents", icon: UsersRound },
+        { label: "Top Up", icon: HeartPlus },
       ],
     },
     {
       key: "coverage",
       label: "Select Coverage Amount",
-      options: ["₹7 Lakhs", "₹15 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
+      options: ["₹10 Lakhs", "₹15 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
         (label) => ({ label }),
       ),
     },
@@ -87,7 +90,7 @@ const productFields: Record<
     {
       key: "planType",
       label: "Select Motor Cover",
-      options: ["Comprehensive", "Third Party", "Own Damage"].map(
+      options: ["Comprehensive", "Third Party"].map(
         (label) => ({ label }),
       ),
     },
@@ -95,7 +98,7 @@ const productFields: Record<
   term: [
     {
       key: "insuredFor",
-      label: "Life cover required for",
+      label: "Life Cover Required For",
       options: [
         { label: "Self", icon: UserRound },
         { label: "Spouse", icon: UsersRound },
@@ -104,7 +107,23 @@ const productFields: Record<
     {
       key: "coverage",
       label: "Select Life Cover",
-      options: ["₹50 Lakhs", "₹1 Crore", "₹2 Crore", "₹5 Crore"].map(
+      options: ["₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
+        (label) => ({ label }),
+      ),
+    },
+  ],
+  "personal-accident": [
+    {
+      key: "accidentFor",
+      label: "Personal Accident Insurance Cover",
+      options: [
+        { label: "Self", icon: UserRound },
+      ],
+    },
+    {
+      key: "coverage",
+      label: "Select Cover",
+      options: ["₹15 Lakhs", "₹25 Lakhs", "₹50 Lakhs", "₹1 Crore+"].map(
         (label) => ({ label }),
       ),
     },
@@ -137,12 +156,12 @@ function ChoiceGrid({
             type="button"
             key={label}
             onClick={() => set(label)}
-            className={`relative flex min-h-[62px] min-w-0 items-center justify-center gap-3 rounded-lg border px-2 text-sm font-medium ${active ? "border-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#6d28d9)]" : "border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] text-[var(--appearance-text,#334155)]"}`}
+            className={`relative flex min-h-[52px] min-w-0 items-center justify-center gap-3 rounded-lg border px-2 text-sm font-medium ${active ? "border-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-violet,#6d28d9)]" : "border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] text-[var(--appearance-text,#334155)]"}`}
           >
-            {Icon && <Icon className="h-6 w-6" />}
+            {Icon && <Icon className="h-5 w-5" />}
             {label}
             {active && (
-              <i className="absolute -right-px -top-px grid h-5 w-5 place-items-center rounded-bl-xl rounded-tr-lg bg-violet-700 text-white">
+              <i className="absolute -right-px -top-px grid h-4 w-4 place-items-center rounded-bl-xl rounded-tr-lg bg-violet-700 text-white">
                 <Check className="h-3 w-3" />
               </i>
             )}
@@ -216,15 +235,15 @@ function QuoteFinder() {
 
   return (
     <div className="overflow-hidden rounded-xl border border-[var(--appearance-border,#ebeaf4)] bg-[var(--appearance-surface,#fff)] shadow-[0_16px_45px_rgba(44,37,105,.08)]">
-      <div className="quote-tabs-responsive grid h-[84px] grid-cols-3 border-b border-[var(--appearance-border,#ecebf4)]">
+      <div className="quote-tabs-responsive grid h-[84px] grid-cols-4 border-b border-[var(--appearance-border,#ecebf4)]">
         {tabs.map(([id, Icon, label]) => (
           <button
             key={id}
             type="button"
             onClick={() => selectTab(id)}
-            className={`flex min-w-0 items-center justify-center gap-5 border-0 bg-[var(--appearance-surface,#fff)] text-base font-medium max-md:gap-2 max-md:text-sm ${tab === id ? "border-b-[3px] border-b-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)]/60 text-[var(--appearance-violet,#6d28d9)]" : "text-[var(--appearance-text,#111c4e)]"}`}
+            className={`flex min-w-0 items-center justify-center gap-2 border-0 bg-[var(--appearance-surface,#fff)] text-base font-medium max-md:gap-2 max-md:text-sm ${tab === id ? "border-b-[3px] border-b-violet-600 bg-[var(--appearance-surface-raised,#f5f3ff)]/60 text-[var(--appearance-violet,#6d28d9)]" : "text-[var(--appearance-text,#111c4e)]"}`}
           >
-            <Icon className="h-6 w-6" />
+            <Icon className="h-5 w-5" />
             {label}
           </button>
         ))}
@@ -249,21 +268,21 @@ function QuoteFinder() {
               required
               value={customerName}
               onChange={(event) => setCustomerName(event.target.value)}
-              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600"
+              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600 mp-control"
               placeholder="Full name"
               autoComplete="name"
             />
-            <input
+            <span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input
               required
               value={mobile}
               onChange={(event) => setMobile(event.target.value.replace(/\D/g, "").slice(0, 10))}
-              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600"
+              className="h-14 rounded-lg border border-slate-300 px-4 text-sm outline-none focus:border-violet-600 mp-control"
               placeholder="10-digit mobile number"
               inputMode="numeric"
               autoComplete="tel"
 
-             maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
-            <input name="website" className="hidden" tabIndex={-1} autoComplete="off" />
+             maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span>
+            <input name="website" className="hidden mp-control" tabIndex={-1} autoComplete="off" />
             {error && <p className="m-0 text-sm text-red-600">{error}</p>}
             <div className="grid grid-cols-[auto_1fr] gap-3">
               <button
@@ -336,9 +355,9 @@ const statItems: Array<[IconType, string, string, string]> = [
   [Star, "4.8/5", "Customer Rating", "Rated excellent by partners & customers"],
   [
     IndianRupee,
-    "High",
-    "Partner Earnings",
-    "Earn attractive rewards on every sale",
+    "Grow",
+    "Magically",
+    "Get attractive rewards on every sale",
   ],
 ];
 function Stats() {
@@ -390,13 +409,13 @@ function PartnerEarning() {
         <h2 className="mb-3 mt-4 text-4xl leading-tight text-[var(--appearance-text,#0b174c)] max-md:text-3xl">
           Join MagikPolicy &amp;
           <br />
-          Earn{" "}
+          Grow{" "}
           <em className="bg-gradient-to-r from-violet-600 via-pink-500 to-orange-500 bg-clip-text not-italic text-transparent">
-             Extra!
+             Magically
           </em>
         </h2>
         <p className="max-w-lg text-sm leading-relaxed text-[var(--appearance-muted,#475569)]">
-          Already earning working as an insurance agent? Switch to
+          Already working as an insurance agent? Switch to
           MagikPolicy and get extra rewards on every eligible policy.
         </p>
         <div className="mt-6 grid grid-cols-3 gap-4 pt-4">
@@ -428,7 +447,7 @@ function PartnerEarning() {
       </div>
       <div className="col-span-2 grid grid-cols-4 gap-3 max-lg:col-span-1 max-md:grid-cols-2 bg-[var(--appearance-surface-raised,#f5f3ff)] p-4 border-0 rounded-lg  ">
         {[
-          [TrendingUp, "Increase Your Earnings", "Do less get more"],
+          [TrendingUp, "Increase Your Income", "Do less get more"],
           [IndianRupee, "No Deductions", "No hidden charges"],
           [Headphones, "Dedicated Partner Support", "We are here to help"],
           [ShieldCheck, "Grow Your Business", "Access insurers & products"],
@@ -588,15 +607,15 @@ function ClaimHelpModal({ close }: { close: () => void }) {
       {submitted ? <div className="grid min-h-72 place-items-center text-center"><div><CheckCircle2 className="mx-auto h-16 w-16 text-emerald-500"/><h2 className="mb-2 mt-4 text-2xl text-[var(--appearance-text,#101c50)]">Request submitted successfully!</h2><p className="text-sm text-[var(--appearance-muted,#475569)]">Our claim assistance team will contact you on WhatsApp shortly.</p><button type="button" onClick={close} className="claim-help-primary mt-4 rounded-lg border-0 bg-violet-600 px-6 py-3 text-sm font-semibold text-white">Close</button></div></div> : <>
         <div className="pr-12"><span className="text-xs font-semibold text-[var(--appearance-violet,#7c3aed)]">CLAIM ASSISTANCE</span><h2 className="mb-2 mt-2 text-2xl text-[var(--appearance-text,#101c50)]">Tell us about your failed claim</h2><p className="mt-0 text-sm text-[var(--appearance-muted,#475569)]">Attach both documents as PDF, JPG, PNG or WEBP files up to 5 MB.</p></div>
         <form className="mt-5 grid grid-cols-2 gap-4 max-md:grid-cols-1" onSubmit={submit}>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="Your full name"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">WhatsApp number<input name="whatsappNumber" required inputMode="numeric" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="10-digit WhatsApp number" maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></label>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="₹ Claim amount"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600" placeholder="City, State"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">Name<input name="name" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600 mp-control" placeholder="Your full name"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">WhatsApp number<input name="whatsappNumber" required inputMode="numeric" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600 mp-control" placeholder="10-digit WhatsApp number" maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">Claim amount<input name="claimAmount" required type="number" min="1" step="0.01" className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600 mp-control" placeholder="₹ Claim amount"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">Location<input name="location" required minLength={2} className="h-12 rounded-lg border border-slate-300 px-3 outline-none focus:border-violet-600 mp-control" placeholder="City, State"/></label>
 
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
-          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)]">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs"/></label>
-          <label className="col-span-2 grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] max-md:col-span-1">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
-          <input name="website" className="hidden" tabIndex={-1} autoComplete="off"/>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">Attach policy<input name="policyDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs mp-control"/></label>
+          <label className="grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] mp-label">Attach failure document<input name="failureDocument" required type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp" className="rounded-lg border border-dashed border-violet-300 p-3 text-xs mp-control"/></label>
+          <label className="col-span-2 grid gap-2 text-sm font-medium text-[var(--appearance-text,#172454)] max-md:col-span-1 mp-label">Reason for claim failure<textarea name="reason" required minLength={10} maxLength={1000} className="min-h-24 resize-y rounded-lg border border-slate-300 p-3 outline-none focus:border-violet-600 mp-control" placeholder="Explain the reason given for rejecting or failing your claim"/></label>
+          <input name="website" className="hidden mp-control" tabIndex={-1} autoComplete="off"/>
           {error && <p className="col-span-2 m-0 text-sm text-red-600 max-md:col-span-1">{error}</p>}
           <button disabled={submitting} className="claim-help-primary col-span-2 h-12 rounded-lg border-0 bg-gradient-to-r from-violet-700 via-fuchsia-600 to-orange-500 text-sm font-semibold text-white disabled:opacity-60 max-md:col-span-1">{submitting ? "Submitting request…" : "Submit Claim Help Request"}</button>
         </form>
@@ -614,7 +633,7 @@ function ClaimBanner() {
         <span className="rounded-full bg-violet-100 px-3 py-1 text-[10px] font-bold text-[var(--appearance-violet,#6d28d9)]">
           CLAIM CONSULTING
         </span>
-        <h2 className="mb-2 mt-4 text-3xl text-[var(--appearance-text,#0b174c)]">
+        <h2 className="mb-2 mt-4 uppercase text-3xl text-[var(--appearance-text,#0b174c)]">
           Is your claim failed?
         </h2>
         <h3 className="m-0 text-lg text-[var(--appearance-text,#172454)]">
@@ -971,50 +990,50 @@ function Advantage() {
               className="grid grid-cols-2 gap-4 max-sm:grid-cols-1"
               onSubmit={submitPartnerApplication}
             >
-              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] mp-label">
                 Full Name
                 <input
                   autoFocus
-                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 mp-control"
                   name="name"
                   placeholder="Enter your full name"
                   required
                 />
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] mp-label">
                 Mobile Number
-                <input
-                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                <span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 mp-control"
                   inputMode="numeric"
                   name="mobile"
 
                   placeholder="Enter mobile number"
                   required
-                 maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
+                 maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span>
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] mp-label">
                 Email Address
                 <input
-                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 mp-control"
                   name="email"
                   placeholder="Enter your email address"
                   required
                   type="email"
                 />
               </label>
-              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)]">
+              <label className="grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] mp-label">
                 City
                 <input
-                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 mp-control"
                   name="city"
                   placeholder="Enter your city"
                   required
                 />
               </label>
-              <label className="col-span-2 grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] max-sm:col-span-1">
+              <label className="col-span-2 grid gap-1.5 text-xs font-semibold text-[var(--appearance-text,#334155)] max-sm:col-span-1 mp-label">
                 Business Type
                 <select
-                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100"
+                  className="h-11 rounded-lg border border-[var(--appearance-border,#e2e8f0)] bg-[var(--appearance-surface,#fff)] px-3 text-sm outline-none transition focus:border-violet-500 focus:ring-2 focus:ring-violet-100 mp-control"
                   defaultValue=""
                   name="businessType"
                   required
@@ -1026,12 +1045,12 @@ function Advantage() {
                   <option>Corporate Partner</option>
                 </select>
               </label>
-              <label className="col-span-2 flex items-start gap-2 text-xs leading-relaxed text-[var(--appearance-muted,#64748b)] max-sm:col-span-1">
-                <input className="mt-0.5 accent-violet-600" required type="checkbox" />
+              <label className="col-span-2 flex items-start gap-2 text-xs leading-relaxed text-[var(--appearance-muted,#64748b)] max-sm:col-span-1 mp-label">
+                <input className="mt-0.5 accent-violet-600 mp-check" required type="checkbox" />
                 <span>I agree to the Terms &amp; Conditions and Privacy Policy.</span>
               </label>
               <button
-                className="btn-primary col-span-2 rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3.5 text-sm font-semibold text-white max-sm:col-span-1"
+                className="btn-primary col-span-2 rounded-lg bg-gradient-to-r from-violet-700 to-pink-500 px-5 py-3.5 text-sm font-semibold text-white max-sm:col-span-1 mp-form-action"
                 type="submit"
               >
                 Submit Application
@@ -1064,7 +1083,7 @@ export function HomeReference() {
               Magically.
             </em>
           </h1>
-          <p className="mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[var(--appearance-text,#172454)] max-md:max-w-[19rem] max-md:text-sm">
+          <p className="uppercase mb-0 mt-4 text-[clamp(1rem,1.25vw,1.5rem)] font-semibold text-[var(--appearance-text,#172454)] max-md:max-w-[19rem] max-md:text-sm">
             Buy policy and get secured instantly.
           </p>
         </div>
@@ -1084,8 +1103,8 @@ export function HomeReference() {
       </div>
       <div className="h-20 max-md:h-12" />
       <div className="home-sections mx-auto grid w-[92%] max-w-[1500px] gap-24 pb-20 max-md:w-[calc(100%_-_24px)] max-md:gap-12 max-md:pb-12">
-        <PartnerEarning />
         <PopularPlans />
+        <PartnerEarning />
         <ClaimBanner />
         <Testimonials />
         <Advantage />

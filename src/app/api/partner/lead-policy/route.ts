@@ -7,7 +7,7 @@ export async function GET(request:NextRequest){
  const user=await verifyRequestToken(request.headers.get("authorization"));
  if(!user||user.role!=="partner")return NextResponse.json({error:"Forbidden"},{status:403});
  const db=supabaseServer();
- const [sectors,types,insurers,products,plans]=await Promise.all([db.from("categories").select("id,name").eq("active",true).order("name"),db.from("product_types").select("id,name,category_id").eq("active",true).order("name"),db.from("insurers").select("id,name").eq("active",true).order("name"),db.from("products").select("id,name,category_id").order("name"),db.from("plans").select("id,name,product_id,insurer_id").order("name")]);
+ const [sectors,types,insurers,products,plans]=await Promise.all([db.from("categories").select("id,name").eq("active",true).order("name"),db.from("product_types").select("id,name,category_id").eq("active",true).order("name"),db.from("insurers").select("id,name").eq("active",true).order("name"),db.from("products").select("id,name,category_id,insurer_id,product_type_id").or("catalog_managed.eq.false,publication_status.eq.published").order("name"),db.from("plans").select("id,name,product_id,insurer_id").eq("catalog_active",true).order("name")]);
  if(sectors.error||types.error||insurers.error||products.error||plans.error)return NextResponse.json({error:"Unable to load policy options"},{status:500});
  return NextResponse.json({sectors:sectors.data,productTypes:types.data,insurers:insurers.data,products:products.data,plans:plans.data},{headers:{"Cache-Control":"private, no-store"}});
 }

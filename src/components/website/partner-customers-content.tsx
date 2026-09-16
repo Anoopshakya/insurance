@@ -145,9 +145,9 @@ export function PartnerCustomersContent() {
         ))}
       </section>
       <div className="pc-search">
-        <label>
+        <label className="mp-label">
           <Search />
-          <input
+          <input className="mp-control"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search name, email or mobile"
@@ -164,9 +164,9 @@ export function PartnerCustomersContent() {
             <h2>Customer Directory</h2>
             <small>{visible.length} records</small>
           </div>
-          <label>
+          <label className="mp-label">
             <Search />
-            <input
+            <input className="mp-control"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search name, email or mobile"
@@ -234,21 +234,21 @@ export function PartnerCustomersContent() {
             <h2>Add Customer</h2>
             <p>Create a customer assigned to your partner account.</p>
             <form onSubmit={create}>
-              <label>
+              <label className="mp-label">
                 Customer name
-                <input name="name" minLength={2} required />
+                <input className="mp-control" name="name" minLength={2} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Mobile number
-                <input name="contact" inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
+                <span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input className="mp-control" name="contact" inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span>
               </label>
-              <label>
+              <label className="mp-label">
                 Email address
-                <input name="email" type="email" />
+                <input className="mp-control" name="email" type="email" />
               </label>
-              <label>
+              <label className="mp-label">
                 Address
-                <textarea name="address" rows={3} />
+                <textarea className="mp-control" name="address" rows={3} />
               </label>
               <div>
                 <button type="button" onClick={() => setOpen(false)}>

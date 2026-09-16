@@ -94,3 +94,7 @@ html[data-theme="dark"] body { background: #071424; color: #f1f5f9; }
 html[data-theme="dark"] .page-shell { background: radial-gradient(circle at top left,rgba(124,58,237,.15),transparent 34rem),#071424; }
 html[data-theme="dark"] .hero { border-color:#26364b; background:#111c2e; box-shadow:0 1.5rem 4rem rgba(0,0,0,.24); }
 html[data-theme="dark"] .description { color:#94a3b8; }
+
+.uppercase{
+  text-transform: capitalize !important;
+}

@@ -55,8 +55,8 @@ export default function AdminLoginPage() {
         <h2>Welcome back</h2>
         <p className="login-copy">Sign in to continue to your operations workspace.</p>
         <form onSubmit={submit}>
-          <label>Email address<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required /></label>
-          <label>Password<div className="password-field"><input type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required minLength={8}/><button type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "Hide" : "Show"}</button></div></label>
+          <label className="mp-label">Email address<input className="mp-control" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="username" required /></label>
+          <label className="mp-label">Password<div className="password-field"><input className="mp-control" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required minLength={8}/><button type="button" onClick={() => setShowPassword(!showPassword)}>{showPassword ? "Hide" : "Show"}</button></div></label>
           {error && <p className="form-error" role="alert">{error}</p>}
           <button className="primary-button login-submit" disabled={loading}>{loading ? "Signing in…" : "Sign in securely"}</button>
         </form>

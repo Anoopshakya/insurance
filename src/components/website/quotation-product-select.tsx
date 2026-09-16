@@ -12,8 +12,8 @@ export function QuotationProductSelect({id,value,onChange,disabled}:{id:string;v
  useEffect(()=>{if(!open)return;const close=(event:PointerEvent)=>{if(!root.current?.contains(event.target as Node))setOpen(false);};document.addEventListener('pointerdown',close);return()=>document.removeEventListener('pointerdown',close);},[open]);
  useEffect(()=>{if(open)document.getElementById(id+'-option-'+active)?.scrollIntoView({block:'nearest'});},[open,active,id]);
  return <div ref={root} className="quotation-product-select" onBlur={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node))setOpen(false);}}>
- <span id={id+'-label'} className="quotation-product-label">Product</span>
- <button ref={trigger} id={id} type="button" role="combobox" data-value={value} aria-label="Select product" aria-haspopup="listbox" aria-expanded={open} aria-controls={id+'-options'} aria-activedescendant={open?id+'-option-'+active:undefined} disabled={disabled} onClick={()=>open?setOpen(false):show()} onKeyDown={event=>{
+ <span id={id+'-label'} className="quotation-product-label mp-label">Product</span>
+ <button className="mp-control mp-combobox" ref={trigger} id={id} type="button" role="combobox" data-value={value} aria-label="Select product" aria-haspopup="listbox" aria-expanded={open} aria-controls={id+'-options'} aria-activedescendant={open?id+'-option-'+active:undefined} disabled={disabled} onClick={()=>open?setOpen(false):show()} onKeyDown={event=>{
   if(event.key==='Escape'&&open){event.preventDefault();event.stopPropagation();setOpen(false);return;}
   if(['ArrowDown','ArrowUp','Home','End'].includes(event.key)){event.preventDefault();if(!open){show();return;}setActive(index=>event.key==='Home'?0:event.key==='End'?products.length-1:(index+(event.key==='ArrowDown'?1:-1)+products.length)%products.length);}
   else if((event.key==='Enter'||event.key===' ')&&open){event.preventDefault();choose(active);}

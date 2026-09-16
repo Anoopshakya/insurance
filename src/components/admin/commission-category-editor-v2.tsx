@@ -30,9 +30,11 @@ export function CommissionCategoryEditorV2({ categoryId }: { categoryId?: string
   const [picker, setPicker] = useState<Tier | null>(null);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loaded,setLoaded]=useState(false);
   const [help, setHelp] = useState(false);
 
   useEffect(() => {
+    setLoaded(false);
     api(`/api/admin/commissions/categories/mapping${categoryId ? `?id=${categoryId}` : ""}`).then(async (response) => {
       const body = await response.json();
       if (!response.ok) return setError(body.error);
@@ -47,7 +49,8 @@ export function CommissionCategoryEditorV2({ categoryId }: { categoryId?: string
         const forTier = (tier: Tier) => body.mappings.filter((item: { commission_tier: string }) => item.commission_tier === tier).map((item: { insurer_id: string }) => item.insurer_id);
         setMapping({ high: forTier("high"), average: forTier("average"), low: forTier("low") });
       }
-    });
+      setLoaded(true);
+    }).catch(()=>setError("Unable to load category. Refresh and try again."));
   }, [categoryId]);
 
   const availableTypes = useMemo(() => types.filter((item) => item.category_id === sector), [types, sector]);
@@ -57,17 +60,18 @@ export function CommissionCategoryEditorV2({ categoryId }: { categoryId?: string
     if (!name.trim()) return setError("Enter a commission category name");
     if (!sector || !type) return setError("Select a sector and product type");
     if (!assigned.size) return setError("Add at least one company");
-    setSaving(true);
-    const response = await api("/api/admin/commissions/categories/mapping", {
+    setSaving(true);setError("");
+    try{const response = await api("/api/admin/commissions/categories/mapping", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ name, categoryId: sector, productTypeId: type, ...mapping }),
+      body: JSON.stringify({ id: categoryId, name, categoryId: sector, productTypeId: type, ...mapping }),
     });
     const body = await response.json();
     setSaving(false);
     if (!response.ok) return setError(body.error);
     router.push("/admin/commissions/categories");
     router.refresh();
+    }catch{setError("Unable to save category. Please try again.")}finally{setSaving(false)}
   }
 
   return <div className="commission-editor">
@@ -75,9 +79,9 @@ export function CommissionCategoryEditorV2({ categoryId }: { categoryId?: string
     {help && <div className="commission-help">Give the category a recognisable name, select its sector and type, assign every provider to one tier, then save.</div>}
     {error && <p className="form-error">{error}</p>}
     <section className="commission-selector named">
-      <label>Category Name *<input value={name} onChange={(event) => setName(event.target.value)} placeholder="e.g. Motor Private Car Standard" /></label>
-      <label>Select Sector *<select value={sector} onChange={(event) => { setSector(event.target.value); setType(""); }}><option value="">Select sector</option>{sectors.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-      <label>Select Type *<select value={type} disabled={!sector} onChange={(event) => setType(event.target.value)}><option value="">Select type</option>{availableTypes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+      <label className="mp-label">Category Name *<input className="mp-control" value={name} onChange={(event) => setName(event.target.value)} placeholder="e.g. Motor Private Car Standard" /></label>
+      <label className="mp-label">Select Sector *<select className="mp-control" value={sector} onChange={(event) => { setSector(event.target.value); setType(""); }}><option value="">Select sector</option>{sectors.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
+      <label className="mp-label">Select Type *<select className="mp-control" value={type} disabled={!sector} onChange={(event) => setType(event.target.value)}><option value="">Select type</option>{availableTypes.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       <button className="secondary-button" onClick={() => { setName(""); setSector(""); setType(""); setMapping({ high: [], average: [], low: [] }); }}>↻ Reset</button>
     </section>
     <section className="commission-tier-grid">{(Object.keys(tierInfo) as Tier[]).map((tier) => {
@@ -85,7 +89,7 @@ export function CommissionCategoryEditorV2({ categoryId }: { categoryId?: string
       return <article className={`commission-tier ${tier}`} key={tier}><header><b>{tierInfo[tier][2]}</b><div><h2>{tierInfo[tier][0]}</h2><span>{items.length} Companies</span></div></header><p>{tierInfo[tier][1]}</p><div className="tier-company-list">{items.map((item, index) => <div key={item.id}><i>{index + 1}.</i>{item.logo_url ? <img src={item.logo_url} alt="" /> : <b>{item.name.slice(0, 2)}</b>}<strong>{item.name}</strong><button onClick={() => setMapping((current) => ({ ...current, [tier]: current[tier].filter((id) => id !== item.id) }))}>×</button></div>)}{!items.length && <small>No companies added yet.</small>}</div><button className="tier-add" disabled={!type} onClick={() => setPicker(tier)}>＋ Add Company</button></article>;
     })}</section>
     <div className="commission-info">ⓘ These categories will be selectable while creating dedicated partner commission slabs.</div>
-    <footer><Link className="secondary-button" href="/admin/commissions/categories">Back to List</Link><button className="primary-button" disabled={saving} onClick={save}>{saving ? "Saving…" : "Save Category Mapping"}</button></footer>
+    <footer><Link className="secondary-button" href="/admin/commissions/categories">Back to List</Link><button className="primary-button" disabled={saving||!loaded} onClick={save}>{saving ? "Saving…" : "Save Category Mapping"}</button></footer>
     {picker && <div className="company-picker" onMouseDown={() => setPicker(null)}><section onMouseDown={(event) => event.stopPropagation()}><header><h2>Add Company to {tierInfo[picker][0]}</h2><button onClick={() => setPicker(null)}>×</button></header><div>{companies.filter((company) => !assigned.has(company.id)).map((company) => <button key={company.id} onClick={() => { setMapping((current) => ({ ...current, [picker]: [...current[picker], company.id] })); setPicker(null); }}>{company.logo_url ? <img src={company.logo_url} alt="" /> : <b>{company.name.slice(0, 2)}</b>}<span>{company.name}</span><em>＋</em></button>)}</div></section></div>}
   </div>;
 }

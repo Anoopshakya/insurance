@@ -19,7 +19,7 @@ const navigation: Array<{ label?: string; items: NavItem[] }> = [
       { label: "Customers", href: "/admin/customers", icon: "users" },
       { label: "Partners / Agents", href: "/admin/partners", icon: "partners" },
       { label: "Policies", href: "/admin/policies", icon: "policies" },
-      { label: "Products & Quotes", href: "/admin/products", icon: "products" },
+      { label: "Products", href: "/admin/products", icon: "products" },
       {
         label: "Renewals",
         href: "/admin/renewals",
@@ -104,16 +104,21 @@ export function AdminShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
     let requestId = 0;
+    let verifiedUser: string | null = null;
+    let verifiedToken: string | null = null;
     setAuthReady(false);
     setAuthError(null);
 
     const unsubscribe = subscribeSession(async (session) => {
+      if (session && session.user.id === verifiedUser && session.access_token === verifiedToken) return;
       const currentRequest = ++requestId;
+      const backgroundCheck = !!session && session.user.id === verifiedUser;
       const isCurrent = () => active && currentRequest === requestId;
-      setAuthReady(false);
+      if (!backgroundCheck) setAuthReady(false);
       setAuthError(null);
 
       if (!session) {
+        verifiedUser = null; verifiedToken = null;
         if (pathname !== "/admin/login") window.location.replace("/admin/login");
         return;
       }
@@ -127,18 +132,20 @@ export function AdminShell({ children }: { children: ReactNode }) {
         });
         if (!isCurrent()) return;
         if (access.status === 401 || access.status === 403) {
+          verifiedUser = null; verifiedToken = null; setAuthReady(false);
           if (pathname !== "/admin/login") window.location.replace("/admin/login");
           return;
         }
         if (!access.ok) {
-          setAuthError("Unable to verify admin access right now. Please try again.");
+          if (!backgroundCheck) setAuthError("Unable to verify admin access right now. Please try again.");
           return;
         }
+        verifiedUser = session.user.id; verifiedToken = session.access_token;
         setAuthReady(true);
         if (pathname === "/admin/login") window.location.replace("/admin");
       } catch {
         if (!isCurrent()) return;
-        setAuthError("Unable to connect. Check your connection and try again.");
+        if (!backgroundCheck) setAuthError("Unable to connect. Check your connection and try again.");
       }
     }, () => setAuthError("Unable to load your session. Please try again."));
 

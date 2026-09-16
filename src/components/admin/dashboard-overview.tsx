@@ -150,7 +150,7 @@ export function DashboardOverview() {
             <article className="panel dashboard-chart">
               <header>
                 <h2>Business Overview</h2>
-                <select aria-label="Chart period">
+                <select className="mp-control" aria-label="Chart period">
                   <option>This Week</option>
                   <option>This Month</option>
                 </select>

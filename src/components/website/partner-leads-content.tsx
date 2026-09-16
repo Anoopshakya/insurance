@@ -170,18 +170,18 @@ export function PartnerLeadsContent() {
         ))}
       </section>
       <section className="pl-filters">
-        <label>
+        <label className="mp-label">
           <Search />
-          <input
+          <input className="mp-control"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name, mobile number, product..."
           />
         </label>
-        <select>
+        <select className="mp-control">
           <option>All Products</option>
         </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)}>
+        <select className="mp-control" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="all">All Status</option>
           {statuses.map((s) => (
             <option value={s} key={s}>
@@ -189,7 +189,7 @@ export function PartnerLeadsContent() {
             </option>
           ))}
         </select>
-        <select className="pl-assigned-filter">
+        <select className="pl-assigned-filter mp-control">
           <option>My Leads</option>
         </select>
         <button className="pl-date">
@@ -264,7 +264,7 @@ export function PartnerLeadsContent() {
               </span>
               <span>
                 <select
-                  className={`pl-status ${row.status}`}
+                  className={(`pl-status ${row.status}`) + " mp-control"}
                   value={row.status}
                   onClick={(event) => event.stopPropagation()}
                   onChange={(e) => update(row.id, e.target.value)}

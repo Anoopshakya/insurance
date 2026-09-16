@@ -17,10 +17,10 @@ export async function GET(request: NextRequest) {
     db.from("customers").select("id,name,contact,email").order("name"),
     db.from("agents").select("id,agent_code,users:users!agents_user_id_fkey(full_name)").in("status", ["approved", "active"]).order("agent_code"),
     db.from("categories").select("id,name").eq("active", true).order("sort_order").order("name"),
-    db.from("products").select("id,name,category_id,category:categories!category_id(id,name)").order("name"),
+    db.from("products").select("id,name,category_id,insurer_id,product_type_id,category:categories!category_id(id,name)").or("catalog_managed.eq.false,publication_status.eq.published").order("name"),
     db.from("product_types").select("id,name,category_id").eq("active", true).order("sort_order").order("name"),
     db.from("insurers").select("id,name").eq("active", true).order("name"),
-    db.from("plans").select("id,name,product_id,insurer_id").order("name"),
+    db.from("plans").select("id,name,product_id,insurer_id").eq("catalog_active",true).order("name"),
   ]);
   const error = policyResult.error || customerResult.error || agentResult.error || sectorResult.error || productResult.error || typeResult.error || insurerResult.error || planResult.error;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
@@ -62,8 +62,8 @@ export async function POST(request: NextRequest) {
     const { data: productType } = await db.from("product_types").select("id,category_id").eq("id", input.productTypeId).eq("active", true).maybeSingle();
     if (!productType || productType.category_id !== input.sectorId) return NextResponse.json({ error: "The selected product type does not belong to the product sector." }, { status: 400 });
     if (input.productId) {
-      const { data: product } = await db.from("products").select("id,category_id").eq("id", input.productId).maybeSingle();
-      if (!product || product.category_id !== input.sectorId) return NextResponse.json({ error: "The selected product does not belong to the product sector." }, { status: 400 });
+      const { data: product } = await db.from("products").select("id,category_id,product_type_id,insurer_id,catalog_managed,publication_status").eq("id", input.productId).maybeSingle();
+      if (!product || product.category_id !== input.sectorId || (product.product_type_id && product.product_type_id !== input.productTypeId) || (product.insurer_id && product.insurer_id !== input.insurerId) || (product.catalog_managed && product.publication_status !== "published")) return NextResponse.json({ error: "The selected product does not belong to the product sector." }, { status: 400 });
     }
     if (input.planId) {
       if (!input.productId) return NextResponse.json({ error: "Select a product before selecting a plan." }, { status: 400 });

@@ -27,8 +27,8 @@ export default function ResetPassword() {
     {!ready && !error && <p>Checking your recovery link...</p>}
     {error && <p role="alert">{error}</p>}
     {ready && !done && <form onSubmit={submit}>
-      <label>New password<input name="password" type="password" autoComplete="new-password" minLength={12} required /></label>
-      <label>Confirm password<input name="confirmPassword" type="password" autoComplete="new-password" minLength={12} required /></label>
+      <label className="mp-label">New password<input className="mp-control" name="password" type="password" autoComplete="new-password" minLength={12} required /></label>
+      <label className="mp-label">Confirm password<input className="mp-control" name="confirmPassword" type="password" autoComplete="new-password" minLength={12} required /></label>
       <button disabled={busy}>{busy ? "Updating..." : "Save password"}</button>
     </form>}
     <p><Link href="/admin/login">Admin sign in</Link> ? <Link href="/partner/login">Partner sign in</Link> ? <Link href="/customer/login">Customer sign in</Link></p>

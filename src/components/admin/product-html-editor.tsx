@@ -1,0 +1,12 @@
+"use client";
+import dynamic from "next/dynamic";
+import {useState} from "react";
+import {safeProductHtml} from "@/lib/product-html";
+import "suneditor/dist/css/suneditor.min.css";
+import {align,font,fontSize,fontColor,hiliteColor,horizontalRule,list,table,formatBlock,lineHeight,textStyle,link,image} from "suneditor/src/plugins";
+const SunEditor=dynamic(()=>import("suneditor-react"),{ssr:false});
+const options={plugins:[align,font,fontSize,fontColor,hiliteColor,horizontalRule,list,table,formatBlock,lineHeight,textStyle,link,image],height:'560px',minHeight:'350px',buttonList:[['undo','redo'],['font','fontSize','formatBlock'],['bold','underline','italic','strike','subscript','superscript'],['fontColor','hiliteColor','textStyle'],['removeFormat'],['outdent','indent','align','horizontalRule','list','lineHeight'],['table','link','image'],['fullScreen','showBlocks']],imageFileInput:false,imageUrlInput:true,defaultStyle:'font-family: Arial; font-size: 16px;',stickyToolbar:0};
+export function ProductHtmlEditor({value,onChange,disabled=false}:{value:string;onChange:(html:string)=>void;disabled?:boolean}){
+ const [mode,setMode]=useState<'visual'|'source'|'preview'>('visual');
+ return <section className="product-page-editor"><h2>Product page content</h2><div className="product-html-toolbar" role="group" aria-label="Editor mode">{(['visual','source','preview'] as const).map(tab=><button type="button" disabled={disabled} key={tab} aria-pressed={mode===tab} onClick={()=>{if(mode==='source'&&tab==='visual')onChange(safeProductHtml(value));setMode(tab)}}>{tab==='visual'?'Visual editor':tab==='source'?'HTML source':'Page preview'}</button>)}</div>{mode==='visual'?<SunEditor defaultValue={safeProductHtml(value)} disable={disabled} setAllPlugins={false} setOptions={options} onChange={onChange} onBlur={(_,html)=>onChange(html)} onPaste={(_,html)=>safeProductHtml(html)}/>:mode==='source'?<textarea aria-label="Product page HTML source" className="mp-control product-html-source" style={{minHeight:560}} disabled={disabled} value={value} maxLength={200000} onChange={e=>onChange(e.target.value)} spellCheck={false}/>:<div className="product-rich-content sun-editor-editable" dangerouslySetInnerHTML={{__html:safeProductHtml(value)}}/>}<p>Design the whole page here, or paste HTML in HTML source. Use image URLs to add pictures. Scripts, forms, embedded frames and unsafe styles are removed when saving.</p></section>;
+}

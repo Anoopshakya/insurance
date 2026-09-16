@@ -61,13 +61,13 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
           <fieldset hidden={step !== 1} disabled={loading || readOnly || step !== 1}>
             <legend>Personal information</legend>
             <div className="profile-form-grid">
-              <label>
+              <label className="mp-label">
                 Date of birth
-                <input name="dateOfBirth" defaultValue={values.dateOfBirth || ""} type="date" required />
+                <input className="mp-control" name="dateOfBirth" defaultValue={values.dateOfBirth || ""} type="date" required />
               </label>
-              <label>
+              <label className="mp-label">
                 Gender
-                <select name="gender" defaultValue={values.gender || ""} required>
+                <select className="mp-control" name="gender" defaultValue={values.gender || ""} required>
                   <option value="" disabled>
                     Select
                   </option>
@@ -77,31 +77,31 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
                   <option value="prefer_not_to_say">Prefer not to say</option>
                 </select>
               </label>
-              <label>
+              <label className="mp-label">
                 Father / spouse name
-                <input name="fatherOrSpouseName" defaultValue={values.fatherOrSpouseName || ""} required />
+                <input className="mp-control" name="fatherOrSpouseName" defaultValue={values.fatherOrSpouseName || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Occupation
-                <input name="occupation" defaultValue={values.occupation || ""} required />
+                <input className="mp-control" name="occupation" defaultValue={values.occupation || ""} required />
               </label>
-              <label className="wide">
-                Address line 1<input name="addressLine1" defaultValue={values.addressLine1 || ""} required />
+              <label className="wide mp-label">
+                Address line 1<input className="mp-control" name="addressLine1" defaultValue={values.addressLine1 || ""} required />
               </label>
-              <label className="wide">
-                Address line 2<input name="addressLine2" defaultValue={values.addressLine2 || ""} />
+              <label className="wide mp-label">
+                Address line 2<input className="mp-control" name="addressLine2" defaultValue={values.addressLine2 || ""} />
               </label>
-              <label>
+              <label className="mp-label">
                 City
-                <input name="city" defaultValue={values.city || ""} required />
+                <input className="mp-control" name="city" defaultValue={values.city || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 State
-                <input name="state" defaultValue={values.state || ""} required />
+                <input className="mp-control" name="state" defaultValue={values.state || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 PIN code
-                <input
+                <input className="mp-control"
                   name="postalCode" defaultValue={values.postalCode || ""}
                   inputMode="numeric"
                   maxLength={6}
@@ -113,9 +113,9 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
           <fieldset hidden={step !== 2} disabled={loading || readOnly || step !== 2}>
             <legend>Identity information</legend>
             <div className="profile-form-grid">
-              <label>
+              <label className="mp-label">
                 PAN number
-                <input
+                <input className="mp-control"
                   name="panNumber" defaultValue={values.panNumber || ""}
                   maxLength={10}
                   autoCapitalize="characters"
@@ -123,9 +123,9 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
                   required
                 />
               </label>
-              <label>
+              <label className="mp-label">
                 Aadhaar number
-                <input
+                <input className="mp-control"
                   name="aadhaarNumber" defaultValue={values.aadhaarNumber || ""}
                   inputMode="numeric"
                   maxLength={14}
@@ -134,9 +134,9 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
                 />
                 <small>Only the last four digits are retained. {identitySaved && `Saved Aadhaar ending ${aadhaarLast4}. Leave identity fields unchanged to reuse saved documents.`}</small>
               </label>
-              <label>
+              <label className="mp-label">
                 PAN card document
-                <input
+                <input className="mp-control"
                   name="panDocument"
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
@@ -144,9 +144,9 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
                 />
                 <small>PDF, JPG or PNG · 5 MB maximum</small>
               </label>
-              <label>
+              <label className="mp-label">
                 Aadhaar card document
-                <input
+                <input className="mp-control"
                   name="aadhaarDocument"
                   type="file"
                   accept="image/jpeg,image/png,application/pdf"
@@ -159,40 +159,40 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
           <fieldset hidden={step !== 3} disabled={loading || readOnly || step !== 3}>
             <legend>Bank account</legend>
             <div className="profile-form-grid">
-              <label>
+              <label className="mp-label">
                 Account holder
-                <input name="accountHolder" defaultValue={values.accountHolder || ""} required />
+                <input className="mp-control" name="accountHolder" defaultValue={values.accountHolder || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Bank name
-                <input name="bankName" defaultValue={values.bankName || ""} required />
+                <input className="mp-control" name="bankName" defaultValue={values.bankName || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Branch name
-                <input name="branchName" defaultValue={values.branchName || ""} required />
+                <input className="mp-control" name="branchName" defaultValue={values.branchName || ""} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Account type
-                <select name="accountType" defaultValue={values.accountType || ""}>
+                <select className="mp-control" name="accountType" defaultValue={values.accountType || ""}>
                   <option value="savings">Savings</option>
                   <option value="current">Current</option>
                 </select>
               </label>
-              <label>
+              <label className="mp-label">
                 Account number
-                <input name="accountNumber" defaultValue={values.accountNumber || ""} inputMode="numeric" required />
+                <input className="mp-control" name="accountNumber" defaultValue={values.accountNumber || ""} inputMode="numeric" required />
               </label>
-              <label>
+              <label className="mp-label">
                 Confirm account number
-                <input
+                <input className="mp-control"
                   name="confirmAccountNumber" defaultValue={values.confirmAccountNumber || ""}
                   inputMode="numeric"
                   required
                 />
               </label>
-              <label>
+              <label className="mp-label">
                 IFSC code
-                <input
+                <input className="mp-control"
                   name="ifsc" defaultValue={values.ifsc || ""}
                   maxLength={11}
                   autoCapitalize="characters"
@@ -206,7 +206,7 @@ export function PartnerProfileForm({ onComplete }: { onComplete: () => void }) {
       {error && <p className="partner-error" role="alert">{error}</p>}
       <div className="profile-actions">
         <button type="button" className="profile-skip" disabled={loading || step === 1} onClick={() => { setError(""); setStep(step - 1); }}>Back</button>
-        {readOnly ? step < 3 && <button type="button" onClick={() => setStep(step + 1)}>Next</button> : <button type="submit" disabled={loading}>{loading ? "Saving..." : step === 3 ? "Save and complete profile" : "Save and next"}</button>}
+        {readOnly ? step < 3 && <button type="button" onClick={() => setStep(step + 1)}>Next</button> : <button className="mp-form-action" type="submit" disabled={loading}>{loading ? "Saving..." : step === 3 ? "Save and complete profile" : "Save and next"}</button>}
       </div>
     </form>
   </section>;

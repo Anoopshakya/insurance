@@ -93,9 +93,9 @@ export function WebsiteHeader() {
               </Link>
             ))}
           </nav>
-          <label className="ml-8 hidden h-[60px] w-[300px] items-center rounded-[10px] border border-[var(--appearance-border,#c8bdf8)] bg-[var(--appearance-surface,#fff)] px-[21px] shadow-[0_2px_8px_rgba(83,52,180,.06)] transition-colors focus-within:border-[#6634f1] xl:flex 2xl:ml-[50px]">
+          <label className="ml-8 hidden h-[60px] w-[300px] items-center rounded-[10px] border border-[var(--appearance-border,#c8bdf8)] bg-[var(--appearance-surface,#fff)] px-[21px] shadow-[0_2px_8px_rgba(83,52,180,.06)] transition-colors focus-within:border-[#6634f1] xl:flex 2xl:ml-[50px] mp-label">
             <input
-              className="min-w-0 flex-1 border-0 bg-transparent text-[14px] font-normal text-[var(--appearance-muted,#536083)] outline-none placeholder:text-[var(--appearance-muted,#697390)] max-2xl:text-[15px]"
+              className="min-w-0 flex-1 border-0 bg-transparent text-[14px] font-normal text-[var(--appearance-muted,#536083)] outline-none placeholder:text-[var(--appearance-muted,#697390)] max-2xl:text-[15px] mp-control"
               placeholder="Search policies, plans, insurers..."
             />
             <Search className="h-[25px] w-[25px] text-[var(--appearance-text,#24305f)]" />
@@ -105,7 +105,7 @@ export function WebsiteHeader() {
               className="hidden h-[40px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-[var(--appearance-surface-raised,#f5f3ff)] px-6 text-sm font-semibold text-[var(--appearance-text,#5527df)] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
             href="/customer/login"
             >
-              Login / Register
+              Customer Login
             </Link>
             <Link
               className="hidden h-[40px] min-w-[172px] place-items-center rounded-[10px] bg-gradient-to-r from-[#4319df] via-[#c018b8] to-[#ff641e] px-5 text-sm font-semibold text-white xl:grid 2xl:min-w-[193px] 2xl:px-7 2xl:text-[16px]"

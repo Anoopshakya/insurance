@@ -7,7 +7,7 @@ import { articles } from "./website-articles";
 
 export function InformationPage({ page, article = false }: { page: PageContent; article?: boolean }) {
   return <div className="public-site editorial-page"><main className="public-inner">
-    <nav className="editorial-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span aria-hidden="true">/</span>{article && <><Link href="/blog">Guides</Link><span aria-hidden="true">/</span></>}<span aria-current="page">{page.eyebrow}</span></nav>
+    
     <header className="public-page-hero"><span>{page.eyebrow}</span><h1>{page.title}</h1><p>{page.intro}</p></header>
     <div className="editorial-grid"><div className="editorial-sections">
       {page.slug === "blog" && <div className="editorial-card-grid">{articles.map(item => <article key={item.slug}><span className="editorial-product-tag">{item.eyebrow}</span><h2>{item.title}</h2><p>{item.intro}</p><Link href={"/blog/" + item.slug}>Read guide &rarr;</Link></article>)}</div>}

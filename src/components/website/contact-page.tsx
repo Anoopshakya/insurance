@@ -40,14 +40,14 @@ export function ContactPage() {
    <div className="contact-card-heading"><span className="contact-icon purple"><Mail /></span><div><h2 id="message-title">Send us a Message</h2><p>Fill in the details and we&apos;ll get back to you shortly.</p></div></div>
    <form onSubmit={submit} noValidate aria-busy={busy}>
     <div className="contact-fields">
-     <label>Full Name <b>*</b><input name="name" autoComplete="name" placeholder="Enter your full name" required maxLength={100} /></label>
-     <label>Mobile Number <b>*</b><span className="contact-input-icon"><Phone size={18} aria-hidden="true" /><input name="mobile" type="tel" autoComplete="tel" placeholder="10-digit mobile number" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span></label>
-     <label>Email Address <b>*</b><span className="contact-input-icon"><Mail size={18} aria-hidden="true" /><input name="email" type="email" autoComplete="email" placeholder="you@example.com" required maxLength={254} /></span></label>
-     <label>State<select aria-label="State" name="state" autoComplete="address-level1" defaultValue=""><option value="">Select your state</option>{contactStates.map(state => <option key={state}>{state}</option>)}</select></label>
-     <label className="contact-message">Your Message <b>*</b><textarea name="message" placeholder="Type your message here..." required minLength={10} maxLength={4000} rows={6} /></label>
+     <label className="mp-label">Full Name <b>*</b><input className="mp-control" name="name" autoComplete="name" placeholder="Enter your full name" required maxLength={100} /></label>
+     <label className="mp-label">Mobile Number <b>*</b><span className="contact-input-icon mp-input-group"><Phone size={18} aria-hidden="true" /><input className="mp-control" name="mobile" type="tel" autoComplete="tel" placeholder="10-digit mobile number" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span></label>
+     <label className="mp-label">Email Address <b>*</b><span className="contact-input-icon mp-input-group"><Mail size={18} aria-hidden="true" /><input className="mp-control" name="email" type="email" autoComplete="email" placeholder="you@example.com" required maxLength={254} /></span></label>
+     <label className="mp-label">State<select className="mp-control" aria-label="State" name="state" autoComplete="address-level1" defaultValue=""><option value="">Select your state</option>{contactStates.map(state => <option key={state}>{state}</option>)}</select></label>
+     <label className="contact-message mp-label">Your Message <b>*</b><textarea className="mp-control" name="message" placeholder="Type your message here..." required minLength={10} maxLength={4000} rows={6} /></label>
     </div>
-    <input name="website" className="contact-honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" />
-    <div className="contact-form-bottom"><label className="contact-consent"><input name="consent" type="checkbox" required /><span>I agree to be contacted by MagikPolicy for my query.</span></label><button type="submit" disabled={busy}><Send size={20} aria-hidden="true" />{busy ? "Sending..." : "Send Message"}</button></div>
+    <input name="website" className="contact-honeypot mp-control" tabIndex={-1} autoComplete="off" aria-hidden="true" />
+    <div className="contact-form-bottom"><label className="contact-consent mp-label"><input className="mp-check" name="consent" type="checkbox" required /><span>I agree to be contacted by MagikPolicy for my query.</span></label><button className="mp-form-action" type="submit" disabled={busy}><Send size={20} aria-hidden="true" />{busy ? "Sending..." : "Send Message"}</button></div>
     {error && <p className="contact-error" role="alert">{error}</p>}
     {sent && <p className="contact-success" role="status"><CheckCircle2 size={20} aria-hidden="true" />Thank you! Your message has been received. Our team will get in touch.</p>}
    </form>

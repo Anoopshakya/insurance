@@ -137,7 +137,7 @@ export function LeadsDirectory() {
               </button>
             ))}
           </div>
-          <div className="directory-search lead-search"><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, mobile or product…" /></div>
+          <div className="directory-search lead-search"><input className="mp-control" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search by name, mobile or product…" /></div>
         </div>
         <div className="directory-table-wrap">
           <table className="directory-table lead-table">
@@ -150,7 +150,7 @@ export function LeadsDirectory() {
                   <td><strong className="lead-product">{products.find(product => product.type === lead.product_type)?.name || lead.product_type || "General enquiry"}</strong>{lead.selections && <small className="lead-options">{Object.values(lead.selections).join(" · ")}</small>}</td>
                   <td>{agentName(lead.agent)}</td>
                   <td>{new Date(lead.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}</td>
-                  <td><select className={`lead-status ${lead.status}`} value={lead.status} onChange={(event) => changeStatus(lead, event.target.value)}>
+                  <td><select className={(`lead-status ${lead.status}`) + " mp-control"} value={lead.status} onChange={(event) => changeStatus(lead, event.target.value)}>
                     <option value="new">New</option><option value="contacted">Contacted</option>
                     {lead.leadType === "internal" && <><option value="qualified">Qualified</option><option value="proposal">Proposal</option></>}
                     <option value="converted">Converted</option><option value={lead.leadType === "website" ? "closed" : "lost"}>{lead.leadType === "website" ? "Closed" : "Lost"}</option>
@@ -165,10 +165,10 @@ export function LeadsDirectory() {
       {createOpen && <div className="directory-modal" onMouseDown={() => setCreateOpen(false)}><section onMouseDown={(event) => event.stopPropagation()}>
         <button className="modal-close" onClick={() => setCreateOpen(false)}>×</button><h2>Create Lead</h2><p>Create an internal lead and assign it to a partner or agent for follow-up.</p>
         <form className="lead-create-form" onSubmit={createLead}>
-          <label>Customer name<input name="name" required minLength={2} /></label>
-          <label>Mobile number<input name="contact" required inputMode="numeric"  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></label>
-          <label>Assign partner / agent<select name="agentId" required defaultValue=""><option value="" disabled>Select partner / agent</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agentName(agent)}</option>)}</select></label>
-          <label>Priority<select name="priority" defaultValue="medium"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+          <label className="mp-label">Customer name<input className="mp-control" name="name" required minLength={2} /></label>
+          <label className="mp-label">Mobile number<span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input className="mp-control" name="contact" required inputMode="numeric"  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span></label>
+          <label className="mp-label">Assign partner / agent<select className="mp-control" name="agentId" required defaultValue=""><option value="" disabled>Select partner / agent</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agentName(agent)}</option>)}</select></label>
+          <label className="mp-label">Priority<select className="mp-control" name="priority" defaultValue="medium"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
           <div className="modal-buttons"><button type="button" className="secondary-button" onClick={() => setCreateOpen(false)}>Cancel</button><button className="primary-button" disabled={saving}>{saving ? "Creating…" : "Create Lead"}</button></div>
         </form>
       </section></div>}

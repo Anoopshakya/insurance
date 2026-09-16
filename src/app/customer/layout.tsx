@@ -1,3 +1,4 @@
+export {privateMetadata as metadata} from "@/lib/seo";
 import type { ReactNode } from "react";
 import { PortalRouteGuard } from "@/components/auth/portal-route-guard";
 import "./customer.css";

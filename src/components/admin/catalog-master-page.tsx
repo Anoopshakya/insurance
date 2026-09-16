@@ -176,7 +176,7 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
       </section>
       <section className="panel master-table-card">
         <div className="master-toolbar">
-          <input
+          <input className="mp-control"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={`Search ${meta.title.toLowerCase()}…`}
@@ -282,9 +282,9 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
                 ×
               </button>
             </header>
-            <label>
+            <label className="mp-label">
               Name *
-              <input
+              <input className="mp-control"
                 name="name"
                 required
                 minLength={2}
@@ -294,18 +294,18 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
             </label>
             {kind === "sectors" && (
               <>
-                <label>
+                <label className="mp-label">
                   Icon / Emoji
-                  <input
+                  <input className="mp-control"
                     name="icon"
                     maxLength={20}
                     defaultValue={editing?.icon || ""}
                     placeholder="e.g. ♡ or 🚗"
                   />
                 </label>
-                <label>
+                <label className="mp-label">
                   Display order
-                  <input
+                  <input className="mp-control"
                     name="sortOrder"
                     type="number"
                     min={0}
@@ -316,9 +316,9 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
             )}
             {kind === "types" && (
               <>
-                <label>
+                <label className="mp-label">
                   Product sector *
-                  <select
+                  <select className="mp-control"
                     name="categoryId"
                     required
                     defaultValue={editing?.category_id || ""}
@@ -333,9 +333,9 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
                     ))}
                   </select>
                 </label>
-                <label>
+                <label className="mp-label">
                   Display order
-                  <input
+                  <input className="mp-control"
                     name="sortOrder"
                     type="number"
                     min={0}
@@ -351,27 +351,27 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
                   name="existingLogo"
                   value={editing?.logo_url || ""}
                 />
-                <label>
+                <label className="mp-label">
                   Company logo
-                  <input
+                  <input className="mp-control"
                     name="logo"
                     type="file"
                     accept="image/png,image/jpeg,image/webp,image/svg+xml"
                   />
                   <small>PNG, JPG, WEBP or SVG · Maximum 2 MB</small>
                 </label>
-                <label>
+                <label className="mp-label">
                   Website URL
-                  <input
+                  <input className="mp-control"
                     name="websiteUrl"
                     type="url"
                     defaultValue={editing?.website_url || ""}
                     placeholder="https://provider.com"
                   />
                 </label>
-                <label>
+                <label className="mp-label">
                   API integration
-                  <select
+                  <select className="mp-control"
                     name="apiStatus"
                     defaultValue={editing?.api_status || "not_integrated"}
                   >
@@ -382,16 +382,16 @@ export function CatalogMasterPage({ kind }: { kind: Kind }) {
                 </label>
               </>
             )}
-            <label className="wide">
+            <label className="wide mp-label">
               Description
-              <textarea
+              <textarea className="mp-control"
                 name="description"
                 defaultValue={editing?.description || ""}
                 placeholder="Short description"
               />
             </label>
-            <label className="master-active">
-              <input
+            <label className="master-active mp-label">
+              <input className="mp-check"
                 name="active"
                 type="checkbox"
                 defaultChecked={editing?.active ?? true}

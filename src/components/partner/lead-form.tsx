@@ -15,25 +15,25 @@ return <div role="dialog" aria-modal="true" aria-label={lead?"Edit Lead":"Add Le
             <h2>{lead ? "Edit Lead" : "Add Lead"}</h2>
             <p>Add a customer enquiry to your pipeline.</p>
             {error&&<p role="alert">{error}</p>}<form onSubmit={create}>
-              <label>
+              <label className="mp-label">
                 Customer name
-                <input name="name" defaultValue={lead?.name||customer?.name||""} minLength={2} required />
+                <input className="mp-control" name="name" defaultValue={lead?.name||customer?.name||""} minLength={2} required />
               </label>
-              <label>
+              <label className="mp-label">
                 Mobile number
-                <input name="contact" defaultValue={lead?.contact||customer?.contact||""} inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} />
+                <span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input className="mp-control" name="contact" defaultValue={lead?.contact||customer?.contact||""} inputMode="numeric" required  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span>
               </label>
-              <label>
+              <label className="mp-label">
                 Priority
-                <select name="priority" defaultValue={lead?.priority||"medium"}>
+                <select className="mp-control" name="priority" defaultValue={lead?.priority||"medium"}>
                   <option value="low">Low</option>
                   <option value="medium">Medium</option>
                   <option value="high">High</option>
                 </select>
               </label>
-              <label>
+              <label className="mp-label">
                 Product sector
-                <select
+                <select className="mp-control"
                   name="productSectorId"
                   value={selectedSector}
                   onChange={(event) => setSelectedSector(event.target.value)}
@@ -49,9 +49,9 @@ return <div role="dialog" aria-modal="true" aria-label={lead?"Edit Lead":"Add Le
                   ))}
                 </select>
               </label>
-              <label>
+              <label className="mp-label">
                 Product type
-                <select
+                <select className="mp-control"
                   name="productTypeId"
                   key={selectedSector}
                   defaultValue={lead?.product_type_id||""}
@@ -70,9 +70,9 @@ return <div role="dialog" aria-modal="true" aria-label={lead?"Edit Lead":"Add Le
                     ))}
                 </select>
               </label>
-              <label>
+              <label className="mp-label">
                 When are they planning to buy?
-                <select name="purchaseTimeline" defaultValue={lead?.purchase_timeline||""} required>
+                <select className="mp-control" name="purchaseTimeline" defaultValue={lead?.purchase_timeline||""} required>
                   <option value="" disabled>
                     Select purchase timeline
                   </option>

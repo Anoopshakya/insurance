@@ -1,3 +1,4 @@
+import {seoMetadata} from "@/lib/seo";
 import { LifeInsurancePage } from "@/components/website/life-insurance-page";
 import { MotorInsurancePage } from "@/components/website/motor-insurance-page";
 import { HealthInsurancePage } from "@/components/website/health-insurance-page";
@@ -8,7 +9,7 @@ import { notFound } from "next/navigation";
 import { findProduct, products, quotationPageTypes } from "@/components/website/website-products";
 export const dynamicParams = false;
 export function generateStaticParams() { return products.flatMap(product => [product.slug, ...product.aliases].map(slug => ({ slug }))); }
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> { const product = findProduct((await params).slug); return product ? { title: product.name, description: product.copy } : {}; }
+export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{return seoMetadata("/products/"+(await params).slug);}
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const product = findProduct((await params).slug); if (!product) notFound();
   if (product.type === "life") return <LifeInsurancePage />;
@@ -17,7 +18,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const showQuotation = quotationPageTypes.includes(product.type);
   const enquiryHref = showQuotation ? "#get-quotation" : "/contact";
   return <div className="public-site editorial-page"><main className="public-inner">
-    <nav className="editorial-breadcrumb" aria-label="Breadcrumb"><Link href="/">Home</Link><span>/</span><Link href="/products">Insurance products</Link><span>/</span><span aria-current="page">{product.name}</span></nav>
+    
     <div className={showQuotation ? "product-quotation-layout" : ""}><div>
     <header className="public-page-hero"><span className="editorial-product-tag"><b aria-hidden="true">{product.icon}</b>EXPLORE YOUR COVER</span><h1>{product.name}</h1><p>{product.copy}</p><div className="editorial-links"><a href={enquiryHref}>{showQuotation ? "Get quotation" : "Contact us"} &rarr;</a><Link href="/products">Compare product categories</Link></div></header>
     <div className={showQuotation ? "editorial-grid product-content-grid" : "editorial-grid"}><div className="editorial-sections">

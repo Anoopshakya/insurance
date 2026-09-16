@@ -47,3 +47,9 @@ test("optional quotation email is validated and saved without losing selections"
  const invalid=endpoint();assert.equal((await invalid.api.POST({json:async()=>({...base,email:"invalid"})})).status,400);assert.equal(invalid.saved(),undefined);
  assert.equal(schema.quoteRequestSchema.safeParse({...base,email:""}).success,true);
 });
+
+test("homepage personal accident enquiry saves cover and insured selection",async()=>{
+ const route=endpoint();const selections={accidentFor:"Self",coverage:"25 Lakhs"};
+ const result=await route.api.POST({json:async()=>({...base,productType:"personal-accident",selections})});
+ assert.equal(result.status,201);assert.equal(route.saved().product_type,"personal-accident");assert.equal(route.saved().selections.accidentFor,"Self");assert.equal(route.saved().selections.coverage,"25 Lakhs");assert.equal(route.saved().source,"homepage_quote_widget");
+});

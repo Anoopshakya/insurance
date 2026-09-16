@@ -1,3 +1,4 @@
+import {seoRouteAction} from "@/lib/seo";
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -9,6 +10,13 @@ const publicPortalRoutes = new Set([
 ]);
 
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  if(!/^\/(partner|customer)(\/|$)/.test(pathname)){
+    const action=seoRouteAction(pathname);
+    if(!action)return NextResponse.next();
+    const url=request.nextUrl.clone();url.pathname=action.path;
+    return action.type==="redirect"?NextResponse.redirect(url,308):NextResponse.rewrite(url);
+  }
   let response = NextResponse.next({ request });
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,7 +37,6 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const pathname = request.nextUrl.pathname;
   if (publicPortalRoutes.has(pathname)) return response;
 
   const {
@@ -47,5 +54,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/partner/:path*", "/customer/:path*"],
+  matcher: ["/((?!api|admin|auth|_next|.*\\..*).*)"],
 };

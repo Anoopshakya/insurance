@@ -108,7 +108,7 @@ export function PublicHome() {
             <h2>Talk to an insurance expert</h2>
             <p>Get a free call back from our expert.</p>
             <form onSubmit={callback}>
-              <input
+              <input className="mp-control"
                 required
                 inputMode="numeric"
 

@@ -161,9 +161,9 @@ export function PartnerDashboard({
             width={80}
             height={80}
           />
-          <label className="pd-search">
+          <label className="pd-search mp-label">
             <Search />
-            <input placeholder="Search customers, policies, leads..." />
+            <input className="mp-control" placeholder="Search customers, policies, leads..." />
           </label>
           <div className="pd-top-actions">
             <div className="pd-account" ref={accountRef} onBlur={event => {
