@@ -101,12 +101,12 @@ export function WebsiteHeader() {
             <Search className="h-[25px] w-[25px] text-[var(--appearance-text,#24305f)]" />
           </label>
           <div className="website-nav-actions absolute right-3 flex items-center gap-1 md:gap-2 xl:static xl:ml-4 xl:gap-4 2xl:ml-6 2xl:gap-[22px]">
-            <Link
+            {/* <Link
               className="hidden h-[40px] min-w-[150px] place-items-center rounded-[10px] border-2 border-solid border-[#7447f4] bg-[var(--appearance-surface-raised,#f5f3ff)] px-6 text-sm font-semibold text-[var(--appearance-text,#5527df)] shadow-[0_2px_8px_rgba(83,52,180,.06)] xl:grid 2xl:min-w-[173px] 2xl:text-[16px]"
             href="/customer/login"
             >
               Customer Login
-            </Link>
+            </Link> */}
             <Link
               className="hidden h-[40px] min-w-[172px] place-items-center rounded-[10px] bg-gradient-to-r from-[#4319df] via-[#c018b8] to-[#ff641e] px-5 text-sm font-semibold text-white xl:grid 2xl:min-w-[193px] 2xl:px-7 2xl:text-[16px]"
             href="/partner/register"
@@ -119,13 +119,13 @@ export function WebsiteHeader() {
             >
               <Search />
             </button>
-            <Link
+            {/* <Link
               className="grid h-9 w-9 place-items-center text-[var(--appearance-text,#09164d)] md:h-11 md:w-11 xl:hidden"
             href="/customer/login"
               aria-label="Login"
             >
               <UserRound />
-            </Link>
+            </Link> */}
             <Link
               className="grid btn-primary h-9 w-9 place-items-center rounded-lg bg-[var(--appearance-surface-raised,#f5f3ff)] text-[var(--appearance-text,#6827ef)] md:h-11 md:w-11 xl:hidden"
             href="/partner/register"
