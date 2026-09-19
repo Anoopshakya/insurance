@@ -39,8 +39,8 @@ export function WebsiteFooter() {
           <div className="mp-socials">
             <a href="https://www.facebook.com/magikpolicy" aria-label="Facebook" target="_blank">f</a>
             <a href="https://instagram.com/magikpolicy" aria-label="Instagram" target="_blank">◎</a>
-            <a href="#" aria-label="YouTube" target="_blank">▶</a>
-            <a href="#" aria-label="LinkedIn" target="_blank">in</a>
+            {/* <a href="#" aria-label="YouTube" target="_blank">▶</a> */}
+            <a href="https://www.linkedin.com/company/magikpolicy/" aria-label="LinkedIn" target="_blank">in</a>
             {/* <a href="#" aria-label="X">𝕏</a> */}
           </div>
           </div>

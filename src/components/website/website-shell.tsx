@@ -1,3 +1,4 @@
+import { TimedInsuranceAssistance } from "./insurance-assistance-modal";
 import type { ReactNode } from "react";
 import { WebsiteHeader } from "./website-header";
 import { WebsiteFooter } from "./website-footer";
@@ -9,6 +10,7 @@ export function WebsiteShell({ children }: { children: ReactNode }) {
       <WebsiteHeader />
       <div className="website-content">{children}</div>
       <WebsiteFooter />
+      <TimedInsuranceAssistance />
     </div>
   );
 }
