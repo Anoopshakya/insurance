@@ -167,7 +167,8 @@ export async function PUT(request:NextRequest){
  try{const input=schema.extend({id:z.string().uuid()}).parse(await request.json()),db=supabaseServer();
  const {data:type}=await db.from("product_types").select("id,categories!inner(active)").eq("id",input.productTypeId).eq("category_id",input.productSectorId).eq("active",true).eq("categories.active",true).maybeSingle();
  if(!type)return NextResponse.json({error:"Select a valid product type"},{status:400});
- const {data,error}=await db.from("leads").update({name:input.name,contact:input.contact,priority:input.priority,product_sector_id:input.productSectorId,product_type_id:input.productTypeId,purchase_timeline:input.purchaseTimeline,updated_at:new Date().toISOString()}).eq("id",input.id).eq("agent_id",agent.id).select("id").maybeSingle();
+ if(input.customerId){const {data:customer}=await db.from('customers').select('id').eq('id',input.customerId).eq('agent_id',agent.id).maybeSingle();if(!customer)return NextResponse.json({error:'Customer not found'},{status:404});}
+ const {data,error}=await db.from("leads").update({customer_id:input.customerId||null,name:input.name,contact:input.contact,priority:input.priority,product_sector_id:input.productSectorId,product_type_id:input.productTypeId,purchase_timeline:input.purchaseTimeline,updated_at:new Date().toISOString()}).eq("id",input.id).eq("agent_id",agent.id).select("id").maybeSingle();
  return error?NextResponse.json({error:error.message},{status:400}):data?NextResponse.json({data}):NextResponse.json({error:"Lead not found"},{status:404});
  }catch(e){return NextResponse.json({error:e instanceof z.ZodError?e.issues[0]?.message:"Unable to update lead"},{status:400})}
 }

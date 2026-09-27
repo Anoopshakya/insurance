@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import {profileSaveError} from "@/lib/partners/profile-error";
 import { verifyRequestToken } from "@/lib/auth-server";
 import { supabaseServer } from "@/lib/supabase-server";
 import { personalSchema, identitySchema, bankSchema, personalColumns, bankColumns, formValues } from "@/lib/partners/onboarding";
@@ -92,6 +93,7 @@ export async function POST(req: NextRequest) {
     }
     return NextResponse.json({ ok: true });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof z.ZodError ? error.issues[0]?.message : error instanceof Error ? error.message : "Unable to save profile. Please try again." }, { status: 400 });
+    if(!(error instanceof z.ZodError)){const failure=error as {code?:string};console.error('Partner profile save failed',{code:failure?.code||'unknown'});}
+    return NextResponse.json({ error: error instanceof z.ZodError ? error.issues.map(issue=>`${issue.path.join('.')}: ${issue.message}`).join('\n') : profileSaveError(error) }, { status: error instanceof z.ZodError ? 400 : 500 });
   }
 }

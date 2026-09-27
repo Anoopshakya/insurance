@@ -1,4 +1,6 @@
 "use client";
+import {LeadCustomerFields} from "@/components/lead-customer-fields";
+import {RecordActions} from "@/components/admin/record-actions";
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { products } from "@/components/website/website-products";
@@ -154,7 +156,7 @@ export function LeadsDirectory() {
                     <option value="new">New</option><option value="contacted">Contacted</option>
                     {lead.leadType === "internal" && <><option value="qualified">Qualified</option><option value="proposal">Proposal</option></>}
                     <option value="converted">Converted</option><option value={lead.leadType === "website" ? "closed" : "lost"}>{lead.leadType === "website" ? "Closed" : "Lost"}</option>
-                  </select></td>
+                  </select><RecordActions module={lead.leadType==='website'?'website-leads':'leads'} row={{...lead,customer_name:lead.name,mobile:lead.contact}} onChanged={load}/></td>
                 </tr>
               ))}
             </tbody>
@@ -162,11 +164,10 @@ export function LeadsDirectory() {
         </div>
         <footer className="directory-footer"><span>Showing {visible.length} of {rows.length} leads</span></footer>
       </section>
-      {createOpen && <div className="directory-modal" onMouseDown={() => setCreateOpen(false)}><section onMouseDown={(event) => event.stopPropagation()}>
+      {createOpen && <div className="directory-modal lead-create-modal" onMouseDown={() => setCreateOpen(false)}><section onMouseDown={(event) => event.stopPropagation()}>
         <button className="modal-close" onClick={() => setCreateOpen(false)}>×</button><h2>Create Lead</h2><p>Create an internal lead and assign it to a partner or agent for follow-up.</p>
         <form className="lead-create-form" onSubmit={createLead}>
-          <label className="mp-label">Customer name<input className="mp-control" name="name" required minLength={2} /></label>
-          <label className="mp-label">Mobile number<span className="mp-input-group mp-phone-group"><span className="mp-country" aria-hidden="true">+91</span><input className="mp-control" name="contact" required inputMode="numeric"  maxLength={10} minLength={10} pattern="[0-9]{10}" onInput={event => { event.currentTarget.value = event.currentTarget.value.replace(/\D/g, "").slice(0, 10); }} /></span></label>
+          <LeadCustomerFields scope="admin" onSelect={row=>{const select=document.querySelector<HTMLSelectElement>('.lead-create-form select[name="agentId"]');if(select&&row.agent_id)select.value=row.agent_id}}/>
           <label className="mp-label">Assign partner / agent<select className="mp-control" name="agentId" required defaultValue=""><option value="" disabled>Select partner / agent</option>{agents.map((agent) => <option key={agent.id} value={agent.id}>{agentName(agent)}</option>)}</select></label>
           <label className="mp-label">Priority<select className="mp-control" name="priority" defaultValue="medium"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
           <div className="modal-buttons"><button type="button" className="secondary-button" onClick={() => setCreateOpen(false)}>Cancel</button><button className="primary-button" disabled={saving}>{saving ? "Creating…" : "Create Lead"}</button></div>

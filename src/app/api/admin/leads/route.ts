@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
 }
 
 const createSchema = z.object({
+  customerId:z.union([z.string().uuid(),z.literal("")]).optional(),
   name: z.string().trim().min(2).max(100),
   contact: z.string().trim().regex(/^[0-9]{10}$/, "Enter exactly 10 digits for the mobile number"),
   agentId: z.string().uuid(),
@@ -62,10 +63,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const input = createSchema.parse(await request.json());
+    if(input.customerId){const {data,error}=await supabaseServer().from('customers').select('id,agent_id').eq('id',input.customerId).maybeSingle();if(error||!data)return NextResponse.json({error:'Customer not found.'},{status:404});if(data.agent_id&&data.agent_id!==input.agentId)return NextResponse.json({error:'Select the partner assigned to this customer.'},{status:400});}
+
     const { data, error } = await supabaseServer()
       .from("leads")
       .insert({
         agent_id: input.agentId,
+        customer_id: input.customerId||null,
         name: input.name,
         contact: input.contact,
         priority: input.priority,
