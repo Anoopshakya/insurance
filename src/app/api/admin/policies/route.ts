@@ -1,3 +1,4 @@
+import {partnerCustomer} from "@/lib/partners/policy-customer";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { verifyRequestToken } from "@/lib/auth-server";
@@ -51,9 +52,9 @@ export async function GET(request: NextRequest) {
 }
 
 const createSchema = z.object({
-  policyNumber: z.string().trim().min(3).max(80), customerId: z.string().uuid(), agentId: z.string().uuid(), sectorId: z.string().uuid(), productId: z.string().uuid().optional().or(z.literal("")), productTypeId: z.string().uuid(), insurerId: z.string().uuid(), planId: z.string().uuid().optional().or(z.literal("")),
+  policyNumber: z.string().trim().min(3).max(80), customerId: z.string().uuid().optional(), partnerAsCustomer:z.union([z.boolean(),z.literal("on")]).optional().transform(v=>v===true||v==="on"), agentId: z.string().uuid(), sectorId: z.string().uuid(), productId: z.string().uuid().optional().or(z.literal("")), productTypeId: z.string().uuid(), insurerId: z.string().uuid(), planId: z.string().uuid().optional().or(z.literal("")),
   premium: z.coerce.number().positive(), coverage: z.coerce.number().nonnegative().optional(), startDate: z.string().date(), tenureMonths: z.coerce.number().int().min(1).max(360), businessType: z.enum(["fresh", "port", "renew"]), status: z.enum(["proposal", "pending", "issued", "active", "expired", "cancelled"]),
-});
+}).refine(v=>v.partnerAsCustomer||!!v.customerId,{message:"Select a customer or mark partner as customer",path:["customerId"]});
 
 export async function POST(request: NextRequest) {
   if (!await authorize(request, "create")) return NextResponse.json({ error: "forbidden" }, { status: 403 });
@@ -70,8 +71,10 @@ export async function POST(request: NextRequest) {
       const { data: plan } = await db.from("plans").select("id").eq("id", input.planId).eq("product_id", input.productId).eq("insurer_id", input.insurerId).maybeSingle();
       if (!plan) return NextResponse.json({ error: "The selected plan does not belong to this product and insurer." }, { status: 400 });
     }
+    let customerId=input.customerId;
+    if(input.partnerAsCustomer){try{customerId=await partnerCustomer(db,input.agentId)}catch(e){return NextResponse.json({error:e instanceof Error?e.message:'Unable to use partner as customer.'},{status:400})}}
     const expiry = new Date(`${input.startDate}T00:00:00Z`); expiry.setUTCMonth(expiry.getUTCMonth() + input.tenureMonths); expiry.setUTCDate(expiry.getUTCDate() - 1);
-    const { data, error } = await db.from("policies").insert({ policy_number: input.policyNumber, customer_id: input.customerId, agent_id: input.agentId, category_id: input.sectorId, product_id: input.productId || null, product_type_id: input.productTypeId, insurer_id: input.insurerId, plan_id: input.planId || null, premium: input.premium, coverage: input.coverage || null, start_date: input.startDate, expiry_date: expiry.toISOString().slice(0,10), tenure_months: input.tenureMonths, business_type: input.businessType, status: input.status }).select().single();
+    const { data, error } = await db.from("policies").insert({ policy_number: input.policyNumber, customer_id: customerId, agent_id: input.agentId, category_id: input.sectorId, product_id: input.productId || null, product_type_id: input.productTypeId, insurer_id: input.insurerId, plan_id: input.planId || null, premium: input.premium, coverage: input.coverage || null, start_date: input.startDate, expiry_date: expiry.toISOString().slice(0,10), tenure_months: input.tenureMonths, business_type: input.businessType, status: input.status }).select().single();
     return error ? NextResponse.json({ error: error.code === "23505" ? "This policy number already exists." : error.message }, { status: 400 }) : NextResponse.json({ data }, { status: 201 });
   } catch (error) { return NextResponse.json({ error: error instanceof z.ZodError ? error.issues[0]?.message : "Could not create policy" }, { status: 400 }); }
 }
