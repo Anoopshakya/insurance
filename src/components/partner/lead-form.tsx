@@ -1,21 +1,33 @@
 "use client";
+import {createPortal} from "react-dom";
 import {LeadCustomerFields} from "@/components/lead-customer-fields";
-import {useEffect,useState,type FormEvent} from "react";
+import {useEffect,useState,useRef,type FormEvent} from "react";
 import {accessToken} from "@/lib/supabase-client";
 import "@/app/partner/partner-leads.css";
 export function LeadForm({lead,customer,close,saved}:{lead?:any;customer?:any;close:()=>void;saved:()=>void}){
+const dialog=useRef<HTMLDialogElement>(null);
+useEffect(()=>{const element=dialog.current;element?.showModal();const previous=document.body.style.overflow;document.body.style.overflow="hidden";return()=>{element?.close();document.body.style.overflow=previous}},[]);
+const feedback=useRef<HTMLParagraphElement>(null);
 const [sectors,setSectors]=useState<any[]>([]),[productTypes,setProductTypes]=useState<any[]>([]),[selectedSector,setSelectedSector]=useState(lead?.product_sector_id||""),[saving,setSaving]=useState(false),[error,setError]=useState("");
+useEffect(()=>{if(error){feedback.current?.focus();feedback.current?.scrollIntoView({block:"nearest"})}},[error]);
 useEffect(()=>{(async()=>{const r=await fetch("/api/partner/leads",{headers:{Authorization:`Bearer ${await accessToken()}`}});const b=await r.json();if(!r.ok)throw Error(b.error);setSectors(b.sectors||[]);setProductTypes(b.productTypes||[])})().catch(e=>setError(e.message))},[]);
-async function create(e:FormEvent<HTMLFormElement>){e.preventDefault();setSaving(true);setError("");const values=Object.fromEntries(new FormData(e.currentTarget));try{const r=await fetch("/api/partner/leads",{method:lead?"PUT":"POST",headers:{Authorization:`Bearer ${await accessToken()}`,"Content-Type":"application/json"},body:JSON.stringify({...values,id:lead?.id,customerId:values.customerId||undefined})});const b=await r.json();if(!r.ok)throw Error(b.error);saved()}catch(e){setError(e instanceof Error?e.message:"Unable to save lead")}finally{setSaving(false)}}
-return <div role="dialog" aria-modal="true" aria-label={lead?"Edit Lead":"Add Lead"}>      {true && (
-        <div className="pl-modal" onMouseDown={() => {if(!saving)close()}}>
+async function create(e:FormEvent<HTMLFormElement>){e.preventDefault();if(saving)return;setError("");const values=Object.fromEntries(new FormData(e.currentTarget));
+const problems:string[]=[];
+if(String(values.name||'').trim().length<2)problems.push('Enter a customer name with at least 2 characters.');
+if(!/^[0-9]{10}$/.test(String(values.contact||'')))problems.push('Enter a 10-digit mobile number.');
+if(!values.productSectorId)problems.push('Select a product sector.');
+if(!values.productTypeId)problems.push('Select a product type.');
+if(!values.purchaseTimeline)problems.push('Select when the customer is planning to buy.');
+if(problems.length){setError(problems.join(' '));return;}
+setSaving(true);try{const r=await fetch("/api/partner/leads",{method:lead?"PUT":"POST",headers:{Authorization:`Bearer ${await accessToken()}`,"Content-Type":"application/json"},body:JSON.stringify({...values,id:lead?.id,customerId:values.customerId||undefined})});const b=await r.json().catch(()=>null);if(!r.ok)throw Error(b?.error||(r.status===401||r.status===403?'Your session or partner access does not allow saving. Sign in again or contact support.':'Unable to save lead. Please try again.'));if(!b?.data?.id)throw Error('The server did not confirm the saved lead. Please refresh your leads before retrying.');saved()}catch(e){setError(e instanceof Error?e.message:"Unable to save lead")}finally{setSaving(false)}}
+return createPortal(<dialog ref={dialog} className="pl-modal pl-lead-dialog" aria-label={lead?"Edit Lead":"Add Lead"} onCancel={e=>{e.preventDefault();if(!saving)close()}}>
           <section onMouseDown={(e) => e.stopPropagation()}>
-            <button className="pl-modal-close" disabled={saving} onClick={() => close()}>
+            <button type="button" aria-label="Close lead form" className="pl-modal-close" disabled={saving} onClick={() => close()}>
               ×
             </button>
             <h2>{lead ? "Edit Lead" : "Add Lead"}</h2>
             <p>Add a customer enquiry to your pipeline.</p>
-            {error&&<p role="alert">{error}</p>}<form onSubmit={create}>
+            <form onSubmit={create} noValidate>
               <LeadCustomerFields scope="partner" initial={{id:customer?.id||lead?.customer_id,name:lead?.name||customer?.name,contact:lead?.contact||customer?.contact}} locked={!!customer}/>
               <label className="mp-label">
                 Priority
@@ -77,17 +89,16 @@ return <div role="dialog" aria-modal="true" aria-label={lead?"Edit Lead":"Add Le
                   <option value="researching">Just researching</option>
                 </select>
               </label>
-              <div>
+              {error&&<p ref={feedback} role="alert" tabIndex={-1} className="mp-form-error">{error}</p>}
+              <div className="pl-lead-actions">
                 <button type="button" disabled={saving} onClick={() => close()}>
                   Cancel
                 </button>
-                <button disabled={saving}>
+                <button type="submit" disabled={saving}>
                   {saving ? "Saving..." : "Save Lead"}
                 </button>
               </div>
             </form>
           </section>
-        </div>
-      )}
-</div>;
+</dialog>,document.body);
 }

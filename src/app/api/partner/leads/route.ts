@@ -70,9 +70,9 @@ export async function POST(request: NextRequest) {
   try {
     const input = schema.parse(await request.json());
     const db = supabaseServer();
-    if (agent.status !== "active")
+    if (!["draft", "submitted", "under_review", "approved", "active"].includes(agent.status))
       return NextResponse.json(
-        { error: "Only active partners can create leads" },
+        { error: "Your partner account cannot create leads while suspended, rejected or deactivated. Contact admin for assistance." },
         { status: 403 },
       );
     const { data: selectedType } = await db

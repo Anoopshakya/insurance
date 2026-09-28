@@ -673,3 +673,11 @@
 
 .pl-actions{position:relative}.pl-actions button{border:0;background:transparent;cursor:pointer}.pl-action-menu{position:absolute;right:0;top:100%;z-index:10;display:grid;min-width:140px;background:white;border:1px solid #ddd;border-radius:8px;box-shadow:0 8px 24px #0002;padding:8px}.pl-action-menu button{padding:10px;text-align:left}@media(max-width:760px){.pl-row.live .pl-actions{display:flex!important}}
 .pl-modal{overflow-y:auto}.pl-modal>section{max-height:calc(100dvh - 2rem);overflow-y:auto;overscroll-behavior:contain}
+
+/* Keep the lead form above dashboard stacking contexts and within mobile viewports. */
+dialog.pl-lead-dialog { margin:auto; padding:0; border:0; width:min(30rem,calc(100vw - 2rem)); height:fit-content; max-height:calc(100dvh - 2rem); background:transparent; color:inherit; overflow:auto; }
+dialog.pl-lead-dialog::backdrop { background:rgba(15,23,42,.55); }
+dialog.pl-lead-dialog > section { width:100%; max-height:none; overflow:visible; box-sizing:border-box; }
+.pl-lead-dialog .pl-lead-actions { position:sticky; bottom:-1.6rem; padding:1rem 0 calc(1rem + env(safe-area-inset-bottom)); background:var(--appearance-surface, #fff); z-index:2; }
+.pl-lead-dialog .mp-form-error { scroll-margin-block:5rem; }
+
