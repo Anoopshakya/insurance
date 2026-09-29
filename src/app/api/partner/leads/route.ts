@@ -27,7 +27,7 @@ async function partnerAgent(request: NextRequest) {
     .select("id,status")
     .eq("user_id", user.uid)
     .single();
-  return data;
+  return data?{...data,user_id:user.uid}:null;
 }
 
 export async function GET(request: NextRequest) {
@@ -39,9 +39,10 @@ export async function GET(request: NextRequest) {
       db
         .from("leads")
         .select(
-          "id,customer_id,policy:policies!policies_source_lead_id_fkey(id),name,contact,source,priority,status,created_at,updated_at,product_sector_id,product_type_id,purchase_timeline,product_sector:categories!leads_product_sector_id_fkey(name),product_type:product_types!leads_product_type_id_fkey(name)",
+          "*,followups:lead_followups(id,scheduled_at,status,followup_type),policy:policies!policies_source_lead_id_fkey(id),name,contact,source,priority,status,created_at,updated_at,product_sector_id,product_type_id,purchase_timeline,product_sector:categories!leads_product_sector_id_fkey(name),product_type:product_types!leads_product_type_id_fkey(name)",
         )
         .eq("agent_id", agent.id)
+        .eq("followups.status", "scheduled")
         .order("created_at", { ascending: false })
         .limit(500),
       db
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
 }
 
 const updateSchema = z.object({
+ lostReason:z.string().max(100).optional(),lostNote:z.string().trim().max(4000).optional(),
   id: z.string().uuid(),
   status: z.enum([
     "new",
@@ -134,21 +136,18 @@ const updateSchema = z.object({
 
 export async function PATCH(request: NextRequest) {
   const agent = await partnerAgent(request);
-  if (!agent) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  if (!agent || ["suspended","rejected","deactivated"].includes(agent.status)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   try {
     const input = updateSchema.parse(await request.json());
     if(input.status==="converted"){
       const {data:policy}=await supabaseServer().from("policies").select("id").eq("source_lead_id",input.id).eq("agent_id",agent.id).maybeSingle();
       if(!policy)return NextResponse.json({error:"Complete Add New Policy to convert this lead"},{status:400});
     }
-    const { data,error } = await supabaseServer()
-      .from("leads")
-      .update({ status: input.status, updated_at: new Date().toISOString() })
-      .eq("id", input.id)
-      .eq("agent_id", agent.id).select("id").maybeSingle();
-    return error
-      ? NextResponse.json({ error: error.message }, { status: 400 })
-      : data?NextResponse.json({ ok: true }):NextResponse.json({error:"Lead not found"},{status:404});
+    const db=supabaseServer();
+    const {data:owned}=await db.from('leads').select('id').eq('id',input.id).eq('agent_id',agent.id).maybeSingle();
+    if(!owned)return NextResponse.json({error:'Lead not found'},{status:404});
+    const {error}=await db.rpc('manage_lead_activity',{p_kind:'internal',p_id:input.id,p_actor:agent.user_id,p_action:'status',p_data:input});
+    return error?NextResponse.json({error:error.message},{status:400}):NextResponse.json({ok:true});
   } catch (error) {
     return NextResponse.json(
       {

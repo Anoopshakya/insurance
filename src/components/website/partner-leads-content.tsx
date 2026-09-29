@@ -1,4 +1,7 @@
 "use client";
+import {LeadFilters,useLeadFilters,matchesLeadFilters} from "@/components/lead-filters";
+import {LeadActivity,LeadStatusControl,NextFollowup} from "@/components/lead-activity";
+import {statusLabel} from "@/lib/lead-activity";
 import {LeadForm} from "@/components/partner/lead-form";
 import {LeadPolicyForm} from "@/components/partner/lead-policy-form";
 import "@/app/partner/partner-policies.css";
@@ -24,6 +27,7 @@ import {
 import { supabaseAuth } from "@/lib/supabase-client";
 type Lead = {
   id: string;
+  followups?:any[];
   policy?:Array<{id:string}>;
   name: string;
   contact: string | null;
@@ -60,6 +64,7 @@ async function api(init: RequestInit = {}) {
   });
 }
 export function PartnerLeadsContent() {
+  const [filters,setFilters]=useLeadFilters();
   const [editing,setEditing]=useState<Lead|null>(null),[policyLead,setPolicyLead]=useState<Lead|null>(null),[menu,setMenu]=useState<string|null>(null);
   const [loading, setLoading] = useState(true);
   const [rows, setRows] = useState<Lead[]>([]),
@@ -72,7 +77,7 @@ export function PartnerLeadsContent() {
     [selectedSector, setSelectedSector] = useState(""),
     [activeLead, setActiveLead] = useState<Lead | null>(null),
     [error, setError] = useState("");
-  const load = useCallback(async () => {setLoading(true);setError("");try {
+  const load = useCallback(async () => {setError("");try {
     const r = await api(),
       b = await r.json();
     if (r.ok) {
@@ -89,19 +94,19 @@ export function PartnerLeadsContent() {
     () =>
       rows.filter(
         (r) =>
-          (status === "all" || r.status === status) &&
+          matchesLeadFilters(r,filters,"",true) && (status === "all" || r.status === status) &&
           `${r.name} ${r.contact || ""} ${r.source || ""}`
             .toLowerCase()
             .includes(query.toLowerCase()),
       ),
-    [rows, query, status],
+    [rows, query, status,filters],
   );
   const summary = [
-    ["Total Leads", rows.length, "12%", Users, "violet"],
+    ["Total Leads", rows.length, "", Users, "violet"],
     [
       "New Leads",
       rows.filter((r) => r.status === "new").length,
-      "18%",
+      "",
       Clock3,
       "blue",
     ],
@@ -109,28 +114,28 @@ export function PartnerLeadsContent() {
       "In Progress",
       rows.filter((r) => !["new", "converted", "lost"].includes(r.status))
         .length,
-      "8%",
+      "",
       BarChart3,
       "orange",
     ],
     [
       "Converted",
       rows.filter((r) => r.status === "converted").length,
-      "20%",
+      "",
       CircleCheck,
       "green",
     ],
   ] as const;
-  async function update(id: string, next: string) {
+  async function update(id: string, next: string,lostReason?:string,lostNote?:string) {
     const lead=rows.find(row=>row.id===id);
     if(next==="converted"&&lead&&!lead.policy?.length){setActiveLead(null);setPolicyLead(lead);return;}
     const r = await api({
       method: "PATCH",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ id, status: next }),
+      body: JSON.stringify({ id, status: next,lostReason,lostNote }),
     });
     if (!r.ok)
-      return setError((await r.json()).error || "Could not update lead.");
+      throw Error((await r.json()).error || "Could not update lead.");
     await load();
   }
   const relatedName = (value: Lead["product_type"] | Lead["product_sector"]) =>
@@ -142,6 +147,7 @@ export function PartnerLeadsContent() {
   if (loading) return <PartnerSkeleton view="leads" />;
   return (
     <div className="pl-page">
+      <LeadFilters rows={rows} value={filters} onChange={setFilters} products={productTypes} partner/>
       <div className="pl-heading">
         <div>
           <h1>Leads</h1>
@@ -185,7 +191,7 @@ export function PartnerLeadsContent() {
           <option value="all">All Status</option>
           {statuses.map((s) => (
             <option value={s} key={s}>
-              {title(s)}
+              {statusLabel(s)}
             </option>
           ))}
         </select>
@@ -224,7 +230,7 @@ export function PartnerLeadsContent() {
             <span>Mobile Number</span>
             <span>Product Interest</span>
             <span>Lead Source</span>
-            <span>Status</span>
+            <span>Lead Status / Next Follow-up</span>
             <span>Created On</span>
             <span>Priority</span>
             <span>Actions</span>
@@ -263,18 +269,9 @@ export function PartnerLeadsContent() {
                 </em>
               </span>
               <span>
-                <select
-                  className={(`pl-status ${row.status}`) + " mp-control"}
-                  value={row.status}
-                  onClick={(event) => event.stopPropagation()}
-                  onChange={(e) => update(row.id, e.target.value)}
-                >
-                  {statuses.map((s) => (
-                    <option value={s} key={s}>
-                      {title(s)}
-                    </option>
-                  ))}
-                </select>
+                <LeadStatusControl value={row.status} className={`pl-status ${row.status} mp-control`} onChange={(status,reason,note)=>update(row.id,status,reason,note)}/>
+                <small><NextFollowup lead={row}/></small>
+
               </span>
               <span className="pl-assigned-date">
                 {new Date(row.created_at).toLocaleDateString("en-IN", {
@@ -285,8 +282,7 @@ export function PartnerLeadsContent() {
               </span>
               <span className="pl-priority">{title(row.priority)}</span>
               <span className="pl-actions">
-                <Phone />
-                <MessageCircle />
+                <LeadActivity id={row.id} scope="partner" name={row.name} onChanged={load}/>
                 <button aria-label={`More actions for ${row.name}`} aria-expanded={menu===row.id} onClick={e=>{e.stopPropagation();setMenu(menu===row.id?null:row.id)}}><MoreVertical /></button>
                 {menu===row.id&&<span className="pl-action-menu" onClick={e=>e.stopPropagation()}><button onClick={()=>{setEditing(row);setOpen(true);setMenu(null)}}>Edit lead</button><button onClick={async()=>{setMenu(null);if(!window.confirm(`Delete lead for ${row.name}?`))return;try{const r=await api({method:"DELETE",headers:{"content-type":"application/json"},body:JSON.stringify({id:row.id})});if(!r.ok)throw Error((await r.json()).error);await load()}catch(e){setError(e instanceof Error?e.message:"Unable to delete lead")}}}>Delete lead</button></span>}
               </span>
@@ -345,7 +341,7 @@ export function PartnerLeadsContent() {
               </div>
               <div>
                 <dt>Status</dt>
-                <dd>{title(activeLead.status)}</dd>
+                <dd>{statusLabel(activeLead.status)}</dd>
               </div>
               <div>
                 <dt>Priority</dt>
